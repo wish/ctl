@@ -91,17 +91,17 @@ func findPodsInCluster(pod, cluster, namespace string, resultChan chan []Pod) {
 	resultChan <- tmpPodList
 }
 
-// selector pops up user interface for choosing from multiple options
+// selector prompts a user interface for choosing from multiple options
 func selector(options []string) int {
 	reader := bufio.NewReader(os.Stdin)
 	for i, o := range options {
 		fmt.Printf("%d:\t%s\n", i+1, o)
 	}
-	fmt.Printf("Select a pod/container to stream logs from (1-%d): ", len(options))
+	fmt.Printf("Select a pod/container (1-%d): ", len(options))
 	input, _ := reader.ReadString('\n')
 	num, err := strconv.Atoi(strings.TrimSpace(input))
 	for err != nil || num < 1 || num > len(options) {
-		fmt.Printf("Please select a valid service (1-%d): ", len(options))
+		fmt.Printf("Please enter a valid number (1-%d): ", len(options))
 		input, _ = reader.ReadString('\n')
 		num, err = strconv.Atoi(strings.TrimSpace(input))
 	}
