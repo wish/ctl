@@ -22,7 +22,7 @@ func init() {
 
 var logCmd = &cobra.Command{
 	Use:   "log [pod] [flags]",
-	Short: "get log of a container in a pod",
+	Short: "Get log of a container in a pod",
 	Long: `Print the logs for a container in a pod or specified resource. If the pod has only one container, the container name is
 optional. If the pod has multiple containers, user have to choose one from them.`,
 	Run: func(cmd *cobra.Command, args []string) {

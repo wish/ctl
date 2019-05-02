@@ -77,7 +77,6 @@ func getPodsInNamespaceInCluster(cluster, namespace string, resultChannel chan P
 	result, err := command.Output()
 
 	if err != nil || string(result) == "" {
-		fmt.Printf("failed to get pods from cluster: %s: %v\n", cluster, err)
 		resultChannel <- tempPodList
 		return
 	}
@@ -112,9 +111,10 @@ func getPodsFromAllClustersByNamespace(namespace string) {
 
 	for range clusters {
 		response := <-resultChan
-		if response.Pods == nil {
+		if len(response.Pods) == 0 {
 			continue
 		}
+
 		fmt.Print(response)
 		result = append(result, response)
 	}
