@@ -8,6 +8,7 @@ import (
 	"os/exec"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -72,5 +73,10 @@ func shPod(pod, container, namespace, shell string) {
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
 	command.Stdin = os.Stdin
+
+	if viper.GetBool("verbose") {
+		prettyPrintCmd(command)
+	}
+
 	command.Run()
 }

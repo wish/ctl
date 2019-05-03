@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -40,8 +41,14 @@ func describePod(pod, namespace string) error {
 	}
 
 	for _, p := range pods {
-		res, err := exec.Command("kubectl", "describe", "pods", p.Name,
-			"-n", p.Namespace, "--context", p.Cluster).Output()
+		command := exec.Command("kubectl", "describe", "pods", p.Name,
+			"-n", p.Namespace, "--context", p.Cluster)
+
+		if viper.GetBool("verbose") {
+			prettyPrintCmd(command)
+		}
+
+		res, err := command.Output()
 		if err != nil {
 			return err
 		}

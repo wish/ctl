@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -91,5 +92,10 @@ func logPod(pod, container, namespace string, flags []string) error {
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
 	command.Stdin = os.Stdin
+
+	if viper.GetBool("verbose") {
+		prettyPrintCmd(command)
+	}
+
 	return command.Run()
 }

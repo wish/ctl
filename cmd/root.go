@@ -5,8 +5,15 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/spf13/viper"
+
 	"github.com/spf13/cobra"
 )
+
+func init() {
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "print out verbose msg")
+	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{

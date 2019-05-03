@@ -7,6 +7,10 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/color"
+
+	"github.com/spf13/viper"
 )
 
 // Pod defines the pod struct
@@ -49,6 +53,7 @@ func findPods(pod, namespace string) ([]Pod, error) {
 		}
 		res = append(res, response...)
 	}
+
 	return res, nil
 }
 
@@ -64,6 +69,10 @@ func findPodsInCluster(pod, cluster, namespace string, resultChan chan []Pod) {
 		command = exec.Command("kubectl", "get", "pods",
 			"-n", namespace, "--no-headers", "--context", cluster,
 			"-o=custom-columns=NAME:.metadata.name,NAMESPACE:.metadata.namespace,CONTAINERS:.spec.containers[*].name")
+	}
+
+	if viper.GetBool("verbose") {
+		prettyPrintCmd(command)
 	}
 
 	result, err := command.Output()
@@ -106,4 +115,12 @@ func selector(options []string) int {
 		num, err = strconv.Atoi(strings.TrimSpace(input))
 	}
 	return num - 1
+}
+
+func prettyPrintCmd(command *exec.Cmd) {
+	var fmtCmd = "Running: "
+	for _, a := range command.Args {
+		fmtCmd += a + " "
+	}
+	color.Green(fmtCmd)
 }

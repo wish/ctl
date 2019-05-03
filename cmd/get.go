@@ -9,6 +9,7 @@ import (
 	"bytes"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // PodList defines the list of Pods
@@ -72,6 +73,10 @@ func getPodsInNamespaceInCluster(cluster, namespace string, resultChannel chan P
 			"-n", namespace,
 			//"-o=custom-columns=NAME:.metadata.name",
 			fmt.Sprintf("--context=%s", cluster))
+	}
+
+	if viper.GetBool("verbose") {
+		prettyPrintCmd(command)
 	}
 
 	result, err := command.Output()
