@@ -16,7 +16,7 @@ func init() {
 
 	logCmd.Flags().BoolP("follow", "f", false, "stream pod logs (stdout)")
 	logCmd.Flags().StringP("container", "c", "", "Print the logs of this container")
-	logCmd.Flags().StringP("tail", "t", "", "Print the logs of this container")
+	logCmd.Flags().StringP("tail", "t", "", "lines of most recent log to be printed")
 	logCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
 
 }

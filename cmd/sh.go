@@ -23,7 +23,7 @@ func init() {
 var shCmd = &cobra.Command{
 	Use:   "sh [pod] [flags]",
 	Short: "Exec /bin/bash into the container of a specific pod",
-	Long: `Print the logs for a container in a pod or specified resource. If the pod has only one container, the container name is
+	Long: `Exec shell into the container of a specific pod. If the pod has only one container, the container name is
 optional. If the pod has multiple containers, user have to choose one from them.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
