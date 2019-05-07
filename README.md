@@ -1,6 +1,9 @@
 # wishctl
 wrapper tool of kubectl for multi-clusters and easy pod/log discovering
 
+# prerequisites
+[Setting up k8s envs](https://github.com/ContextLogic/k8s/wiki/Setting-up-your-environment-for-k8s), (kubectl + kubeconfig)
+
 # install
 presumably bin/ folder is up to date. Can just move the execuables to the $PATH
 
