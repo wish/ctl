@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"sync"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -87,23 +86,18 @@ func logPod(pod, container, namespace string, aggregate bool, flags []string) {
 		os.Exit(1)
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(len(podSelected))
-
 	for _, p := range podSelected {
-		go logSinglePod(p, container, flags, &wg)
+		logSinglePod(p, container, flags)
 	}
-	wg.Wait()
 
 }
 
-func logSinglePod(pod Pod, container string, flags []string, wg *sync.WaitGroup) {
-	defer wg.Done()
+func logSinglePod(pod Pod, container string, flags []string) {
 	if container == "" {
 		container = pod.Containers[0]
 	}
 
-	fmt.Printf("Printing log from: %s/%s/%s - %s\n:", pod.Cluster, pod.Namespace, pod.Name, container)
+	fmt.Printf("Printing log from %s/%s/%s - %s:\n", pod.Cluster, pod.Namespace, pod.Name, container)
 	args := []string{"logs", pod.Name,
 		"-n", pod.Namespace,
 		"--context", pod.Cluster,
