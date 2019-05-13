@@ -103,6 +103,7 @@ func logSinglePod(pod Pod, container string, flags []string, wg *sync.WaitGroup)
 		container = pod.Containers[0]
 	}
 
+	fmt.Printf("Printing log from: %s/%s/%s - %s\n:", pod.Cluster, pod.Namespace, pod.Name, container)
 	args := []string{"logs", pod.Name,
 		"-n", pod.Namespace,
 		"--context", pod.Cluster,
