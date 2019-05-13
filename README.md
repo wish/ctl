@@ -35,9 +35,10 @@ optional. If the pod has multiple containers, choose one from them.
 
 Flags:
 - --namespace, -n specify the namespace. This could largely reduce the run time of the command.
-- --container, -c specify the container name.
+- --container, -c specify the container name. If no container specified, will print first container's log by default.
 - --follow, -f stream pod logs (stdout).
 - --tail, -t lines of recent log file to display.
+- --aggregate, -a enable/disable printing logs from multiple pods.
 
 ### sh [pod] [flags]
 Exec /bin/bash into the container of a specific pod. If the pod has only one container, the container name is
