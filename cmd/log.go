@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"sync"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -18,6 +18,7 @@ func init() {
 	logCmd.Flags().StringP("container", "c", "", "Print the logs of this container")
 	logCmd.Flags().StringP("tail", "t", "", "lines of most recent log to be printed")
 	logCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
+	logCmd.Flags().BoolP("aggregate", "a", false, "Aggregated all the logs found ")
 
 }
 
@@ -48,43 +49,63 @@ optional. If the pod has multiple containers, user have to choose one from them.
 
 		container, _ := cmd.Flags().GetString("container")
 		namespace, _ := cmd.Flags().GetString("namespace")
+		aggregate, _ := cmd.Flags().GetBool("aggregate")
 
-		err := logPod(args[0], container, namespace, flags)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		logPod(args[0], container, namespace, aggregate, flags)
 	},
 	Args:    cobra.MinimumNArgs(1),
 	Aliases: []string{"logs"},
+	PreRun: func(cmd *cobra.Command, args []string) {
+		if cmd.Flags().Changed("follow") && cmd.Flags().Changed("aggregate") {
+			fmt.Println("Cannot aggregate logs while streaming logs")
+			os.Exit(1)
+		}
+	},
 }
 
-func logPod(pod, container, namespace string, flags []string) error {
+func logPod(pod, container, namespace string, aggregate bool, flags []string) {
 	pods, err := findPods(pod, namespace)
 	if err != nil {
-		return err
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	var podSelected Pod
+	var podSelected []Pod
 	if len(pods) > 1 {
-		var options []string
-		for _, p := range pods {
-			options = append(options, fmt.Sprintf("%s/%s/%s", p.Cluster, p.Namespace, p.Name))
+		if !aggregate {
+			var options []string
+			for _, p := range pods {
+				options = append(options, fmt.Sprintf("%s/%s/%s", p.Cluster, p.Namespace, p.Name))
+			}
+			podSelected = []Pod{pods[selector(options)]}
+		} else {
+			podSelected = pods
 		}
-		podSelected = pods[selector(options)]
 	} else if len(pods) == 1 {
-		podSelected = pods[0]
+		podSelected = pods
 	} else {
-		return errors.Errorf("failed to find pod \"%s\"\n", pod)
+		fmt.Printf("failed to find pod \"%s\"\n", pod)
+		os.Exit(1)
 	}
 
-	if container == "" && len(podSelected.Containers) > 1 {
-		option := selector(podSelected.Containers)
-		container = podSelected.Containers[option]
+	var wg sync.WaitGroup
+	wg.Add(len(podSelected))
+
+	for _, p := range podSelected {
+		go logSinglePod(p, container, flags, &wg)
+	}
+	wg.Wait()
+
+}
+
+func logSinglePod(pod Pod, container string, flags []string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if container == "" {
+		container = pod.Containers[0]
 	}
 
-	args := []string{"logs", podSelected.Name,
-		"-n", podSelected.Namespace,
-		"--context", podSelected.Cluster,
+	args := []string{"logs", pod.Name,
+		"-n", pod.Namespace,
+		"--context", pod.Cluster,
 		"-c", container}
 	args = append(args, flags...)
 
@@ -97,5 +118,5 @@ func logPod(pod, container, namespace string, flags []string) error {
 		prettyPrintCmd(command)
 	}
 
-	return command.Run()
+	command.Run()
 }
