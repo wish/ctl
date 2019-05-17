@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/user"
 
 	"github.com/spf13/viper"
 
@@ -26,6 +27,13 @@ var rootCmd = &cobra.Command{
 			fmt.Println("kubectl not installed. k8s commands are unavaible.")
 			os.Exit(1)
 		}
+		currentUser, _ := user.Current()
+		_, err = os.Stat(currentUser.HomeDir + "/.kube/config")
+		if os.IsNotExist(err) {
+			fmt.Println("missing kubeconfig. k8s commands are unavaible.")
+			os.Exit(1)
+		}
+
 	},
 }
 

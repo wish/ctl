@@ -18,6 +18,7 @@ func init() {
 	logCmd.Flags().StringP("tail", "t", "", "lines of most recent log to be printed")
 	logCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
 	logCmd.Flags().BoolP("aggregate", "a", false, "Aggregated all the logs found ")
+	//logCmd.Flags().DurationP("since", "s")
 
 }
 
