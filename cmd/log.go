@@ -18,7 +18,8 @@ func init() {
 	logCmd.Flags().StringP("tail", "t", "", "lines of most recent log to be printed")
 	logCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
 	logCmd.Flags().BoolP("aggregate", "a", false, "Aggregated all the logs found ")
-	//logCmd.Flags().DurationP("since", "s")
+	logCmd.Flags().StringP("since", "s", "", "Only return logs newer than a relative duration like 5s, 2m, or 3h")
+	logCmd.Flags().String("since-time", "", "Only return logs after a specific date (RFC3339). Defaults to all logs")
 
 }
 
@@ -46,6 +47,14 @@ optional. If the pod has multiple containers, user have to choose one from them.
 			}
 			flags = append(flags, "--tail", lines)
 		}
+		if cmd.Flags().Changed("since") {
+			duration, _ := cmd.Flags().GetString("since")
+			flags = append(flags, "--since", duration)
+		}
+		if cmd.Flags().Changed("since-time") {
+			sinceTime, _ := cmd.Flags().GetString("since-time")
+			flags = append(flags, "--since-time", sinceTime)
+		}
 
 		container, _ := cmd.Flags().GetString("container")
 		namespace, _ := cmd.Flags().GetString("namespace")
@@ -58,6 +67,10 @@ optional. If the pod has multiple containers, user have to choose one from them.
 	PreRun: func(cmd *cobra.Command, args []string) {
 		if cmd.Flags().Changed("follow") && cmd.Flags().Changed("aggregate") {
 			fmt.Println("Cannot aggregate logs while streaming logs")
+			os.Exit(1)
+		}
+		if cmd.Flags().Changed("since") && cmd.Flags().Changed("since-time") {
+			fmt.Println("Only one of since-time / since may be used")
 			os.Exit(1)
 		}
 	},
