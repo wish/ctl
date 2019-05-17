@@ -39,6 +39,8 @@ Flags:
 - --follow, -f stream pod logs (stdout).
 - --tail, -t lines of recent log file to display.
 - --aggregate, -a enable/disable printing logs from multiple pods.
+- --since, -s Only return logs newer than a relative duration like 5s, 2m, or 3h. Defaults to all logs. Only one of since-time / since may be used.
+- --since-time Only return logs after a specific date (RFC3339). Defaults to all logs. Only one of since-time / since may be used.
 
 ### sh [pod] [flags]
 Exec /bin/bash into the container of a specific pod. If the pod has only one container, the container name is
