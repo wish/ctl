@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bytes"
+
 	"bufio"
 	"fmt"
 	"os"
@@ -27,11 +29,111 @@ type WishCtlError string
 // Error implements error interfaces
 func (w WishCtlError) Error() string { return string(w) }
 
+// Struct to hold a cluster's information form the config file
+type cluster struct {
+	Name        string
+	Region      string
+	Environment string
+	Az          string
+	Hidden      bool
+}
+
+// Struct used to unmarshal yaml config
+type config struct {
+	Clusters []cluster
+}
+
+// Unmarshal config filee
+func getConf(configpath string) *config {
+	viper.SetConfigFile(configpath)
+	err := viper.ReadInConfig()
+
+	if err != nil {
+		fmt.Printf("%v", err)
+	}
+
+	conf := &config{}
+	err = viper.Unmarshal(conf)
+	if err != nil {
+		fmt.Printf("unable to decode into config struct, %v", err)
+	}
+
+	return conf
+}
+
 // CLUSTERNOTFOUND defines the error of not finding any cluster
 const CLUSTERNOTFOUND = WishCtlError("failed to get cluster, no cluster found")
 
-func findPods(pod, namespace string) ([]Pod, error) {
-	clusters, err := getAllClusters()
+//Gets a lift off all cluster names
+func getAllClusters() ([]string, error) {
+	result, err := exec.Command("kubectl", "config", "get-contexts", "-o=name").Output()
+	if err != nil {
+		return nil, err
+	}
+	clusterList := strings.Split(strings.TrimSpace(string(result)), "\n")
+	return clusterList, nil
+}
+
+//Gets a filterned list of clusters given region, environment and AZ
+func getFilteredClusters(configpath, region, environment, az string) ([]string, error) {
+	clusterList, err := getAllClusters()
+	if err != nil {
+		return nil, err
+	}
+
+	if configpath == "" {
+		configpath = os.Getenv("WISHCTL_CONFIG")
+	}
+	conf := getConf(configpath)
+	clusterMap := make(map[string]cluster)
+	for _, c := range conf.Clusters {
+		clusterMap[c.Name] = c
+	}
+
+	clusters := make([]string, 0)
+	for _, c := range clusterList {
+		if clusterInfo, ok := clusterMap[c]; ok {
+			if (!clusterInfo.Hidden) &&
+				(region == "" || strings.Trim(region, " \r\n") == strings.Trim(clusterInfo.Region, " \r\n")) &&
+				(environment == "" || strings.Trim(environment, " \r\n") == strings.Trim(clusterInfo.Environment, " \r\n")) &&
+				(az == "" || strings.Trim(az, " \r\n") == strings.Trim(clusterInfo.Az, " \r\n")) {
+				clusters = append(clusters, c)
+			}
+		} else {
+			fmt.Printf("WARNING: the cluster ", c, " is not defined in the configuration",
+				" pods in this cluster are not included in the results \n")
+		}
+	}
+	return clusters, err
+}
+
+// PodList defines the list of Pods
+type PodList struct {
+	ClusterName string
+	Pods        []string
+}
+
+// String format the PodList struct
+func (p PodList) String() string {
+
+	var b bytes.Buffer
+	b.WriteString(fmt.Sprintf("Cluster - %s:\n", p.ClusterName))
+
+	if p.Pods == nil {
+		b.WriteString("\tnil\n")
+		return b.String()
+	}
+
+	for _, n := range p.Pods {
+		b.WriteString(fmt.Sprintf("\t%s\n", n))
+	}
+
+	return b.String()
+
+}
+
+func findPods(pod, namespace, configpath, region, environment, az string) ([]Pod, error) {
+	clusters, err := getFilteredClusters(environment, region, environment, az)
 	if err != nil {
 		return nil, err
 	}

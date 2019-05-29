@@ -15,6 +15,10 @@ import (
 func init() {
 	rootCmd.AddCommand(describeCmd)
 	describeCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
+	describeCmd.Flags().StringP("region", "r", "", "Specify the region")
+	describeCmd.Flags().StringP("env", "e", "", "Specify the enviroment")
+	describeCmd.Flags().StringP("az", "a", "", "Specify the alvalibility zone")
+	describeCmd.Flags().StringP("config", "", "", "Specify the config file")
 }
 
 var describeCmd = &cobra.Command{
@@ -23,7 +27,11 @@ var describeCmd = &cobra.Command{
 	Long:  `Print a detailed description of the selected pods.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		namespace, _ := cmd.Flags().GetString("namespace")
-		if err := describePod(args[0], namespace); err != nil {
+		region, _ := cmd.Flags().GetString("region")
+		env, _ := cmd.Flags().GetString("env")
+		az, _ := cmd.Flags().GetString("az")
+		config, _ := cmd.Flags().GetString("config")
+		if err := describePod(args[0], namespace, config, region, env, az); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
@@ -31,8 +39,8 @@ var describeCmd = &cobra.Command{
 	Args: cobra.MinimumNArgs(1),
 }
 
-func describePod(pod, namespace string) error {
-	pods, err := findPods(pod, namespace)
+func describePod(pod, namespace, configpath, region, environment, az string) error {
+	pods, err := findPods(pod, namespace, configpath, region, environment, az)
 	if err != nil {
 		return err
 	}

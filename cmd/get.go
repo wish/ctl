@@ -6,34 +6,17 @@ import (
 	"os/exec"
 	"strings"
 
-	"bytes"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// PodList defines the list of Pods
-type PodList struct {
-	ClusterName string
-	Pods        []string
-}
-
-// String format the PodList struct
-func (p PodList) String() string {
-
-	var b bytes.Buffer
-	b.WriteString(fmt.Sprintf("Cluster - %s:\n", p.ClusterName))
-
-	if p.Pods == nil {
-		b.WriteString("\tnil\n")
-		return b.String()
-	}
-
-	for _, n := range p.Pods {
-		b.WriteString(fmt.Sprintf("\t%s\n", n))
-	}
-
-	return b.String()
+func init() {
+	rootCmd.AddCommand(getCmd)
+	getCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
+	getCmd.Flags().StringP("region", "r", "", "Specify the region")
+	getCmd.Flags().StringP("env", "e", "", "Specify the enviroment")
+	getCmd.Flags().StringP("az", "a", "", "Specify the alvalibility zone")
+	getCmd.Flags().StringP("config", "", "", "Specify the config file")
 
 }
 
@@ -43,15 +26,14 @@ var getCmd = &cobra.Command{
 	Long:  "Get a list of pods in namespace. If namespace not specified, it will get all the pods across all the namespaces",
 	Run: func(cmd *cobra.Command, args []string) {
 		namespace, _ := cmd.Flags().GetString("namespace")
-		getPodsFromAllClustersByNamespace(namespace)
+		region, _ := cmd.Flags().GetString("region")
+		env, _ := cmd.Flags().GetString("env")
+		az, _ := cmd.Flags().GetString("az")
+		config, _ := cmd.Flags().GetString("config")
+		getPodsFromClustersByNamespace(namespace, config, region, env, az)
 	},
 	Args:    cobra.MaximumNArgs(0),
 	Aliases: []string{"gets"},
-}
-
-func init() {
-	rootCmd.AddCommand(getCmd)
-	getCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
 }
 
 func getPodsInNamespaceInCluster(cluster, namespace string, resultChannel chan PodList) {
@@ -95,8 +77,8 @@ func getPodsInNamespaceInCluster(cluster, namespace string, resultChannel chan P
 	resultChannel <- PodList{cluster, podList}
 }
 
-func getPodsFromAllClustersByNamespace(namespace string) {
-	clusters, err := getAllClusters()
+func getPodsFromClustersByNamespace(namespace, configpath, region, enviroment, az string) {
+	clusters, err := getFilteredClusters(configpath, region, enviroment, az)
 	if err != nil {
 		fmt.Printf("failed to get clusters: %v\n", err)
 		os.Exit(1)
@@ -127,13 +109,4 @@ func getPodsFromAllClustersByNamespace(namespace string) {
 	if len(result) == 0 {
 		fmt.Println("No pod found.")
 	}
-}
-
-func getAllClusters() ([]string, error) {
-	result, err := exec.Command("kubectl", "config", "get-contexts", "-o=name").Output()
-	if err != nil {
-		return nil, err
-	}
-	clusterList := strings.Split(strings.TrimSpace(string(result)), "\n")
-	return clusterList, nil
 }

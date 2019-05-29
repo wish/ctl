@@ -16,6 +16,10 @@ func init() {
 
 	shCmd.Flags().StringP("container", "c", "", "Sepcify the container")
 	shCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
+	shCmd.Flags().StringP("region", "r", "", "Specify the region")
+	shCmd.Flags().StringP("env", "e", "", "Specify the enviroment")
+	shCmd.Flags().StringP("az", "a", "", "Specify the alvalibility zone")
+	shCmd.Flags().StringP("config", "", "", "Specify the config file")
 	shCmd.Flags().StringP("shell", "s", "/bin/bash", "Specify the shell path")
 
 }
@@ -29,15 +33,19 @@ optional. If the pod has multiple containers, user have to choose one from them.
 
 		container, _ := cmd.Flags().GetString("container")
 		namespace, _ := cmd.Flags().GetString("namespace")
+		region, _ := cmd.Flags().GetString("region")
+		env, _ := cmd.Flags().GetString("env")
+		az, _ := cmd.Flags().GetString("az")
+		config, _ := cmd.Flags().GetString("config")
 		shell, _ := cmd.Flags().GetString("shell")
 
-		shPod(args[0], container, namespace, shell)
+		shPod(args[0], container, namespace, shell, config, region, env, az)
 	},
 	Args: cobra.MinimumNArgs(1),
 }
 
-func shPod(pod, container, namespace, shell string) {
-	pods, err := findPods(pod, namespace)
+func shPod(pod, container, namespace, shell, configpath, region, environment, az string) {
+	pods, err := findPods(pod, namespace, configpath, region, environment, az)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

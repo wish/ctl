@@ -1,0 +1,47 @@
+clusters:
+  - name: app-01-prod.k8s.local
+    region: us-west-1
+    environment: prod
+    az: us-west-1a
+  - name: app-02-prod.k8s.local
+    region: us-west-1
+    environment: prod
+    az: us-west-1c
+  - name: app-03-stage.k8s.local
+    region: us-west-1
+    environment: stage
+    az: us-west-1a
+  - name: app-04-stage.k8s.local
+    region: us-west-1
+    environment: prod
+    az: us-west-1c
+  - name: app-05-dev.k8s.local
+    region: us-west-1
+    environment: dev
+    az: us-west-1a
+  - name: app-06-prod.k8s.local
+    region: us-east-1
+    environment: prod
+    az: us-east-1a
+  - name: app-07-prod.k8s.local
+    region: us-east-1
+    environment: prod
+    az: us-east-1e
+  - name: app-11-mongo.k8s.local
+    environment: prod
+    hidden: true
+  - name: app-12-mongo.k8s.local
+    environment: mongo
+    hidden: true
+  - name: app-13-mongo.k8s.local
+    environment: mongo
+  - name: app-14-mongo.k8s.local
+    environment: mongo
+    hidden: true
+  - name: test-01-dev.k8s.local
+    region: us-west-1
+    environment: dev
+    az: us-west-1c
+  - name: test-15-dev.k8s.local
+    environment: dev
+    hidden: true
