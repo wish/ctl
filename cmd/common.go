@@ -30,7 +30,7 @@ type WishCtlError string
 func (w WishCtlError) Error() string { return string(w) }
 
 // Struct to hold a cluster's information form the config file
-type cluster struct {
+type Cluster struct {
 	Name        string
 	Region      string
 	Environment string
@@ -40,7 +40,7 @@ type cluster struct {
 
 // Struct used to unmarshal yaml config
 type config struct {
-	Clusters []cluster
+	Clusters []Cluster
 }
 
 // Unmarshal config filee
@@ -74,22 +74,7 @@ func getAllClusters() ([]string, error) {
 	return clusterList, nil
 }
 
-//Gets a filterned list of clusters given region, environment and AZ
-func getFilteredClusters(configpath, region, environment, az string) ([]string, error) {
-	clusterList, err := getAllClusters()
-	if err != nil {
-		return nil, err
-	}
-
-	if configpath == "" {
-		configpath = os.Getenv("WISHCTL_CONFIG")
-	}
-	conf := getConf(configpath)
-	clusterMap := make(map[string]cluster)
-	for _, c := range conf.Clusters {
-		clusterMap[c.Name] = c
-	}
-
+func filterClusters(clusterList []string, clusterMap map[string]Cluster, region, environment, az string) []string {
 	clusters := make([]string, 0)
 	for _, c := range clusterList {
 		if clusterInfo, ok := clusterMap[c]; ok {
@@ -104,6 +89,28 @@ func getFilteredClusters(configpath, region, environment, az string) ([]string, 
 				" pods in this cluster are not included in the results \n")
 		}
 	}
+	return clusters
+}
+
+//Gets a filterned list of clusters given region, environment and AZ
+func getFilteredClusters(configpath, region, environment, az string) ([]string, error) {
+	clusterList, err := getAllClusters()
+	if err != nil {
+		return nil, err
+	}
+
+	if configpath == "" {
+		configpath = os.Getenv("WISHCTL_CONFIG")
+	}
+
+	conf := getConf(configpath)
+	clusterMap := make(map[string]Cluster)
+	for _, c := range conf.Clusters {
+		clusterMap[c.Name] = c
+	}
+
+	clusters := filterClusters(clusterList, clusterMap, region, environment, az)
+
 	return clusters, err
 }
 
