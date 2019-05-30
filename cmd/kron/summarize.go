@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// kron/listCmd represents the kron/list command
 var summarizeCmd = &cobra.Command{
 	Use:   "summarize",
 	Short: "Get aggregate info about a group of jobs",

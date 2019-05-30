@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// kron/listCmd represents the kron/list command
 var infoCmd = &cobra.Command{
 	Use:   "info",
 	Short: "Get info about a job",

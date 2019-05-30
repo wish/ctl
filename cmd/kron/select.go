@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// kron/listCmd represents the kron/list command
 var selectCmd = &cobra.Command{
 	Use:   "select",
 	Short: "Uses list to select a job to operate on",

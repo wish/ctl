@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// kron/listCmd represents the kron/list command
 var execCmd = &cobra.Command{
 	Use:   "exec",
 	Short: "Executes a job now",

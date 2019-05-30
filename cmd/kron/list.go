@@ -2,7 +2,7 @@ package kron
 
 import (
 	"fmt"
-	"github.com/ContextLogic/wishctl/pkg/kron"
+	"github.com/ContextLogic/ctl/pkg/kron"
 	"github.com/spf13/cobra"
 	"os"
 	"text/tabwriter"

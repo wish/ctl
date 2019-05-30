@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// kron/listCmd represents the kron/list command
 var unfavoriteCmd = &cobra.Command{
 	Use:   "unfavorite",
 	Short: "Removes job(s) from favorite list",

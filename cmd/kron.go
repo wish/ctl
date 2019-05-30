@@ -1,8 +1,7 @@
 package cmd
 
 import (
-  //"fmt"
-  "github.com/ContextLogic/wishctl/cmd/kron"
+  "github.com/ContextLogic/ctl/cmd/kron"
 )
 
 func init() {

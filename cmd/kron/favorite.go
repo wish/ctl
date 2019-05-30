@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// kron/listCmd represents the kron/list command
 var favoriteCmd = &cobra.Command{
 	Use:   "favorite",
 	Short: "Adds a job to favorite list",
