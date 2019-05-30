@@ -16,6 +16,12 @@ type Client struct {
 }
 
 func GetKubeConfigPath() string {
+	// For multiple calls
+	fl := flag.Lookup("kubeconfig")
+	if fl != nil {
+		return fl.Value.String()
+	}
+	// Set kubeconfig value
 	var kubeconfig *string
 	var home string
 	if home = os.Getenv("HOME"); home == "" {
@@ -60,8 +66,8 @@ func GetDefaultClient() (*Client, error) {
 func GetContextClient(context string) (*Client, error) {
 	v, err := clientHelper(func() (*restclient.Config, error) {
 		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-			&clientcmd.ClientConfigLoadingRules{Precedence: []string{GetKubeConfigPath()}},
-			&clientcmd.ConfigOverrides{}).ClientConfig()
+			&clientcmd.ClientConfigLoadingRules{ExplicitPath: GetKubeConfigPath()},
+			&clientcmd.ConfigOverrides{CurrentContext: context}).ClientConfig()
 		return config, err
 	})
 	return v, err

@@ -4,9 +4,9 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func getContexts() []string {
+func GetContexts() []string {
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{Precedence: []string{GetKubeConfigPath()}},
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: GetKubeConfigPath()},
 		&clientcmd.ConfigOverrides{}).RawConfig()
 
 	if err != nil {
