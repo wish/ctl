@@ -29,7 +29,7 @@ type WishCtlError string
 // Error implements error interfaces
 func (w WishCtlError) Error() string { return string(w) }
 
-// Struct to hold a cluster's information form the config file
+// Cluster ... Struct to hold a cluster's information form the config file
 type Cluster struct {
 	Name        string
 	Region      string
@@ -43,7 +43,7 @@ type config struct {
 	Clusters []Cluster
 }
 
-// Unmarshal config filee
+// Unmarshal config file
 func getConf(configpath string) *config {
 	viper.SetConfigFile(configpath)
 	err := viper.ReadInConfig()
@@ -64,7 +64,7 @@ func getConf(configpath string) *config {
 // CLUSTERNOTFOUND defines the error of not finding any cluster
 const CLUSTERNOTFOUND = WishCtlError("failed to get cluster, no cluster found")
 
-//Gets a lift off all cluster names
+//Gets a list off all cluster names
 func getAllClusters() ([]string, error) {
 	result, err := exec.Command("kubectl", "config", "get-contexts", "-o=name").Output()
 	if err != nil {

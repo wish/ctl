@@ -13,7 +13,7 @@ clusters:
     az: us-west-1a
   - name: app-04-stage.k8s.local
     region: us-west-1
-    environment: prod
+    environment: stage
     az: us-west-1c
   - name: app-05-dev.k8s.local
     region: us-west-1
