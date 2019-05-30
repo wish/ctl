@@ -2,24 +2,23 @@ package kron
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"github.com/ContextLogic/wishctl/pkg/kron"
-	"text/tabwriter"
+	"github.com/spf13/cobra"
 	"os"
+	"text/tabwriter"
 	"time"
 )
 
 // kron/listCmd represents the kron/list command
-
 
 func init() {
 	KronCmd.AddCommand(listCmd)
 }
 
 var listCmd = &cobra.Command{
-	Use: "list",
-  Short: "Get a list of cronjobs",
-  Long: "Get a list of cronjobs based on specified search criteria.",
+	Use:   "list",
+	Short: "Get a list of cronjobs",
+	Long:  "Get a list of cronjobs based on specified search criteria.",
 	Run: func(cmd *cobra.Command, args []string) {
 		cl, err := kron.GetDefaultClient()
 		if err != nil {
@@ -33,7 +32,7 @@ var listCmd = &cobra.Command{
 		fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tAGE")
 		for _, v := range list {
 			fmt.Fprintf(w, "%s\t%s\t%t\t%d\t%v\t%v\n",
-				v.Name, // Name
+				v.Name,          // Name
 				v.Spec.Schedule, // Schedule
 				// Suspend boolean
 				*v.Spec.Suspend,
@@ -46,12 +45,12 @@ var listCmd = &cobra.Command{
 				time.Since(v.CreationTimestamp.Time).Round(time.Second))
 
 			// FOR DEBUGGING the values stored in a cronjob object
-				// fmt.Println("Object Meta")
-				// fmt.Println(v.ObjectMeta.String())
-				// fmt.Println("Spec")
-				// fmt.Println(v.Spec.String())
-				// fmt.Println("Status")
-				// fmt.Println(v.Status.String())
+			// fmt.Println("Object Meta")
+			// fmt.Println(v.ObjectMeta.String())
+			// fmt.Println("Spec")
+			// fmt.Println(v.Spec.String())
+			// fmt.Println("Status")
+			// fmt.Println(v.Status.String())
 		}
 		w.Flush()
 	},

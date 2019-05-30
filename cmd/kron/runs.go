@@ -6,9 +6,9 @@ import (
 )
 
 var runsCmd = &cobra.Command{
-  Use: "runs",
-  Short: "Subcommand for operating on runs of a command",
-  Long: "", // TODO
+	Use:   "runs",
+	Short: "Subcommand for operating on runs of a command",
+	Long:  "", // TODO
 }
 
 func init() {

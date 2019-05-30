@@ -1,16 +1,16 @@
 package kron
 
 import (
-  // "github.com/ContextLogic/wishctl/pkg/kron"
-  "github.com/spf13/cobra"
+	// "github.com/ContextLogic/wishctl/pkg/kron"
+	"github.com/spf13/cobra"
 )
 
 func init() {
-  // Nothing
+	// Nothing
 }
 
 var KronCmd = &cobra.Command{
-  Use: "kron",
-  Short: "A tool for cron on kubernetes",
-  Long: "A subcommand for managing and reviewing cron jobs on kubernetes.",
+	Use:   "kron",
+	Short: "A tool for cron on kubernetes",
+	Long:  "A subcommand for managing and reviewing cron jobs on kubernetes.",
 }
