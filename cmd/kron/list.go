@@ -10,9 +10,12 @@ import (
 )
 
 // kron/listCmd represents the kron/list command
-
 func init() {
 	KronCmd.AddCommand(listCmd)
+	// Contexts flag
+	listCmd.Flags().StringSliceP("contexts", "c", kron.GetContexts(), "Specific contexts to list cronjobs from")
+	// Limit flag
+	listCmd.Flags().Int64P("limit", "l", 0, "Limit the number of returned cron jobs")
 }
 
 var listCmd = &cobra.Command{
@@ -20,9 +23,12 @@ var listCmd = &cobra.Command{
 	Short: "Get a list of cronjobs",
 	Long:  "Get a list of cronjobs based on specified search criteria.",
 	Run: func(cmd *cobra.Command, args []string) {
-		ctxs := kron.GetContexts()
+		// Get flags
+		ctxs, _ := cmd.Flags().GetStringSlice("contexts")
+		// Limit
+		limit, _ := cmd.Flags().GetInt64("limit")
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
 		fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tAGE\tCONTEXT")
 
 		for _, ctx := range ctxs {
@@ -30,7 +36,7 @@ var listCmd = &cobra.Command{
 			if err != nil {
 				panic(err.Error())
 			}
-			list, err := cl.List()
+			list, err := cl.List(kron.ListOptions{Limit: limit})
 			if err != nil {
 				panic(err.Error())
 			}
@@ -51,6 +57,7 @@ var listCmd = &cobra.Command{
 					ctx)
 			}
 		}
+		w.Flush()
 
 		// FOR DEBUGGING the values stored in a cronjob object
 		// fmt.Println("Object Meta")
@@ -59,6 +66,5 @@ var listCmd = &cobra.Command{
 		// fmt.Println(v.Spec.String())
 		// fmt.Println("Status")
 		// fmt.Println(v.Status.String())
-		w.Flush()
 	},
 }
