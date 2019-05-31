@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"bytes"
+	"io/ioutil"
+	"log"
 
 	"bufio"
 	"fmt"
@@ -13,6 +15,7 @@ import (
 	"github.com/fatih/color"
 
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 // Pod defines the pod struct
@@ -30,32 +33,32 @@ type WishCtlError string
 func (w WishCtlError) Error() string { return string(w) }
 
 // Cluster ... Struct to hold a cluster's information form the config file
-type Cluster struct {
-	Name        string
-	Region      string
-	Environment string
-	Az          string
-	Hidden      bool
+type context struct {
+	Cluster     string `yaml:"cluster"`
+	User        string `yaml:"user"`
+	Region      string `yaml:"region"`
+	Environment string `yaml:"environment"`
+	Az          string `yaml:"az"`
+	Hidden      bool   `yaml:"hidden"`
 }
 
 // Struct used to unmarshal yaml config
 type config struct {
-	Clusters []Cluster
+	Contexts []struct {
+		Context context `yaml:"context"`
+		Name    string  `yaml:"name"`
+	} `yaml:"contexts"`
 }
 
-// Unmarshal config file
 func getConf(configpath string) *config {
-	viper.SetConfigFile(configpath)
-	err := viper.ReadInConfig()
-
-	if err != nil {
-		fmt.Printf("%v", err)
-	}
-
 	conf := &config{}
-	err = viper.Unmarshal(conf)
+	yamlFile, err := ioutil.ReadFile(configpath)
 	if err != nil {
-		fmt.Printf("unable to decode into config struct, %v", err)
+		log.Printf("yamlFile.Get err   #%v ", err)
+	}
+	err = yaml.Unmarshal(yamlFile, conf)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
 	}
 
 	return conf
@@ -74,10 +77,10 @@ func getAllClusters() ([]string, error) {
 	return clusterList, nil
 }
 
-func filterClusters(clusterList []string, clusterMap map[string]Cluster, region, environment, az string) []string {
+func filterContexts(contextList []string, contextMap map[string]context, region, environment, az string) []string {
 	clusters := make([]string, 0)
-	for _, c := range clusterList {
-		if clusterInfo, ok := clusterMap[c]; ok {
+	for _, c := range contextList {
+		if clusterInfo, ok := contextMap[c]; ok {
 			if (!clusterInfo.Hidden) &&
 				(region == "" || strings.Trim(region, " \r\n") == strings.Trim(clusterInfo.Region, " \r\n")) &&
 				(environment == "" || strings.Trim(environment, " \r\n") == strings.Trim(clusterInfo.Environment, " \r\n")) &&
@@ -100,16 +103,16 @@ func getFilteredClusters(configpath, region, environment, az string) ([]string, 
 	}
 
 	if configpath == "" {
-		configpath = os.Getenv("WISHCTL_CONFIG")
+		configpath = os.Getenv("KUBECONFIG")
 	}
 
 	conf := getConf(configpath)
-	clusterMap := make(map[string]Cluster)
-	for _, c := range conf.Clusters {
-		clusterMap[c.Name] = c
+	clusterMap := make(map[string]context)
+	for _, c := range conf.Contexts {
+		clusterMap[c.Name] = c.Context
 	}
 
-	clusters := filterClusters(clusterList, clusterMap, region, environment, az)
+	clusters := filterContexts(clusterList, clusterMap, region, environment, az)
 
 	return clusters, err
 }
