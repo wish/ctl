@@ -34,7 +34,8 @@ var listCmd = &cobra.Command{
 		for _, ctx := range ctxs {
 			cl, err := kron.GetContextClient(ctx)
 			if err != nil {
-				panic(err.Error())
+				fmt.Printf("ERROR: Context \"%s\" not found\n", ctx)
+				continue;
 			}
 			list, err := cl.List(kron.ListOptions{Limit: limit})
 			if err != nil {
