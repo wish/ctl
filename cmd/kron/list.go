@@ -2,6 +2,7 @@ package kron
 
 import (
 	"fmt"
+	"sync"
 	"github.com/ContextLogic/wishctl/pkg/kron"
 	"github.com/spf13/cobra"
 	"os"
@@ -31,15 +32,17 @@ var listCmd = &cobra.Command{
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
 		fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tAGE\tCONTEXT")
 
-		done := make(chan struct{})
+		var wg sync.WaitGroup
+		wg.Add(len(ctxs))
 
 		// Parallelizing fetching
 		for _, ctx := range ctxs {
-			go func(ctx string, finish chan struct{}) {
+			go func(ctx string) {
+				defer wg.Done()
+
 				cl, err := kron.GetContextClient(ctx)
 				if err != nil {
 					fmt.Printf("ERROR: Context \"%s\" not found\n", ctx)
-					finish <- struct{}{}
 					return
 				}
 				list, err := cl.List(kron.ListOptions{Limit: limit})
@@ -62,13 +65,10 @@ var listCmd = &cobra.Command{
 						// Context
 						ctx)
 				}
-				finish <- struct{}{}
-			} (ctx, done)
+			} (ctx)
 		}
 		// Wait for all threads to finish
-		for x := 0; x < len(ctxs); x++ {
-			<- done
-		}
+		wg.Wait()
 		w.Flush()
 
 		// FOR DEBUGGING the values stored in a cronjob object

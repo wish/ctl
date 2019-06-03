@@ -3,6 +3,7 @@ package kron
 import (
 	"fmt"
 	"time"
+	"sync"
 	"github.com/ContextLogic/wishctl/pkg/kron"
 	"github.com/spf13/cobra"
 )
@@ -29,14 +30,16 @@ var infoCmd = &cobra.Command{
 		// Positional arg
 		job := args[0]
 
-		done := make(chan struct{})
+		var waitc sync.WaitGroup
+		waitc.Add(len(ctxs))
 
 		for _, ctx := range ctxs {
-			go func(ctx string, finish chan struct{}) {
+			go func(ctx string) {
+				defer waitc.Done()
+
 				cl, err := kron.GetContextClient(ctx)
 				if err != nil {
 					fmt.Printf("ERROR: Context \"%s\" not found\n", ctx)
-					finish <- struct{}{}
 					return
 				}
 
@@ -47,36 +50,26 @@ var infoCmd = &cobra.Command{
 					namespaces = nss
 				}
 
-				done := make(chan struct{})
+				var waitn sync.WaitGroup
+				waitn.Add(len(namespaces))
 
 				for _, ns := range namespaces {
-					go func(ns string, finish chan struct{}) {
+					go func(ns string) {
+						defer waitn.Done()
+
 						cronjob, err := cl.Get(ns, job, kron.GetOptions{})
 						if err != nil {
 							// Cronjob not found on this context
-							finish <- struct{}{}
 							return
 						}
 
-						fmt.Printf("Context: %s\n", ctx)
-						fmt.Printf("\tNamespace: %s\n", ns)
-						fmt.Printf("\tSchedule: %s\n", cronjob.Spec.Schedule)
-						fmt.Printf("\tActive: %d\n", len(cronjob.Status.Active))
-						fmt.Printf("\tLast schedule: %v\n", time.Since(cronjob.Status.LastScheduleTime.Time).Round(time.Second))
-						fmt.Printf("\tCreated on: %v\n", cronjob.CreationTimestamp)
-						finish <- struct{}{}
-					} (ns, done)
+						fmt.Printf("Context: %s\n\tNamespace: %s\n\tSchedule: %s\n\tActive: %d\n\tLast Schedule: %v\n\tCreated on: %v\n",
+							ctx, ns, cronjob.Spec.Schedule, len(cronjob.Status.Active), time.Since(cronjob.Status.LastScheduleTime.Time).Round(time.Second), cronjob.CreationTimestamp)
+					} (ns)
 				}
-
-				for n := 0; n < len(namespaces); n++ {
-					<- done
-				}
-				finish <- struct{}{}
-			} (ctx, done)
+				waitn.Wait()
+			} (ctx)
 		}
-
-		for c := 0; c < len(ctxs); c++ {
-			<- done
-		}
+		waitc.Wait()
 	},
 }
