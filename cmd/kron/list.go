@@ -31,32 +31,43 @@ var listCmd = &cobra.Command{
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
 		fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tAGE\tCONTEXT")
 
+		done := make(chan struct{})
+
+		// Parallelizing fetching
 		for _, ctx := range ctxs {
-			cl, err := kron.GetContextClient(ctx)
-			if err != nil {
-				fmt.Printf("ERROR: Context \"%s\" not found\n", ctx)
-				continue;
-			}
-			list, err := cl.List(kron.ListOptions{Limit: limit})
-			if err != nil {
-				panic(err.Error())
-			}
-			for _, v := range list {
-				fmt.Fprintf(w, "%s\t%s\t%t\t%d\t%v\t%v\t%s\n",
-					v.Name,          // Name
-					v.Spec.Schedule, // Schedule
-					// Suspend boolean
-					*v.Spec.Suspend,
-					// Active jobs
-					len(v.Status.Active),
-					// Last schedule
-					// TODO fix rounding
-					time.Since(v.Status.LastScheduleTime.Time).Round(time.Second),
-					// Age
-					time.Since(v.CreationTimestamp.Time).Round(time.Second),
-					// Context
-					ctx)
-			}
+			go func(ctx string, finish chan struct{}) {
+				cl, err := kron.GetContextClient(ctx)
+				if err != nil {
+					fmt.Printf("ERROR: Context \"%s\" not found\n", ctx)
+					finish <- struct{}{}
+					return
+				}
+				list, err := cl.List(kron.ListOptions{Limit: limit})
+				if err != nil {
+					panic(err.Error())
+				}
+				for _, v := range list {
+					fmt.Fprintf(w, "%s\t%s\t%t\t%d\t%v\t%v\t%s\n",
+						v.Name,          // Name
+						v.Spec.Schedule, // Schedule
+						// Suspend boolean
+						*v.Spec.Suspend,
+						// Active jobs
+						len(v.Status.Active),
+						// Last schedule
+						// TODO fix rounding
+						time.Since(v.Status.LastScheduleTime.Time).Round(time.Second),
+						// Age
+						time.Since(v.CreationTimestamp.Time).Round(time.Second),
+						// Context
+						ctx)
+				}
+				finish <- struct{}{}
+			} (ctx, done)
+		}
+		// Wait for all threads to finish
+		for x := 0; x < len(ctxs); x++ {
+			<- done
 		}
 		w.Flush()
 
