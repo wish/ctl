@@ -9,8 +9,8 @@ import (
 // so Get does not use the parameter
 // options is left as a parameter for consistency
 // REVIEW: what namespace to search in?
-func (c *Client) Get(name string, options GetOptions) (*v1beta1.CronJob, error) {
-	cronjob, err := c.clientset.BatchV1beta1().CronJobs("default").Get(name, metav1.GetOptions{})
+func (c *Client) Get(namespace string, name string, options GetOptions) (*v1beta1.CronJob, error) {
+	cronjob, err := c.clientset.BatchV1beta1().CronJobs(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
