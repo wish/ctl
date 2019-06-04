@@ -8,8 +8,8 @@ import (
 
 // For storing the location of a job for select and favorite.
 type location struct {
-	Contexts []string
-	Namespaces []string
+	Contexts []string  `json:"contexts"`
+	Namespaces []string  `json:"namespaces"`
 }
 
 func toLocation(obj interface{}) location {
