@@ -35,6 +35,9 @@ var listCmd = &cobra.Command{
 		var wg sync.WaitGroup
 		wg.Add(len(ctxs))
 
+		// To make sure that only one routine is printing at a time
+		var mutex = &sync.Mutex{}
+
 		// Parallelizing fetching
 		for _, ctx := range ctxs {
 			go func(ctx string) {
@@ -50,33 +53,30 @@ var listCmd = &cobra.Command{
 					panic(err.Error())
 				}
 				for _, v := range list {
-					fmt.Fprintf(w, "%s\t%s\t%t\t%d\t%v\t%v\t%s\n",
-						v.Name,          // Name
-						v.Spec.Schedule, // Schedule
-						// Suspend boolean
-						*v.Spec.Suspend,
-						// Active jobs
-						len(v.Status.Active),
-						// Last schedule
-						// TODO fix rounding
-						time.Since(v.Status.LastScheduleTime.Time).Round(time.Second),
-						// Age
-						time.Since(v.CreationTimestamp.Time).Round(time.Second),
-						// Context
-						ctx)
+					mutex.Lock()
+
+					fmt.Fprintf(w, "%s\t", v.Name) // Name
+					fmt.Fprintf(w, "%s\t", v.Spec.Schedule) // Schedule
+					fmt.Fprintf(w, "%t\t", *v.Spec.Suspend) // Suspend
+					fmt.Fprintf(w, "%d\t", len(v.Status.Active))
+					// Last schedule
+					// TODO fix rounding
+					if v.Status.LastScheduleTime == nil {
+						fmt.Fprintf(w, "<none>\t")
+					} else {
+						fmt.Fprintf(w, "%v\t", time.Since(v.Status.LastScheduleTime.Time).Round(time.Second))
+					}
+					// Age
+					fmt.Fprintf(w, "%v\t", time.Since(v.CreationTimestamp.Time).Round(time.Second))
+					// Context
+					fmt.Fprintf(w, "%s\n", ctx)
+
+					mutex.Unlock()
 				}
 			} (ctx)
 		}
 		// Wait for all threads to finish
 		wg.Wait()
 		w.Flush()
-
-		// FOR DEBUGGING the values stored in a cronjob object
-		// fmt.Println("Object Meta")
-		// fmt.Println(v.ObjectMeta.String())
-		// fmt.Println("Spec")
-		// fmt.Println(v.Spec.String())
-		// fmt.Println("Status")
-		// fmt.Println(v.Status.String())
 	},
 }
