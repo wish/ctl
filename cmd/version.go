@@ -15,7 +15,7 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Show wishctl version",
+	Short: "Show ctl version",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(rootCmd.Use + " version: " + Version)
 	},
