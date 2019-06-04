@@ -6,9 +6,8 @@ import (
 	"os/exec"
 	"os/user"
 
-	"github.com/spf13/viper"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func init() {

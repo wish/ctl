@@ -1,12 +1,11 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
-
-	"bytes"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
