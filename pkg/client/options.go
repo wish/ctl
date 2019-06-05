@@ -1,4 +1,4 @@
-package kron
+package client
 
 type ListOptions struct {
   Limit int64
@@ -6,5 +6,5 @@ type ListOptions struct {
 }
 
 type GetOptions struct {
-  
+
 }

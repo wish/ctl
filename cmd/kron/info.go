@@ -5,13 +5,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ContextLogic/ctl/pkg/kron"
+	"github.com/ContextLogic/ctl/pkg/client"
+	clienthelper "github.com/ContextLogic/ctl/pkg/client/helper"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	KronCmd.AddCommand(infoCmd)
-	infoCmd.Flags().StringSliceP("contexts", "c", kron.GetContexts(), "Specific contexts to list cronjobs from")
+	infoCmd.Flags().StringSliceP("contexts", "c", clienthelper.GetContexts(), "Specific contexts to list cronjobs from")
 	infoCmd.Flags().StringSliceP("namespaces", "n", []string{}, "Specific namespaces to list cronjobs from within contexts")
 }
 
@@ -38,7 +39,7 @@ var infoCmd = &cobra.Command{
 			go func(ctx string) {
 				defer waitc.Done()
 
-				cl, err := kron.GetContextClient(ctx)
+				cl, err := client.GetContextClient(ctx)
 				if err != nil {
 					fmt.Printf("ERROR: Context \"%s\" not found\n", ctx)
 					return
@@ -58,7 +59,7 @@ var infoCmd = &cobra.Command{
 					go func(ns string) {
 						defer waitn.Done()
 
-						cronjob, err := cl.Get(ns, job, kron.GetOptions{})
+						cronjob, err := cl.GetCronJob(ns, job, client.GetOptions{})
 						if err != nil {
 							// Cronjob not found on this context
 							return

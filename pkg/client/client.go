@@ -1,13 +1,14 @@
-package kron
+package client
 
 import (
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"github.com/ContextLogic/ctl/pkg/client/helper"
 )
 
-// Kron Client object for all operations
+// Client object for all operations
 type Client struct {
 	clientset *kubernetes.Clientset
 }
@@ -30,10 +31,10 @@ func clientHelper(getConfig func() (*restclient.Config, error)) (*Client, error)
 	return &cl, nil
 }
 
-// Creates a kron client from the kubeconfig file
+// Creates a client from the kubeconfig file
 func GetDefaultClient() (*Client, error) {
 	v, err := clientHelper(func() (*restclient.Config, error) {
-		config, err := clientcmd.BuildConfigFromFlags("", getKubeConfigPath())
+		config, err := clientcmd.BuildConfigFromFlags("", helper.GetKubeConfigPath())
 		return config, err
 	})
 	return v, err
@@ -42,7 +43,7 @@ func GetDefaultClient() (*Client, error) {
 func GetContextClient(context string) (*Client, error) {
 	v, err := clientHelper(func() (*restclient.Config, error) {
 		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-			&clientcmd.ClientConfigLoadingRules{ExplicitPath: getKubeConfigPath()},
+			&clientcmd.ClientConfigLoadingRules{ExplicitPath: helper.GetKubeConfigPath()},
 			&clientcmd.ConfigOverrides{CurrentContext: context}).ClientConfig()
 		return config, err
 	})

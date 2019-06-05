@@ -1,11 +1,11 @@
-package kron
+package client
 
 import (
 	"k8s.io/api/batch/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (c *Client) List(options ListOptions) ([]v1beta1.CronJob, error) {
+func (c *Client) ListCronJobs(options ListOptions) ([]v1beta1.CronJob, error) {
 	cronjobs, err := c.clientset.BatchV1beta1().CronJobs("").List(metav1.ListOptions{Limit: options.Limit})
 	if err != nil {
 		return nil, err

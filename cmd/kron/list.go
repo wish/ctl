@@ -7,7 +7,8 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/ContextLogic/ctl/pkg/kron"
+	"github.com/ContextLogic/ctl/pkg/client"
+	clienthelper "github.com/ContextLogic/ctl/pkg/client/helper"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +16,7 @@ import (
 func init() {
 	KronCmd.AddCommand(listCmd)
 	// Contexts flag
-	listCmd.Flags().StringSliceP("contexts", "c", kron.GetContexts(), "Specific contexts to list cronjobs from")
+	listCmd.Flags().StringSliceP("contexts", "c", clienthelper.GetContexts(), "Specific contexts to list cronjobs from")
 	// Limit flag
 	listCmd.Flags().Int64P("limit", "l", 0, "Limit the number of returned cron jobs")
 }
@@ -44,12 +45,12 @@ var listCmd = &cobra.Command{
 			go func(ctx string) {
 				defer wg.Done()
 
-				cl, err := kron.GetContextClient(ctx)
+				cl, err := client.GetContextClient(ctx)
 				if err != nil {
 					fmt.Printf("ERROR: Context \"%s\" not found\n", ctx)
 					return
 				}
-				list, err := cl.List(kron.ListOptions{Limit: limit})
+				list, err := cl.ListCronJobs(client.ListOptions{Limit: limit})
 				if err != nil {
 					panic(err.Error())
 				}

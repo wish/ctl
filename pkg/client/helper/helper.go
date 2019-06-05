@@ -1,4 +1,4 @@
-package kron
+package helper
 
 import (
 	"k8s.io/client-go/tools/clientcmd"
@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func getKubeConfigPath() string {
+func GetKubeConfigPath() string {
 	// For multiple calls
 	fl := flag.Lookup("kubeconfig")
 	if fl != nil {
@@ -30,7 +30,7 @@ func getKubeConfigPath() string {
 
 func GetContexts() []string {
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: getKubeConfigPath()},
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: GetKubeConfigPath()},
 		&clientcmd.ConfigOverrides{}).RawConfig()
 
 	if err != nil {
