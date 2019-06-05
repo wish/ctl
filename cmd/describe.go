@@ -1,11 +1,9 @@
 package cmd
 
 import (
-	"os/exec"
-
 	"fmt"
-
 	"os"
+	"os/exec"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"

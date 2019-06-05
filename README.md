@@ -1,4 +1,4 @@
-# wishctl
+# ctl
 wrapper tool of kubectl for multi-clusters and easy pod/log discovering
 
 # prerequisites
@@ -8,8 +8,8 @@ wrapper tool of kubectl for multi-clusters and easy pod/log discovering
 presumably bin/ folder is up to date. Can just move the execuables to the $PATH
 
 ## build from source
-make build/wishctl.<darwin|linux>
-and move bin/<darwin|linux>/wishctl to the $PATH
+make build/ctl.<darwin|linux>
+and move bin/<darwin|linux>/ctl to the $PATH
 
 # usage
 
@@ -23,7 +23,7 @@ List pods with/without namespace given.
 Flag:
 - --namespace, -n specify the namespace. This could largely reduce the run time of the command.
 
-### describe [pod] 
+### describe [pod]
 Get a detailed description of the pods matching the name query
 
 Flag:

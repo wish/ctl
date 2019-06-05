@@ -6,9 +6,8 @@ import (
 	"os/exec"
 	"os/user"
 
-	"github.com/spf13/viper"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -18,9 +17,9 @@ func init() {
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "wishctl",
+	Use:   "ctl",
 	Short: "A CLI tool for discovering k8s pods/logs across multiple clusters",
-	Long:  `wishctl is a CLI tool for easily getting/exec pods/logs across multiple clusters/namespaces. If you have any questions, problems, or requests please ask #automation.`,
+	Long:  `ctl is a CLI tool for easily getting/exec pods/logs across multiple clusters/namespaces. If you have any questions, problems, or requests please ask #automation.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		_, err := exec.LookPath("kubectl")
 		if err != nil {

@@ -1,17 +1,17 @@
 SHA  := $(shell git rev-parse --short HEAD)
 
 default: \
-	build/wishctl.linux \
-	build/wishctl.darwin
+	build/ctl.linux \
+	build/ctl.darwin
 
-build/wishctl.linux:
+build/ctl.linux:
 	@echo "$@"
 	@GOOS=linux CGO_ENABLED=0 go build -ldflags \
-	       "-X github.com/ContextLogic/wishctl/cmd.Version=${SHA}" \
-	       -o bin/linux/wishctl github.com/ContextLogic/wishctl
+	       "-X github.com/ContextLogic/ctl/cmd.Version=${SHA}" \
+	       -o bin/linux/ctl github.com/ContextLogic/ctl
 
-build/wishctl.darwin:
+build/ctl.darwin:
 	@echo "$@"
 	@GOOS=darwin CGO_ENABLED=0 go build -ldflags \
-		"-X github.com/ContextLogic/wishctl/cmd.Version=${SHA}" \
-	     -o bin/darwin/wishctl github.com/ContextLogic/wishctl
+		"-X github.com/ContextLogic/ctl/cmd.Version=${SHA}" \
+	     -o bin/darwin/ctl github.com/ContextLogic/ctl
