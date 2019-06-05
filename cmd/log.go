@@ -17,8 +17,12 @@ func init() {
 	logCmd.Flags().StringP("container", "c", "", "Print the logs of this container")
 	logCmd.Flags().StringP("tail", "t", "", "lines of most recent log to be printed")
 	logCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
-	logCmd.Flags().BoolP("aggregate", "a", false, "Aggregated all the logs found ")
+	logCmd.Flags().BoolP("aggregate", "", false, "Aggregated all the logs found ")
 	logCmd.Flags().StringP("since", "s", "", "Only return logs newer than a relative duration like 5s, 2m, or 3h")
+	logCmd.Flags().StringP("region", "r", "", "Specify the region")
+	logCmd.Flags().StringP("env", "e", "", "Specify the enviroment")
+	logCmd.Flags().StringP("az", "a", "", "Specify the alvalibility zone")
+	logCmd.Flags().StringP("config", "", "", "Specify the config file")
 	logCmd.Flags().String("since-time", "", "Only return logs after a specific date (RFC3339). Defaults to all logs")
 
 }
@@ -59,8 +63,12 @@ optional. If the pod has multiple containers, user have to choose one from them.
 		container, _ := cmd.Flags().GetString("container")
 		namespace, _ := cmd.Flags().GetString("namespace")
 		aggregate, _ := cmd.Flags().GetBool("aggregate")
+		region, _ := cmd.Flags().GetString("region")
+		env, _ := cmd.Flags().GetString("env")
+		az, _ := cmd.Flags().GetString("az")
+		config, _ := cmd.Flags().GetString("config")
 
-		logPod(args[0], container, namespace, aggregate, flags)
+		logPod(args[0], container, namespace, config, region, env, az, aggregate, flags)
 	},
 	Args:    cobra.MinimumNArgs(1),
 	Aliases: []string{"logs"},
@@ -76,8 +84,8 @@ optional. If the pod has multiple containers, user have to choose one from them.
 	},
 }
 
-func logPod(pod, container, namespace string, aggregate bool, flags []string) {
-	pods, err := findPods(pod, namespace)
+func logPod(pod, container, namespace, configpath, region, environment, az string, aggregate bool, flags []string) {
+	pods, err := findPods(pod, namespace, configpath, region, environment, az)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
