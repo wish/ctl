@@ -6,9 +6,13 @@ import (
 )
 
 // Helper for getting all namespaces
-func (c *Client) GetNamespaces() []string {
+func (c *Client) GetNamespaces(context string) []string {
 	// Default options
-	namespaces, err := c.clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
+	cs, err := c.getContextClientset(context)
+  if err != nil {
+    return nil
+  }
+  namespaces, err := cs.CoreV1().Namespaces().List(metav1.ListOptions{})
 	if err != nil {
 		panic(err.Error())
 	}

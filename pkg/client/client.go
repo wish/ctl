@@ -10,12 +10,11 @@ import (
 
 // Client object for all operations
 type Client struct {
-	clientset *kubernetes.Clientset
+	config string	// Config file location
+	clientsets map[string]*kubernetes.Clientset // maps from context name to client
 }
 
-func clientHelper(getConfig func() (*restclient.Config, error)) (*Client, error) {
-	var cl Client // Return client
-
+func clientsetHelper(getConfig func() (*restclient.Config, error)) (*kubernetes.Clientset, error) {
 	config, err := getConfig()
 
 	if err != nil {
@@ -24,28 +23,28 @@ func clientHelper(getConfig func() (*restclient.Config, error)) (*Client, error)
 
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
-	cl.clientset = clientset
-	if err != nil {
-		return &cl, err
-	}
-	return &cl, nil
+	return clientset, err
 }
 
+// TODO: Add more constructors??
 // Creates a client from the kubeconfig file
-func GetDefaultClient() (*Client, error) {
-	v, err := clientHelper(func() (*restclient.Config, error) {
-		config, err := clientcmd.BuildConfigFromFlags("", helper.GetKubeConfigPath())
-		return config, err
-	})
-	return v, err
+func GetDefaultConfigClient() *Client {
+	return &Client{helper.GetKubeConfigPath(), make(map[string]*kubernetes.Clientset)}
 }
 
-func GetContextClient(context string) (*Client, error) {
-	v, err := clientHelper(func() (*restclient.Config, error) {
+func (c *Client) getContextClientset(context string) (*kubernetes.Clientset, error) {
+	if cs, ok := c.clientsets[context]; ok {
+		return cs, nil
+	}
+	v, err := clientsetHelper(func() (*restclient.Config, error) {
 		config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 			&clientcmd.ClientConfigLoadingRules{ExplicitPath: helper.GetKubeConfigPath()},
 			&clientcmd.ConfigOverrides{CurrentContext: context}).ClientConfig()
 		return config, err
 	})
-	return v, err
+	if err != nil {
+		return nil, err
+	}
+	c.clientsets[context] = v
+	return v, nil
 }

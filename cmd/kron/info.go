@@ -2,7 +2,6 @@ package kron
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/ContextLogic/ctl/pkg/client"
@@ -32,46 +31,21 @@ var infoCmd = &cobra.Command{
 		// Positional arg
 		job := args[0]
 
-		var waitc sync.WaitGroup
-		waitc.Add(len(ctxs))
+		cronjobs, err := client.GetDefaultConfigClient().
+			GetCronJobOverMultiple(ctxs, nss, job, client.GetOptions{})
 
-		for _, ctx := range ctxs {
-			go func(ctx string) {
-				defer waitc.Done()
-
-				cl, err := client.GetContextClient(ctx)
-				if err != nil {
-					fmt.Printf("ERROR: Context \"%s\" not found\n", ctx)
-					return
-				}
-
-				var namespaces []string
-				if len(nss) == 0 {
-					namespaces = cl.GetNamespaces()
-				} else {
-					namespaces = nss
-				}
-
-				var waitn sync.WaitGroup
-				waitn.Add(len(namespaces))
-
-				for _, ns := range namespaces {
-					go func(ns string) {
-						defer waitn.Done()
-
-						cronjob, err := cl.GetCronJob(ns, job, client.GetOptions{})
-						if err != nil {
-							// Cronjob not found on this context
-							return
-						}
-
-						fmt.Printf("Context: %s\n\tNamespace: %s\n\tSchedule: %s\n\tActive: %d\n\tLast Schedule: %v\n\tCreated on: %v\n",
-							ctx, ns, cronjob.Spec.Schedule, len(cronjob.Status.Active), time.Since(cronjob.Status.LastScheduleTime.Time).Round(time.Second), cronjob.CreationTimestamp)
-					}(ns)
-				}
-				waitn.Wait()
-			}(ctx)
+		if err != nil {
+			panic(err.Error())
 		}
-		waitc.Wait()
+
+		for _, cronjob := range cronjobs {
+			// Formatter here
+			fmt.Printf("Context: %s\n\tNamespace: %s\n\tSchedule: %s\n\tActive: %d\n\tLast Schedule: %v\n\tCreated on: %v\n",
+				cronjob.Context, cronjob.Namespace, cronjob.Spec.Schedule, len(cronjob.Status.Active), time.Since(cronjob.Status.LastScheduleTime.Time).Round(time.Second), cronjob.CreationTimestamp)
+		}
+
+		if len(cronjobs) == 0 {
+			fmt.Println("Did not find any matching jobs")
+		}
 	},
 }
