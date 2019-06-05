@@ -1,9 +1,9 @@
 package cmd
 
 import (
-  "github.com/ContextLogic/wishctl/cmd/kron"
+	"github.com/ContextLogic/ctl/cmd/kron"
 )
 
 func init() {
-  rootCmd.AddCommand(kron.KronCmd)
+	rootCmd.AddCommand(kron.KronCmd)
 }

@@ -2,12 +2,13 @@ package kron
 
 import (
 	"fmt"
-	"sync"
-	"github.com/ContextLogic/wishctl/pkg/kron"
-	"github.com/spf13/cobra"
 	"os"
+	"sync"
 	"text/tabwriter"
 	"time"
+
+	"github.com/ContextLogic/ctl/pkg/kron"
+	"github.com/spf13/cobra"
 )
 
 // kron/listCmd represents the kron/list command
@@ -55,7 +56,7 @@ var listCmd = &cobra.Command{
 				for _, v := range list {
 					mutex.Lock()
 
-					fmt.Fprintf(w, "%s\t", v.Name) // Name
+					fmt.Fprintf(w, "%s\t", v.Name)          // Name
 					fmt.Fprintf(w, "%s\t", v.Spec.Schedule) // Schedule
 					fmt.Fprintf(w, "%t\t", *v.Spec.Suspend) // Suspend
 					fmt.Fprintf(w, "%d\t", len(v.Status.Active))
@@ -73,7 +74,7 @@ var listCmd = &cobra.Command{
 
 					mutex.Unlock()
 				}
-			} (ctx)
+			}(ctx)
 		}
 		// Wait for all threads to finish
 		wg.Wait()

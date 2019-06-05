@@ -2,9 +2,10 @@ package kron
 
 import (
 	"fmt"
-	"time"
 	"sync"
-	"github.com/ContextLogic/wishctl/pkg/kron"
+	"time"
+
+	"github.com/ContextLogic/ctl/pkg/kron"
 	"github.com/spf13/cobra"
 )
 
@@ -65,10 +66,10 @@ var infoCmd = &cobra.Command{
 
 						fmt.Printf("Context: %s\n\tNamespace: %s\n\tSchedule: %s\n\tActive: %d\n\tLast Schedule: %v\n\tCreated on: %v\n",
 							ctx, ns, cronjob.Spec.Schedule, len(cronjob.Status.Active), time.Since(cronjob.Status.LastScheduleTime.Time).Round(time.Second), cronjob.CreationTimestamp)
-					} (ns)
+					}(ns)
 				}
 				waitn.Wait()
-			} (ctx)
+			}(ctx)
 		}
 		waitc.Wait()
 	},
