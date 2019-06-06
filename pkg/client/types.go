@@ -7,12 +7,10 @@ import (
 
 type CronJobDiscovery struct {
 	Context string
-	Namespace string
 	batchv1beta1.CronJob
 }
 
 type PodDiscovery struct {
 	Context string
-	Namespace string
 	corev1.Pod
 }

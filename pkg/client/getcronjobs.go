@@ -1,9 +1,11 @@
 package client
 
 import (
+	"fmt"
 	"sync"
 	"k8s.io/api/batch/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/ContextLogic/ctl/pkg/client/helper"
 )
 
 // GetOptions currently does not support any functionality
@@ -22,6 +24,41 @@ func (c *Client) GetCronJob(context, namespace string, name string, options GetO
 	return cronjob, nil
 }
 
+func (c *Client) FindCronJobs(contexts, namespaces, names []string, options ListOptions) ([]CronJobDiscovery, error) {
+	if len(contexts) == 0 {
+		contexts = helper.GetContexts()
+	}
+	// Creating set of names
+	positive := make(map[string]struct{})
+	for _, name := range names {
+		positive[name] = struct{}{}
+	}
+
+	var ret []CronJobDiscovery
+
+	for _, ctx := range contexts {
+		nss := namespaces
+		if len(nss) == 0 {
+			nss = []string{""}
+		}
+		for _, ns := range nss {
+			cronjobs, err := c.ListCronJobs(ctx, ns, options)
+			if err != nil {
+				fmt.Println(err.Error())
+				continue
+			}
+			for _, cronjob := range cronjobs {
+				if _, ok := positive[cronjob.Name]; ok {
+					ret = append(ret, CronJobDiscovery{ctx, cronjob})
+				}
+			}
+		}
+	}
+
+	return ret, nil
+}
+
+// DEPRECATED; TODO: Remove this method
 // If contexts and namespaces are left blank, then searches through all
 func (c *Client) GetCronJobOverMultiple(contexts, namespaces []string, name string, options GetOptions) ([]CronJobDiscovery, error) {
 	var waitc sync.WaitGroup
@@ -50,7 +87,7 @@ func (c *Client) GetCronJobOverMultiple(contexts, namespaces []string, name stri
 					if err != nil { return }
 
 					mutex.Lock()
-					ret = append(ret, CronJobDiscovery{ctx, ns, *cronjob})
+					ret = append(ret, CronJobDiscovery{ctx, *cronjob})
 					mutex.Unlock()
 				}(ns)
 			}

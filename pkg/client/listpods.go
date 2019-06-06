@@ -39,7 +39,7 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 
 			mutex.Lock()
 			for _, x := range list {
-				ret = append(ret, PodDiscovery{ctx, x.Namespace, x})
+				ret = append(ret, PodDiscovery{ctx, x})
 			}
 			mutex.Unlock()
 		}(ctx)

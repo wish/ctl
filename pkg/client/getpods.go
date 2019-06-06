@@ -1,7 +1,7 @@
 package client
 
 import (
-  // "fmt"
+  "fmt"
 	"sync"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -20,6 +20,41 @@ func (c *Client) GetPod(context, namespace string, name string, options GetOptio
 	return pod, nil
 }
 
+func (c *Client) FindPods(contexts, namespaces, names []string, options ListOptions) ([]PodDiscovery, error) {
+	if len(contexts) == 0 {
+		contexts = helper.GetContexts()
+	}
+	// Creating set of names
+	positive := make(map[string]struct{})
+	for _, name := range names {
+		positive[name] = struct{}{}
+	}
+
+	var ret []PodDiscovery
+
+	for _, ctx := range contexts {
+		nss := namespaces
+		if len(nss) == 0 {
+			nss = []string{""}
+		}
+		for _, ns := range nss {
+			pods, err := c.ListPods(ctx, ns, options)
+			if err != nil {
+				fmt.Println(err.Error())
+				continue
+			}
+			for _, pod := range pods {
+				if _, ok := positive[pod.Name]; ok {
+					ret = append(ret, PodDiscovery{ctx, pod})
+				}
+			}
+		}
+	}
+
+	return ret, nil
+}
+
+// DEPRECATED; TODO: Remove this method
 // If contexts and namespaces are left blank, then searches through all
 func (c *Client) GetPodOverContext(contexts, namespaces []string, name string, options GetOptions) ([]PodDiscovery, error) {
   if len(contexts) == 0 {
@@ -52,7 +87,7 @@ func (c *Client) GetPodOverContext(contexts, namespaces []string, name string, o
 					if err != nil { return }
 
 					mutex.Lock()
-          ret = append(ret, PodDiscovery{ctx, ns, *pod})
+          ret = append(ret, PodDiscovery{ctx, *pod})
 					mutex.Unlock()
 				}(ns)
 			}

@@ -34,7 +34,7 @@ var listCmd = &cobra.Command{
 		fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tAGE\tCONTEXT")
 
 		list, err := client.GetDefaultConfigClient().
-			ListCronJobsOverContexts(ctxs, client.ListOptions{limit})
+			ListCronJobsOverContexts(ctxs, "", client.ListOptions{limit})
 
 		if err != nil {
 			panic(err.Error())

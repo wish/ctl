@@ -6,12 +6,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (c *Client) ListCronJobs(context string, options ListOptions) ([]v1beta1.CronJob, error) {
+func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]v1beta1.CronJob, error) {
 	cs, err := c.getContextClientset(context)
 	if err != nil {
 		return nil, err
 	}
-	cronjobs, err := cs.BatchV1beta1().CronJobs("").List(metav1.ListOptions{Limit: options.Limit})
+	cronjobs, err := cs.BatchV1beta1().CronJobs(namespace).List(metav1.ListOptions{Limit: options.Limit})
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (c *Client) ListCronJobs(context string, options ListOptions) ([]v1beta1.Cr
 	return cronjobs.Items, nil
 }
 
-func (c *Client) ListCronJobsOverContexts(contexts []string, options ListOptions) ([]CronJobDiscovery, error) {
+func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, options ListOptions) ([]CronJobDiscovery, error) {
 	var wait sync.WaitGroup
 	wait.Add(len(contexts))
 
@@ -34,12 +34,12 @@ func (c *Client) ListCronJobsOverContexts(contexts []string, options ListOptions
 		go func(ctx string) {
 			defer wait.Done()
 
-			list, err := c.ListCronJobs(ctx, options)
+			list, err := c.ListCronJobs(ctx, namespace, options)
 			if err != nil { return }
 
 			mutex.Lock()
 			for _, x := range list {
-				ret = append(ret, CronJobDiscovery{ctx, x.Namespace, x})
+				ret = append(ret, CronJobDiscovery{ctx, x})
 			}
 			mutex.Unlock()
 		}(ctx)
