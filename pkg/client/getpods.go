@@ -1,34 +1,36 @@
 package client
 
 import (
+  // "fmt"
 	"sync"
-	"k8s.io/api/batch/v1beta1"
+	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+  "github.com/ContextLogic/ctl/pkg/client/helper"
 )
 
-// GetOptions currently does not support any functionality
-// so Get does not use the parameter
-// options is left as a parameter for consistency
-// REVIEW: what namespace to search in?
-func (c *Client) GetCronJob(context, namespace string, name string, options GetOptions) (*v1beta1.CronJob, error) {
+func (c *Client) GetPod(context, namespace string, name string, options GetOptions) (*v1.Pod, error) {
 	cs, err := c.getContextClientset(context)
 	if err != nil {
 		return nil, err
 	}
-	cronjob, err := cs.BatchV1beta1().CronJobs(namespace).Get(name, metav1.GetOptions{})
+	pod, err := cs.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
-	return cronjob, nil
+	return pod, nil
 }
 
 // If contexts and namespaces are left blank, then searches through all
-func (c *Client) GetCronJobOverMultiple(contexts, namespaces []string, name string, options GetOptions) ([]CronJobDiscovery, error) {
+func (c *Client) GetPodOverContext(contexts, namespaces []string, name string, options GetOptions) ([]PodDiscovery, error) {
+  if len(contexts) == 0 {
+    contexts = helper.GetContexts()
+  }
+
 	var waitc sync.WaitGroup
 	waitc.Add(len(contexts))
 
 	var mutex sync.Mutex // lock for ret
-	var ret []CronJobDiscovery
+	var ret []PodDiscovery
 
 	for _, ctx := range contexts {
 		go func(ctx string) {
@@ -46,11 +48,11 @@ func (c *Client) GetCronJobOverMultiple(contexts, namespaces []string, name stri
 				go func(ns string) {
 					defer waitn.Done()
 
-					cronjob, err := c.GetCronJob(ctx, ns, name, options)
+					pod, err := c.GetPod(ctx, ns, name, options)
 					if err != nil { return }
 
 					mutex.Lock()
-					ret = append(ret, CronJobDiscovery{ctx, ns, *cronjob})
+          ret = append(ret, PodDiscovery{ctx, ns, *pod})
 					mutex.Unlock()
 				}(ns)
 			}

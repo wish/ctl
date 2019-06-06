@@ -2,6 +2,7 @@
 package client
 
 import (
+  "fmt"
   metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -14,7 +15,9 @@ func (c *Client) GetNamespaces(context string) []string {
   }
   namespaces, err := cs.CoreV1().Namespaces().List(metav1.ListOptions{})
 	if err != nil {
-		panic(err.Error())
+		// TODO: Do some logging on why namespaces couldn't be found
+    fmt.Println(err.Error())
+    return []string{}
 	}
 
 	list := make([]string, len(namespaces.Items))

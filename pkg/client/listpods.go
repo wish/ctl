@@ -7,12 +7,6 @@ import (
 	"github.com/ContextLogic/ctl/pkg/client/helper"
 )
 
-type PodDiscovery struct {
-	Context string
-	Namespace string
-	v1.Pod
-}
-
 func (c *Client) ListPods(context string, namespace string, options ListOptions) ([]v1.Pod, error) {
 	cs, err := c.getContextClientset(context)
 	if err != nil {

@@ -23,3 +23,15 @@ func printPodList(lst []client.PodDiscovery) {
   }
   w.Flush()
 }
+
+func describePod(pod client.PodDiscovery) {
+  fmt.Printf("Context: %s\n", pod.Context)
+  fmt.Printf("Namespace: %s\n", pod.Namespace)
+  fmt.Printf("%+v\n", pod.Pod)
+}
+
+func describePodList(lst []client.PodDiscovery) {
+  for _, pod := range lst {
+    describePod(pod)
+  }
+}
