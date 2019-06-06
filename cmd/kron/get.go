@@ -11,17 +11,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// kron/listCmd represents the kron/list command
+// kron/getCmd represents the kron/list command
 func init() {
-	KronCmd.AddCommand(listCmd)
+	KronCmd.AddCommand(getCmd)
 	// Contexts flag
-	listCmd.Flags().StringSliceP("contexts", "c", clienthelper.GetContexts(), "Specific contexts to list cronjobs from")
+	getCmd.Flags().StringSliceP("contexts", "c", clienthelper.GetContexts(), "Specific contexts to list cronjobs from")
 	// Limit flag
-	listCmd.Flags().Int64P("limit", "l", 0, "Limit the number of returned cron jobs")
+	getCmd.Flags().Int64P("limit", "l", 0, "Limit the number of returned cron jobs")
 }
 
-var listCmd = &cobra.Command{
-	Use:   "list",
+var getCmd = &cobra.Command{
+	Use:   "get",
 	Short: "Get a list of cronjobs",
 	Long:  "Get a list of cronjobs based on specified search criteria.",
 	Run: func(cmd *cobra.Command, args []string) {

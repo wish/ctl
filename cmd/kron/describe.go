@@ -10,17 +10,17 @@ import (
 )
 
 func init() {
-	KronCmd.AddCommand(infoCmd)
-	infoCmd.Flags().StringSliceP("contexts", "c", clienthelper.GetContexts(), "Specific contexts to list cronjobs from")
-	infoCmd.Flags().StringSliceP("namespaces", "n", []string{}, "Specific namespaces to list cronjobs from within contexts")
+	KronCmd.AddCommand(describeCmd)
+	describeCmd.Flags().StringSliceP("contexts", "c", clienthelper.GetContexts(), "Specific contexts to list cronjobs from")
+	describeCmd.Flags().StringSliceP("namespaces", "n", []string{}, "Specific namespaces to list cronjobs from within contexts")
 }
 
 // Currently does not support selected job
 // Requires job name
-var infoCmd = &cobra.Command{
-	Use:   "info [job]",
-	Short: "Get info about a job",
-	Long:  "Get info about a specific job, or the selected job if none is specified.",
+var describeCmd = &cobra.Command{
+	Use:   "describe [jobs]",
+	Short: "Show details about specified cron jobs",
+	Long:  "Show details about specific cron jobs, or the selected job if none is specified.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("Attempting to find job \"%s\"\n", args[0])
 
