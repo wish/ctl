@@ -1,12 +1,8 @@
 package cmd
 
 import (
-  "fmt"
   "github.com/ContextLogic/ctl/pkg/client"
-  "text/tabwriter"
   "github.com/spf13/cobra"
-  "os"
-  "time"
 )
 
 func init() {
@@ -26,24 +22,13 @@ var getCmd = &cobra.Command{
     namespace, _ := cmd.Flags().GetString("namespace")
 
     list, err := client.GetDefaultConfigClient().
-      ListPodsOverContexts(ctxs, namespace, client.ListOptions{0})
+      ListPodsOverContexts(ctxs, namespace, client.ListOptions{})
 
     if err != nil {
       panic(err.Error())
     }
 
-    w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
-    fmt.Fprintln(w, "CONTEXT\tNAMESPACE\tNAME\tREADY\tSTATUS\tRESTARTS\tAGE")
-
-    for _, v := range list {
-      fmt.Fprintf(w, "%s\t", v.Context)
-      fmt.Fprintf(w, "%s\t", v.Namespace)
-      fmt.Fprintf(w, "%s\t", v.Name)
-      fmt.Fprintf(w, "TODO\t")
-      fmt.Fprintf(w, "%v\t", v.Status.Phase)
-      fmt.Fprintf(w, "TODO\t")
-      fmt.Fprintf(w, "%v\n", time.Since(v.CreationTimestamp.Time).Round(time.Second))
-    }
-    w.Flush()
+    // Output
+    printPodList(list)
   },
 }
