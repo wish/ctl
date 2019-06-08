@@ -8,3 +8,7 @@ type ListOptions struct {
 type GetOptions struct {
 
 }
+
+type LogOptions struct {
+  
+}
