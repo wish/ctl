@@ -4,7 +4,7 @@ import (
   "github.com/ContextLogic/ctl/pkg/client"
   "github.com/spf13/cobra"
   "fmt"
-  // "os"
+  "os"
   // "io"
 )
 
@@ -27,21 +27,17 @@ var logCmd = &cobra.Command{
     namespace, _ := cmd.Flags().GetString("namespace")
     container, _ := cmd.Flags().GetString("container")
 
-    err := client.GetDefaultConfigClient().LogPod(ctxs, namespace, args[0], container, client.LogOptions{})
+    res, err := client.GetDefaultConfigClient().LogPod(ctxs, namespace, args[0], container, client.LogOptions{})
     if err != nil {
       fmt.Println(err.Error())
+      os.Exit(1)
       // panic(err.Error())
     }
-    // _, err = io.Copy(os.Stdout, readCloser)
-    // readCloser.Close()
-    // pods, err := client.GetDefaultConfigClient().FindPods(ctxs, namespaces, args, client.ListOptions{})
-    // if err != nil {
-    //   panic(err.Error())
-    // }
-    // if len(pods) == 0 {
-    //   fmt.Println("Could not find any matching pods!")
-    // } else {
-    //   describePodList(pods)
-    // }
+
+    raw, err := res.Raw()
+    if err != nil {
+      panic(err.Error())
+    }
+    fmt.Println(string(raw))
   },
 }
