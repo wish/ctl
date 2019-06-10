@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/Azure/go-autorest/autorest v0.2.0 // indirect
+	github.com/docker/spdystream v0.0.0-20181023171402-6480d4af844c // indirect
 	github.com/fatih/color v0.0.0-20181010231311-3f9d52f7176a
 	github.com/google/go-cmp v0.3.0 // indirect
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf // indirect

@@ -1,88 +1,33 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+  "github.com/ContextLogic/ctl/pkg/client"
+  "github.com/spf13/cobra"
+  "os"
 )
 
 func init() {
-	rootCmd.AddCommand(shCmd)
-
-	shCmd.Flags().StringP("container", "c", "", "Sepcify the container")
-	shCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
-	shCmd.Flags().StringP("region", "r", "", "Specify the region")
-	shCmd.Flags().StringP("env", "e", "", "Specify the enviroment")
-	shCmd.Flags().StringP("az", "a", "", "Specify the alvalibility zone")
-	shCmd.Flags().StringP("config", "", "", "Specify the config file")
-	shCmd.Flags().StringP("shell", "s", "/bin/bash", "Specify the shell path")
-
+  rootCmd.AddCommand(shCmd)
+  shCmd.Flags().StringSliceP("namespace", "n", []string{}, "Specify the namespace")
+  shCmd.Flags().StringP("context", "c", "", "Specify the context")
+  shCmd.Flags().StringP("container", "t", "", "Specify the container")
 }
 
 var shCmd = &cobra.Command{
-	Use:   "sh [pod] [flags]",
-	Short: "Exec /bin/bash into the container of a specific pod",
-	Long: `Exec shell into the container of a specific pod. If the pod has only one container, the container name is
-optional. If the pod has multiple containers, user have to choose one from them.`,
-	Run: func(cmd *cobra.Command, args []string) {
+  Use: "sh pod [flags]",
+  Short: "Exec $SHELL into the container of a specific pod",
+  Long: `Exec shell into the container of a specific pod.
+    If the pod has only one container, the container name is optional.
+    If the pod has multiple containers, user have to choose one from them.`,
+  Args: cobra.ExactArgs(1),
+  Run: func(cmd *cobra.Command, args []string) {
+    ctxs, _ := cmd.Flags().GetStringSlice("context")
+    namespace, _ := cmd.Flags().GetString("namespace")
+    container, _ := cmd.Flags().GetString("container")
 
-		container, _ := cmd.Flags().GetString("container")
-		namespace, _ := cmd.Flags().GetString("namespace")
-		region, _ := cmd.Flags().GetString("region")
-		env, _ := cmd.Flags().GetString("env")
-		az, _ := cmd.Flags().GetString("az")
-		config, _ := cmd.Flags().GetString("config")
-		shell, _ := cmd.Flags().GetString("shell")
-
-		shPod(args[0], container, namespace, shell, config, region, env, az)
-	},
-	Args: cobra.MinimumNArgs(1),
-}
-
-func shPod(pod, container, namespace, shell, configpath, region, environment, az string) {
-	pods, err := findPods(pod, namespace, configpath, region, environment, az)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	var podSelected Pod
-	if len(pods) > 1 {
-		var options []string
-		for _, p := range pods {
-			options = append(options, fmt.Sprintf("%s/%s/%s", p.Cluster, p.Namespace, p.Name))
-		}
-		podSelected = pods[selector(options)]
-	} else if len(pods) == 1 {
-		podSelected = pods[0]
-	} else {
-		fmt.Printf("failed to find pod \"%s\"\n", pod)
-		os.Exit(1)
-	}
-
-	if len(podSelected.Containers) > 1 {
-		option := selector(podSelected.Containers)
-		container = podSelected.Containers[option]
-	} else if len(podSelected.Containers) == 1 {
-		container = podSelected.Containers[0]
-	} else {
-		fmt.Printf("Pod: %s has no container.\n", podSelected.Name)
-	}
-
-	command := exec.Command("kubectl", "exec",
-		"-it", podSelected.Name,
-		"-c", container, shell,
-		"-n", podSelected.Namespace,
-		"--context", podSelected.Cluster)
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	command.Stdin = os.Stdin
-
-	if viper.GetBool("verbose") {
-		prettyPrintCmd(command)
-	}
-
-	command.Run()
+    err := client.GetDefaultConfigClient().ShInPod(ctxs, namespace, args[0], container, []string{"/bin/sh"}, os.Stdin, os.Stdout, os.Stderr)
+    if err != nil {
+      panic(err.Error())
+    }
+  },
 }
