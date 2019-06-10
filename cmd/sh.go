@@ -25,7 +25,7 @@ var shCmd = &cobra.Command{
     namespace, _ := cmd.Flags().GetString("namespace")
     container, _ := cmd.Flags().GetString("container")
 
-    err := client.GetDefaultConfigClient().ShInPod(ctxs, namespace, args[0], container, []string{"/bin/sh"}, os.Stdin, os.Stdout, os.Stderr)
+    err := client.GetDefaultConfigClient().ExecInPod(ctxs, namespace, args[0], container, []string{"/bin/sh"}, os.Stdin, os.Stdout, os.Stderr)
     if err != nil {
       panic(err.Error())
     }
