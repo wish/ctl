@@ -18,7 +18,7 @@ var getCmd = &cobra.Command{
     If namespace not specified, it will get all the pods across all the namespaces.
     If context(s) not specified, it will go through all contexts.`,
   Run: func(cmd *cobra.Command, args []string) {
-    ctxs, _ := cmd.Flags().GetStringSlice("contexts")
+    ctxs, _ := cmd.Flags().GetStringSlice("context")
     namespace, _ := cmd.Flags().GetString("namespace")
 
     list, err := client.GetDefaultConfigClient().
