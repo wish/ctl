@@ -11,7 +11,7 @@ func (c *Client) ListPods(context string, namespace string, options ListOptions)
 	if err != nil {
 		return nil, err
 	}
-	pods, err := cs.CoreV1().Pods(namespace).List(metav1.ListOptions{Limit: options.Limit})
+	pods, err := cs.CoreV1().Pods(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}

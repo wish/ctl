@@ -9,8 +9,7 @@ import (
 
 func GetKubeConfigPath() string {
 	// For multiple calls
-	fl := flag.Lookup("kubeconfig")
-	if fl != nil {
+	if fl := flag.Lookup("kubeconfig"); fl != nil {
 		return fl.Value.String()
 	}
 	// Set kubeconfig value

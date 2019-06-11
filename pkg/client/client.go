@@ -13,7 +13,7 @@ import (
 type Client struct {
 	config     string                           // Config file location
 	clientsets map[string]*kubernetes.Clientset // maps from context name to client
-	cslock     sync.RWMutex
+	cslock     sync.RWMutex                     // For concurrent access of clientsets
 }
 
 func clientsetHelper(getConfig func() (*restclient.Config, error)) (*kubernetes.Clientset, error) {

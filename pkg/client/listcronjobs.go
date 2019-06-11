@@ -1,10 +1,9 @@
 package client
 
 import (
-	"sync"
-	// "k8s.io/api/batch/v1beta1"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sync"
 )
 
 func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]CronJobDiscovery, error) {
@@ -12,7 +11,7 @@ func (c *Client) ListCronJobs(context string, namespace string, options ListOpti
 	if err != nil {
 		return nil, err
 	}
-	cronjobs, err := cs.BatchV1beta1().CronJobs(namespace).List(metav1.ListOptions{Limit: options.Limit})
+	cronjobs, err := cs.BatchV1beta1().CronJobs(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}

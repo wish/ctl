@@ -5,13 +5,12 @@ import (
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 	"os"
-	// "io"
 )
 
 func init() {
 	rootCmd.AddCommand(logCmd)
-	logCmd.Flags().StringSliceP("context", "c", "", "Specify the context")
-	logCmd.Flags().StringP("namespace", "n", []string{}, "Specify the namespace")
+	logCmd.Flags().StringSliceP("context", "c", []string{}, "Specify the context")
+	logCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
 	logCmd.Flags().StringP("container", "t", "", "Specify the container")
 }
 
@@ -38,6 +37,7 @@ var logCmd = &cobra.Command{
 		if err != nil {
 			panic(err.Error())
 		}
+		// REVIEW: Format??
 		fmt.Println(string(raw))
 	},
 }

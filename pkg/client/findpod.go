@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Helper for finding a specific pod
+// Helpers for finding a specific pod
 func (c *Client) findPod(contexts []string, namespace, name string) (*PodDiscovery, error) {
 	list, err := c.ListPodsOverContexts(contexts, namespace, ListOptions{})
 	if err != nil {
@@ -35,7 +35,7 @@ func (c *Client) findPodWithContainer(contexts []string, namespace, name, contai
 
 	// Check for container
 	if container == "" { // No container specified
-		if len(pod.Spec.Containers) == 1 {
+		if len(pod.Spec.Containers) == 1 { // Only container
 			container = pod.Spec.Containers[0].Name
 		} else {
 			conts := make([]string, len(pod.Spec.Containers))

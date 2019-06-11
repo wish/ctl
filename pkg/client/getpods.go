@@ -1,8 +1,6 @@
 package client
 
 import (
-	// "fmt"
-	// "sync"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -29,12 +27,12 @@ func (c *Client) FindPods(contexts []string, namespace string, names []string, o
 		positive[name] = struct{}{}
 	}
 
-	var ret []PodDiscovery
-
 	all, err := c.ListPodsOverContexts(contexts, namespace, options)
 	if err != nil {
 		return nil, err
 	}
+
+	var ret []PodDiscovery
 
 	for _, p := range all {
 		if _, ok := positive[p.Name]; ok {

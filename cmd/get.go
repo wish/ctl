@@ -27,7 +27,7 @@ var getCmd = &cobra.Command{
 		if err != nil {
 			panic(err.Error())
 		}
-
+		// NOTE: List is unsorted and could be in an inconsistent order
 		// Output
 		printPodList(list)
 	},

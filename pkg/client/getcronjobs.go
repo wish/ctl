@@ -1,21 +1,16 @@
 package client
 
 import (
-	// "fmt"
-	// "sync"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GetOptions currently does not support any functionality
-// so Get does not use the parameter
-// options is left as a parameter for consistency
-// REVIEW: what namespace to search in?
 func (c *Client) GetCronJob(context, namespace string, name string, options GetOptions) (*CronJobDiscovery, error) {
 	cs, err := c.getContextClientset(context)
 	if err != nil {
 		return nil, err
 	}
+	// REVIEW: In the future it will be useful to have a function to convert client.GetOptions -> metav1.GetOptions
 	cronjob, err := cs.BatchV1beta1().CronJobs(namespace).Get(name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -33,12 +28,12 @@ func (c *Client) FindCronJobs(contexts []string, namespace string, names []strin
 		positive[name] = struct{}{}
 	}
 
-	var ret []CronJobDiscovery
-
 	all, err := c.ListCronJobsOverContexts(contexts, namespace, options)
 	if err != nil {
 		return nil, err
 	}
+
+	var ret []CronJobDiscovery
 
 	for _, p := range all {
 		if _, ok := positive[p.Name]; ok {
