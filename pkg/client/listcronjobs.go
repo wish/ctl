@@ -3,8 +3,8 @@ package client
 import (
 	"sync"
 	// "k8s.io/api/batch/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]CronJobDiscovery, error) {
@@ -39,7 +39,9 @@ func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, o
 			defer wait.Done()
 
 			list, err := c.ListCronJobs(ctx, namespace, options)
-			if err != nil { return }
+			if err != nil {
+				return
+			}
 
 			mutex.Lock()
 			for _, j := range list {

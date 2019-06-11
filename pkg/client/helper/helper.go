@@ -1,8 +1,8 @@
 package helper
 
 import (
-	"k8s.io/client-go/tools/clientcmd"
 	"flag"
+	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"path/filepath"
 )

@@ -1,19 +1,19 @@
 package client
 
 import (
+	"github.com/ContextLogic/ctl/pkg/client/helper"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"github.com/ContextLogic/ctl/pkg/client/helper"
 	"sync"
 )
 
 // Client object for all operations
 type Client struct {
-	config string	// Config file location
+	config     string                           // Config file location
 	clientsets map[string]*kubernetes.Clientset // maps from context name to client
-	cslock sync.RWMutex
+	cslock     sync.RWMutex
 }
 
 func clientsetHelper(getConfig func() (*restclient.Config, error)) (*kubernetes.Clientset, error) {

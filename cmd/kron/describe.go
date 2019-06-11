@@ -21,9 +21,7 @@ var describeCmd = &cobra.Command{
 	Short: "Show details about specified cron jobs",
 	Long:  "Show details about specific cron jobs, or the selected job if none is specified.",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Contexts
 		ctxs, _ := cmd.Flags().GetStringSlice("context")
-		// Namespaces
 		namespace, _ := cmd.Flags().GetString("namespace")
 
 		cronjobs, err := client.GetDefaultConfigClient().

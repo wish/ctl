@@ -18,20 +18,20 @@ func init() {
 		createConfig()
 		// panic(err.Error())
 	}
-	favoriteCmd.Flags().StringSliceP("contexts", "c", []string{}, "Specific contexts to list cronjobs from")
-	favoriteCmd.Flags().StringSliceP("namespaces", "n", []string{}, "Specific namespaces to list cronjobs from within contexts")
+	favoriteCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to list cronjobs from")
+	favoriteCmd.Flags().StringP("namespace", "n", "", "Specific namespace to list cronjobs from within contexts")
 }
 
 var favoriteCmd = &cobra.Command{
 	Use:   "favorite job",
 	Short: "Adds a job to favorite list",
 	Long:  "Adds specified job(s) to the favorite list. If no job was specified the selected job is added.",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// args/flags
 		job := args[0]
-		ctxs, _ := cmd.Flags().GetStringSlice("contexts")
-		nss, _ := cmd.Flags().GetStringSlice("namespaces")
+		ctxs, _ := cmd.Flags().GetStringSlice("context")
+		nss, _ := cmd.Flags().GetString("namespace")
 
 		// Behaviour when
 		var f map[string]location
@@ -43,7 +43,7 @@ var favoriteCmd = &cobra.Command{
 		if l, ok := f[job]; ok {
 			fmt.Printf("Job \"%s\" is already in favorites with:\n", job)
 			fmt.Printf("Contexts: %v\n", l.Contexts)
-			fmt.Printf("Namespaces: %v\n", l.Namespaces)
+			fmt.Printf("Namespace: %v\n", l.Namespace)
 			fmt.Println("Overriding entry...")
 		}
 		f[job] = location{ctxs, nss}

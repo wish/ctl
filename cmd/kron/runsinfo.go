@@ -5,6 +5,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func init() {
+	runsCmd.AddCommand(runsInfoCmd)
+}
+
 var runsInfoCmd = &cobra.Command{
 	Use:   "info [job [run] | run]",
 	Short: "Get info about a run",
@@ -13,8 +17,4 @@ var runsInfoCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("TODO")
 	},
-}
-
-func init() {
-	runsCmd.AddCommand(runsInfoCmd)
 }

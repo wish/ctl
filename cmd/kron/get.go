@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/ContextLogic/ctl/pkg/client"
-	clienthelper "github.com/ContextLogic/ctl/pkg/client/helper"
 	"github.com/spf13/cobra"
 )
 
@@ -15,9 +14,8 @@ import (
 func init() {
 	KronCmd.AddCommand(getCmd)
 	// Contexts flag
-	getCmd.Flags().StringSliceP("contexts", "c", clienthelper.GetContexts(), "Specific contexts to list cronjobs from")
-	// Limit flag
-	getCmd.Flags().Int64P("limit", "l", 0, "Limit the number of returned cron jobs")
+	getCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to list cronjobs from")
+	getCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to list cronjobs from within contexts")
 }
 
 var getCmd = &cobra.Command{
@@ -26,19 +24,23 @@ var getCmd = &cobra.Command{
 	Long:  "Get a list of cronjobs based on specified search criteria.",
 	Run: func(cmd *cobra.Command, args []string) {
 		// Get flags
-		ctxs, _ := cmd.Flags().GetStringSlice("contexts")
-		// Limit
-		limit, _ := cmd.Flags().GetInt64("limit")
-
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
-		fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tAGE\tCONTEXT")
+		ctxs, _ := cmd.Flags().GetStringSlice("context")
+		namespace, _ := cmd.Flags().GetString("namespace")
 
 		list, err := client.GetDefaultConfigClient().
-			ListCronJobsOverContexts(ctxs, "", client.ListOptions{limit})
+			ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
 
 		if err != nil {
 			panic(err.Error())
 		}
+
+		if len(list) == 0 {
+			fmt.Println("No cron jobs found!")
+			return
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
+		fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tAGE\tCONTEXT")
 
 		for _, v := range list {
 			fmt.Fprintf(w, "%s\t", v.Name)          // Name

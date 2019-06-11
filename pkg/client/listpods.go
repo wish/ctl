@@ -1,9 +1,9 @@
 package client
 
 import (
-	"sync"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sync"
 )
 
 func (c *Client) ListPods(context string, namespace string, options ListOptions) ([]PodDiscovery, error) {
@@ -38,7 +38,9 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 			defer wait.Done()
 
 			pods, err := c.ListPods(ctx, namespace, options)
-			if err != nil { return }
+			if err != nil {
+				return
+			}
 
 			mutex.Lock()
 			for _, pod := range pods {

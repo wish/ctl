@@ -7,7 +7,7 @@ import (
 )
 
 type selectedJob struct {
-	Name string `json:"name"`
+	Name     string   `json:"name"`
 	Location location `json:"location"`
 }
 
@@ -22,20 +22,20 @@ func init() {
 		createConfig()
 		// panic(err.Error())
 	}
-	selectCmd.Flags().StringSliceP("contexts", "c", []string{}, "Specific contexts to list cronjobs from")
-	selectCmd.Flags().StringSliceP("namespaces", "n", []string{}, "Specific namespaces to list cronjobs from within contexts")
+	selectCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to list cronjobs from")
+	selectCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to list cronjobs from within contexts")
 }
 
 var selectCmd = &cobra.Command{
 	Use:   "select job",
 	Short: "Uses list to select a job to operate on",
 	Long:  "Uses list to select a job on which other commands can conveniently operate on.",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// args/flags
 		job := args[0]
-		ctxs, _ := cmd.Flags().GetStringSlice("contexts")
-		nss, _ := cmd.Flags().GetStringSlice("namespaces")
+		ctxs, _ := cmd.Flags().GetStringSlice("context")
+		namespace, _ := cmd.Flags().GetString("namespace")
 
 		var s selectedJob
 		err := viper.UnmarshalKey("selected", &s)
@@ -43,7 +43,7 @@ var selectCmd = &cobra.Command{
 			fmt.Println(err.Error())
 		}
 
-		viper.Set("selected", selectedJob{job, location{ctxs, nss}})
+		viper.Set("selected", selectedJob{job, location{ctxs, namespace}})
 		viper.WriteConfig()
 	},
 }

@@ -3,8 +3,8 @@ package client
 import (
 	// "fmt"
 	// "sync"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // GetOptions currently does not support any functionality
