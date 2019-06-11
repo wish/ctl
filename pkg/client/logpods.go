@@ -5,6 +5,7 @@ import (
   "k8s.io/client-go/rest"
 )
 
+// Retrieves logs of a single pod (uses first found if multiple)
 func (c *Client) LogPod(contexts []string, namespace, name, container string, options LogOptions) (*rest.Result, error) {
   pod, container, err := c.findPodWithContainer(contexts, namespace, name, container)
   if err != nil {

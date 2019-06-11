@@ -5,14 +5,13 @@ import (
 	"time"
 
 	"github.com/ContextLogic/ctl/pkg/client"
-	clienthelper "github.com/ContextLogic/ctl/pkg/client/helper"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	KronCmd.AddCommand(describeCmd)
-	describeCmd.Flags().StringSliceP("contexts", "c", clienthelper.GetContexts(), "Specific contexts to list cronjobs from")
-	describeCmd.Flags().StringSliceP("namespaces", "n", []string{}, "Specific namespaces to list cronjobs from within contexts")
+	describeCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to list cronjobs from")
+	describeCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to list cronjobs from within contexts")
 }
 
 // Currently does not support selected job
@@ -22,17 +21,13 @@ var describeCmd = &cobra.Command{
 	Short: "Show details about specified cron jobs",
 	Long:  "Show details about specific cron jobs, or the selected job if none is specified.",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Attempting to find job \"%s\"\n", args[0])
-
 		// Contexts
-		ctxs, _ := cmd.Flags().GetStringSlice("contexts")
+		ctxs, _ := cmd.Flags().GetStringSlice("context")
 		// Namespaces
-		nss, _ := cmd.Flags().GetStringSlice("namespaces")
-		// Positional arg
-		job := args[0]
+		namespace, _ := cmd.Flags().GetString("namespace")
 
 		cronjobs, err := client.GetDefaultConfigClient().
-			GetCronJobOverMultiple(ctxs, nss, job, client.GetOptions{})
+			FindCronJobs(ctxs, namespace, args, client.ListOptions{})
 
 		if err != nil {
 			panic(err.Error())

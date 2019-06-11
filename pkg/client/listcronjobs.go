@@ -2,11 +2,12 @@ package client
 
 import (
 	"sync"
-	"k8s.io/api/batch/v1beta1"
+	// "k8s.io/api/batch/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/ContextLogic/ctl/pkg/client/helper"
 )
 
-func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]v1beta1.CronJob, error) {
+func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]CronJobDiscovery, error) {
 	cs, err := c.getContextClientset(context)
 	if err != nil {
 		return nil, err
@@ -15,15 +16,18 @@ func (c *Client) ListCronJobs(context string, namespace string, options ListOpti
 	if err != nil {
 		return nil, err
 	}
-
-	// Add more search options.
-	// Search my keyword will have to be done after querying.
-	// Thus, limit will have to be changed post-processing
-
-	return cronjobs.Items, nil
+	items := make([]CronJobDiscovery, len(cronjobs.Items))
+	for i, j := range cronjobs.Items {
+		items[i] = CronJobDiscovery{context, j}
+	}
+	return items, nil
 }
 
 func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, options ListOptions) ([]CronJobDiscovery, error) {
+	if len(contexts) == 0 {
+		contexts = helper.GetContexts()
+	}
+
 	var wait sync.WaitGroup
 	wait.Add(len(contexts))
 
@@ -38,8 +42,8 @@ func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, o
 			if err != nil { return }
 
 			mutex.Lock()
-			for _, x := range list {
-				ret = append(ret, CronJobDiscovery{ctx, x})
+			for _, j := range list {
+				ret = append(ret, j)
 			}
 			mutex.Unlock()
 		}(ctx)

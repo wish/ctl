@@ -8,8 +8,8 @@ import (
 
 func init() {
   rootCmd.AddCommand(describeCmd)
-  describeCmd.Flags().StringSliceP("namespace", "n", []string{}, "Specify the namespace")
   describeCmd.Flags().StringSliceP("context", "c", []string{}, "Specify the context")
+  describeCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
 }
 
 var describeCmd = &cobra.Command{
@@ -21,9 +21,9 @@ var describeCmd = &cobra.Command{
   Args: cobra.MinimumNArgs(1),
   Run: func(cmd *cobra.Command, args []string) {
     ctxs, _ := cmd.Flags().GetStringSlice("context")
-    namespaces, _ := cmd.Flags().GetStringSlice("namespace")
+    namespace, _ := cmd.Flags().GetString("namespace")
 
-    pods, err := client.GetDefaultConfigClient().FindPods(ctxs, namespaces, args, client.ListOptions{})
+    pods, err := client.GetDefaultConfigClient().FindPods(ctxs, namespace, args, client.ListOptions{})
     if err != nil {
       panic(err.Error())
     }

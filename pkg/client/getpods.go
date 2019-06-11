@@ -1,14 +1,13 @@
 package client
 
 import (
-  "fmt"
-	"sync"
-	"k8s.io/api/core/v1"
+  // "fmt"
+	// "sync"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
   "github.com/ContextLogic/ctl/pkg/client/helper"
 )
 
-func (c *Client) GetPod(context, namespace string, name string, options GetOptions) (*v1.Pod, error) {
+func (c *Client) GetPod(context, namespace string, name string, options GetOptions) (*PodDiscovery, error) {
 	cs, err := c.getContextClientset(context)
 	if err != nil {
 		return nil, err
@@ -17,10 +16,10 @@ func (c *Client) GetPod(context, namespace string, name string, options GetOptio
 	if err != nil {
 		return nil, err
 	}
-	return pod, nil
+	return &PodDiscovery{context, *pod}, nil
 }
 
-func (c *Client) FindPods(contexts, namespaces, names []string, options ListOptions) ([]PodDiscovery, error) {
+func (c *Client) FindPods(contexts []string, namespace string, names []string, options ListOptions) ([]PodDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = helper.GetContexts()
 	}
@@ -32,70 +31,16 @@ func (c *Client) FindPods(contexts, namespaces, names []string, options ListOpti
 
 	var ret []PodDiscovery
 
-	for _, ctx := range contexts {
-		nss := namespaces
-		if len(nss) == 0 {
-			nss = []string{""}
-		}
-		for _, ns := range nss {
-			pods, err := c.ListPods(ctx, ns, options)
-			if err != nil {
-				fmt.Println(err.Error())
-				continue
-			}
-			for _, pod := range pods {
-				if _, ok := positive[pod.Name]; ok {
-					ret = append(ret, PodDiscovery{ctx, pod})
-				}
-			}
-		}
-	}
-
-	return ret, nil
-}
-
-// DEPRECATED; TODO: Remove this method
-// If contexts and namespaces are left blank, then searches through all
-func (c *Client) GetPodOverContext(contexts, namespaces []string, name string, options GetOptions) ([]PodDiscovery, error) {
-  if len(contexts) == 0 {
-    contexts = helper.GetContexts()
+  all, err := c.ListPodsOverContexts(contexts, namespace, options)
+  if err != nil {
+    return nil, err
   }
 
-	var waitc sync.WaitGroup
-	waitc.Add(len(contexts))
+  for _, p := range all {
+    if _, ok := positive[p.Name]; ok {
+      ret = append(ret, p)
+    }
+  }
 
-	var mutex sync.Mutex // lock for ret
-	var ret []PodDiscovery
-
-	for _, ctx := range contexts {
-		go func(ctx string) {
-			defer waitc.Done()
-
-			nss := namespaces
-			if len(nss) == 0 {
-				nss = c.GetNamespaces(ctx)
-			}
-
-			var waitn sync.WaitGroup
-			waitn.Add(len(nss))
-
-			for _, ns := range nss {
-				go func(ns string) {
-					defer waitn.Done()
-
-					pod, err := c.GetPod(ctx, ns, name, options)
-					if err != nil { return }
-
-					mutex.Lock()
-          ret = append(ret, PodDiscovery{ctx, *pod})
-					mutex.Unlock()
-				}(ns)
-			}
-
-			waitn.Wait()
-		}(ctx)
-	}
-
-	waitc.Wait()
 	return ret, nil
 }
