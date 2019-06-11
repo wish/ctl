@@ -6,11 +6,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type selectedJob struct {
-	Name     string   `json:"name"`
-	Location location `json:"location"`
-}
-
 func init() {
 	KronCmd.AddCommand(selectCmd)
 	viper.SetDefault("selected", make(map[string]location))

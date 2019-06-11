@@ -23,30 +23,36 @@ func init() {
 }
 
 var favoriteCmd = &cobra.Command{
-	Use:   "favorite job",
-	Short: "Adds a job to favorite list",
+	Use:   "favorite [jobs]",
+	Short: "Adds jobs to favorite list",
 	Long:  "Adds specified job(s) to the favorite list. If no job was specified the selected job is added.",
-	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// args/flags
-		job := args[0]
 		ctxs, _ := cmd.Flags().GetStringSlice("context")
 		nss, _ := cmd.Flags().GetString("namespace")
 
-		// Behaviour when
-		var f map[string]location
-		err := viper.UnmarshalKey("favorites", &f)
+		f, err := getFavorites()
 		if err != nil {
-			fmt.Println(err.Error())
+			panic(err.Error())
 		}
 
-		if l, ok := f[job]; ok {
-			fmt.Printf("Job \"%s\" is already in favorites with:\n", job)
-			fmt.Printf("Contexts: %v\n", l.Contexts)
-			fmt.Printf("Namespace: %v\n", l.Namespace)
-			fmt.Println("Overriding entry...")
+		if len(args) == 0 {
+			selected, err := getSelected()
+			if err != nil {
+				panic(err.Error())
+			}
+			if l, ok := f[selected.Name]; ok {
+				fmt.Println(overrideFavoriteMessage(selected.Name, l))
+			}
+			f[selected.Name] = selected.Location
+		} else {
+			for _, job := range args {
+				if l, ok := f[job]; ok {
+					fmt.Println(overrideFavoriteMessage(job, l))
+				}
+				f[job] = location{ctxs, nss}
+			}
 		}
-		f[job] = location{ctxs, nss}
 
 		viper.Set("favorites", f)
 		viper.WriteConfig()
