@@ -25,7 +25,7 @@ func printPodList(lst []client.PodDiscovery) {
 			}
 		}
 		fmt.Fprintf(w, "%d/%d\t", ready, len(v.Spec.Containers))
-		fmt.Fprintf(w, "%s\t", v.Status.Phase)	// A bit off from kubectl output
+		fmt.Fprintf(w, "%s\t", v.Status.Phase) // A bit off from kubectl output
 		// Restarts
 		var restarts int32
 		for _, s := range v.Status.ContainerStatuses {

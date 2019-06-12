@@ -2,9 +2,9 @@ package kron
 
 import (
 	"fmt"
+	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/viper"
 	"os"
-	"github.com/ContextLogic/ctl/pkg/client"
 )
 
 // For storing the location of a job for select and favorite.
