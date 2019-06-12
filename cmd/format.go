@@ -11,6 +11,10 @@ import (
 // REVIEW: Most of the processing here was guessed with reverse engineering
 // by comparing with the output of kubectl
 func printPodList(lst []client.PodDiscovery) {
+	if len(lst) == 0 {
+		fmt.Println("No pods found")
+		return
+	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
 	fmt.Fprintln(w, "CONTEXT\tNAMESPACE\tNAME\tREADY\tSTATUS\tRESTARTS\tAGE")
 

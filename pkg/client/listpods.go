@@ -1,8 +1,10 @@
 package client
 
 import (
+	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"os"
 	"sync"
 )
 
@@ -39,6 +41,7 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 
 			pods, err := c.ListPods(ctx, namespace, options)
 			if err != nil {
+				fmt.Fprintf(os.Stderr, `Could not connect to cluster "%s": %v\n`, ctx, err)
 				return
 			}
 
