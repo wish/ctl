@@ -17,9 +17,9 @@ func init() {
 var logCmd = &cobra.Command{
 	Use:   "log pod [flags]",
 	Short: "Get log of a container in a pod",
-	Long: `Print a detailed description of the selected pods..
-    If namespace not specified, it will get all the pods across all the namespaces.
-    If context(s) not specified, it will go through all contexts.`,
+	Long: `Print a detailed description of the selected pod.
+If namespace not specified, it will get all the pods across all the namespaces.
+If context(s) not specified, it will search through all contexts.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctxs, _ := cmd.Flags().GetStringSlice("context")

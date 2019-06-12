@@ -18,14 +18,15 @@ func init() {
 		createConfig()
 		// panic(err.Error())
 	}
-	favoriteCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to list cronjobs from")
-	favoriteCmd.Flags().StringP("namespace", "n", "", "Specific namespace to list cronjobs from within contexts")
+	favoriteCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to match cronjobs from")
+	favoriteCmd.Flags().StringP("namespace", "n", "", "Specific namespace to match cronjobs from within contexts")
 }
 
 var favoriteCmd = &cobra.Command{
-	Use:   "favorite [jobs]",
+	Use:   "favorite [jobs] [flags]",
 	Short: "Adds jobs to favorite list",
-	Long:  "Adds specified job(s) to the favorite list. If no job was specified the selected job is added.",
+	Long: `Adds specified job(s) to the favorite list. If no job was specified the selected job is added.
+A namespace and contexts can be specified to limit matches.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// args/flags
 		ctxs, _ := cmd.Flags().GetStringSlice("context")

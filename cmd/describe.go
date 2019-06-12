@@ -15,9 +15,9 @@ func init() {
 var describeCmd = &cobra.Command{
 	Use:   "describe pods [flags]",
 	Short: "Show details of a specific pod(s)",
-	Long: `Print a detailed description of the selected pods..
-    If namespace not specified, it will get all the pods across all the namespaces.
-    If context(s) not specified, it will go through all contexts.`,
+	Long: `Print a detailed description of the pods specified by name.
+If namespace not specified, it will get all the pods across all the namespaces.
+If context(s) not specified, it will search through all contexts.`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctxs, _ := cmd.Flags().GetStringSlice("context")

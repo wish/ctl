@@ -21,10 +21,11 @@ func init() {
 }
 
 var unfavoriteCmd = &cobra.Command{
-	Use:   "unfavorite job...",
+	Use:   "unfavorite jobs",
 	Short: "Removes job(s) from favorite list",
-	Long:  "Removes job(s) from favorite list. If no jobs are specified, removes selected job. If job is selected, opens a list to choose to remove from.",
-	Args:  cobra.MinimumNArgs(1),
+	Long: `Removes job(s) from favorite list.
+If no jobs are specified, removes selected job.`,
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// args/flags
 

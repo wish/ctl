@@ -17,15 +17,17 @@ func init() {
 		createConfig()
 		// panic(err.Error())
 	}
-	selectCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to list cronjobs from")
-	selectCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to list cronjobs from within contexts")
+	selectCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to select cronjobs from")
+	selectCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to select cronjobs from within contexts")
 }
 
 var selectCmd = &cobra.Command{
-	Use:   "select job",
+	Use:   "select job [flags]",
 	Short: "Uses list to select a job to operate on",
-	Long:  "Uses list to select a job on which other commands can conveniently operate on.",
-	Args:  cobra.ExactArgs(1),
+	Long: `Uses list to select a job on which other commands can conveniently operate on.
+A namespace and contexts can be specified to limit matches.
+If namespace/contexts are not specified, usage will match with all results.`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// args/flags
 		job := args[0]

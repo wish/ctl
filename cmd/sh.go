@@ -17,8 +17,12 @@ var shCmd = &cobra.Command{
 	Use:   "sh pod [flags]",
 	Short: "Exec $SHELL into the container of a specific pod",
 	Long: `Exec shell into the container of a specific pod.
-    If the pod has only one container, the container name is optional.
-    If the pod has multiple containers, user have to choose one from them.`,
+If namespace not specified, it will get all the pods across all the namespaces.
+If context(s) not specified, it will list from all contexts.
+Note that this command only operates on one pod, if multiple pods match,
+the command will only work on the first one found.
+If the pod has only one container, the container name is optional.
+If the pod has multiple containers, user have to choose one from them.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctxs, _ := cmd.Flags().GetStringSlice("context")

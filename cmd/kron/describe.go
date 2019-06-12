@@ -10,17 +10,19 @@ import (
 
 func init() {
 	KronCmd.AddCommand(describeCmd)
-	describeCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to list cronjobs from")
-	describeCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to list cronjobs from within contexts")
-	describeCmd.Flags().BoolP("favorites", "f", false, "Operate on all favorited cron jobs. ")
+	describeCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to search cronjobs from")
+	describeCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to search cronjobs from within contexts")
+	describeCmd.Flags().BoolP("favorites", "f", false, "Describe all favorited cron jobs")
 }
 
 // Currently does not support selected job
 // Requires job name
 var describeCmd = &cobra.Command{
-	Use:   "describe [jobs]",
+	Use:   "describe [jobs] [flags]",
 	Short: "Show details about specified cron jobs",
-	Long:  "Show details about specific cron jobs, or the selected job if none is specified.",
+	Long: `Show details about specific cron jobs, or the selected job if none is specified.
+If namespace not specified, it will get all the cron jobs across all the namespaces.
+If context(s) not specified, it will search through all contexts.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctxs, _ := cmd.Flags().GetStringSlice("context")
 		namespace, _ := cmd.Flags().GetString("namespace")
