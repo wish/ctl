@@ -1,8 +1,12 @@
 package client
 
 import (
+	"errors"
+	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"os"
+	"strings"
 	"sync"
 )
 
@@ -32,6 +36,7 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 
 	var mutex sync.Mutex
 	var ret []PodDiscovery
+	var failed []string
 
 	for _, ctx := range contexts {
 		go func(ctx string) {
@@ -39,6 +44,8 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 
 			pods, err := c.ListPods(ctx, namespace, options)
 			if err != nil {
+				fmt.Fprintf(os.Stderr, "Could not connect to cluster \"%s\": %v\n", ctx, err)
+				failed = append(failed, ctx)
 				return
 			}
 
@@ -51,5 +58,8 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 	}
 
 	wait.Wait()
+	if failed != nil {
+		return ret, errors.New("Failed connecting to the following contexts: " + strings.Join(failed, ", "))
+	}
 	return ret, nil
 }

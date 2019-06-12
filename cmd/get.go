@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func init() {
@@ -23,12 +25,14 @@ var getCmd = &cobra.Command{
 
 		list, err := client.GetDefaultConfigClient().
 			ListPodsOverContexts(ctxs, namespace, client.ListOptions{})
-
-		if err != nil {
-			panic(err.Error())
-		}
 		// NOTE: List is unsorted and could be in an inconsistent order
 		// Output
-		printPodList(list)
+		if list != nil {
+			printPodList(list)
+		}
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 	},
 }

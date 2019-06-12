@@ -35,7 +35,8 @@ var logCmd = &cobra.Command{
 
 		raw, err := res.Raw()
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 		// REVIEW: Format??
 		fmt.Println(string(raw))
