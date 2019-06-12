@@ -3,8 +3,10 @@ package kron
 import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/robfig/cron"
 	"github.com/spf13/viper"
 	"os"
+	"time"
 )
 
 // For storing the location of a job for select and favorite.
@@ -75,4 +77,23 @@ func filterFromFavorites(lst []client.CronJobDiscovery) []client.CronJobDiscover
 		}
 	}
 	return filtered
+}
+
+type byLastRun []client.CronJobDiscovery
+
+func (l byLastRun) Len() int      { return len(l) }
+func (l byLastRun) Swap(i, j int) { l[i], l[j] = l[j], l[i] }
+func (l byLastRun) Less(i, j int) bool {
+	return l[i].Status.LastScheduleTime.Time.After(l[j].Status.LastScheduleTime.Time)
+}
+
+type byNextRun []client.CronJobDiscovery
+
+func (l byNextRun) Len() int      { return len(l) }
+func (l byNextRun) Swap(i, j int) { l[i], l[j] = l[j], l[i] }
+func (l byNextRun) Less(i, j int) bool {
+	a, _ := cron.ParseStandard(l[i].Spec.Schedule)
+	b, _ := cron.ParseStandard(l[j].Spec.Schedule)
+	now := time.Now()
+	return a.Next(now).Before(b.Next(now))
 }

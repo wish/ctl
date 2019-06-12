@@ -2,7 +2,6 @@ package kron
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
@@ -53,9 +52,7 @@ If context(s) not specified, it will search through all contexts.`,
 		}
 
 		for _, cronjob := range cronjobs {
-			// Formatter here
-			fmt.Printf("Context: %s\n\tName: %s\n\tNamespace: %s\n\tSchedule: %s\n\tActive: %d\n\tLast Schedule: %v\n\tCreated on: %v\n",
-				cronjob.Context, cronjob.Name, cronjob.Namespace, cronjob.Spec.Schedule, len(cronjob.Status.Active), time.Since(cronjob.Status.LastScheduleTime.Time).Round(time.Second), cronjob.CreationTimestamp)
+			describeCronJob(cronjob)
 		}
 
 		if len(cronjobs) == 0 {

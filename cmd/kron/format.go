@@ -3,6 +3,7 @@ package kron
 import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/robfig/cron"
 	"os"
 	"text/tabwriter"
 	"time"
@@ -21,7 +22,7 @@ func printCronJobList(lst []client.CronJobDiscovery) {
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
-	fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tAGE\tCONTEXT")
+	fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tNEXT RUN\tAGE\tCONTEXT")
 
 	for _, v := range lst {
 		fmt.Fprintf(w, "%s\t", v.Name)          // Name
@@ -35,10 +36,25 @@ func printCronJobList(lst []client.CronJobDiscovery) {
 		} else {
 			fmt.Fprintf(w, "%v\t", time.Since(v.Status.LastScheduleTime.Time).Round(time.Second))
 		}
+		// Next run
+		s, _ := cron.ParseStandard(v.Spec.Schedule)
+		fmt.Fprintf(w, "%v\t", time.Until(s.Next(time.Now())).Round(time.Second))
 		// Age
 		fmt.Fprintf(w, "%v\t", time.Since(v.CreationTimestamp.Time).Round(time.Second))
 		// Context
 		fmt.Fprintf(w, "%s\n", v.Context)
 	}
 	w.Flush()
+}
+
+func describeCronJob(c client.CronJobDiscovery) {
+	fmt.Printf("Context: %s\n", c.Context)
+	fmt.Printf("\tName: %s\n", c.Name)
+	fmt.Printf("\tNamespace: %s\n", c.Namespace)
+	fmt.Printf("\tSchedule: %s\n", c.Spec.Schedule)
+	fmt.Printf("\tActive: %d\n", len(c.Status.Active))
+	fmt.Printf("\tLast schedule: %v\n", time.Since(c.Status.LastScheduleTime.Time).Round(time.Second))
+	s, _ := cron.ParseStandard(c.Spec.Schedule)
+	fmt.Printf("\tNext run: %v\n", time.Until(s.Next(time.Now())).Round(time.Second))
+	fmt.Printf("\tCreated on: %v\n", c.CreationTimestamp)
 }
