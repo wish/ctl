@@ -5,6 +5,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func GetKubeConfigPath() string {
@@ -38,7 +39,10 @@ func GetContexts() []string {
 
 	ctxs := make([]string, 0, len(config.Contexts))
 	for k, _ := range config.Contexts { // Currently ignoring mappings
-		ctxs = append(ctxs, k)
+		// Hardcode ignore test clusters
+		if !strings.Contains(k, "test") { // REVIEW: Remove this when possible
+			ctxs = append(ctxs, k)
+		}
 	}
 
 	return ctxs
