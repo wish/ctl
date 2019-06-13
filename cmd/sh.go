@@ -11,6 +11,7 @@ func init() {
 	shCmd.Flags().StringSliceP("context", "c", []string{}, "Specify the context")
 	shCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
 	shCmd.Flags().StringP("container", "t", "", "Specify the container")
+	shCmd.Flags().StringP("shell", "s", "/bin/bash", "Specify the shell path")
 }
 
 var shCmd = &cobra.Command{
@@ -28,8 +29,9 @@ If the pod has multiple containers, user have to choose one from them.`,
 		ctxs, _ := cmd.Flags().GetStringSlice("context")
 		namespace, _ := cmd.Flags().GetString("namespace")
 		container, _ := cmd.Flags().GetString("container")
+		shell, _ := cmd.Flags().GetString("shell")
 
-		err := client.GetDefaultConfigClient().ExecInPod(ctxs, namespace, args[0], container, []string{"/bin/sh"}, os.Stdin, os.Stdout, os.Stderr)
+		err := client.GetDefaultConfigClient().ExecInPod(ctxs, namespace, args[0], container, []string{shell}, os.Stdin, os.Stdout, os.Stderr)
 		if err != nil {
 			panic(err.Error())
 		}
