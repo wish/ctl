@@ -4,9 +4,6 @@ wrapper tool of kubectl for multi-clusters and easy pod/log discovering
 # prerequisites
 [Setting up k8s envs](https://github.com/ContextLogic/k8s/wiki/Setting-up-your-environment-for-k8s), (kubectl + kubeconfig)
 
-# install
-presumably bin/ folder is up to date. Can just move the execuables to the $PATH
-
 ## build from source
 make build/ctl.<darwin|linux>
 and move bin/<darwin|linux>/ctl to the $PATH
@@ -14,39 +11,70 @@ and move bin/<darwin|linux>/ctl to the $PATH
 # usage
 
 ### get
-List pods with/without namespace given.
+List pods with/without namespace given and over contexts.
 
-| NAME | READY | STATUS | RESTARTS | AGE |
-|------|---------|-------|-------|-------|
-| Name of pod | ready containers/total containers | Curent Status | Times of Restarts | How long been running
-
-Flag:
-- --namespace, -n specify the namespace. This could largely reduce the run time of the command.
-
-### describe [pod]
-Get a detailed description of the pods matching the name query
-
-Flag:
-- --namespace, -n specify the namespace. This could largely reduce the run time of the command.
-
-### log [pod] [flags]
-Get the logs given a container in a pod specified. If the pod has only one container, the container name is
-optional. If the pod has multiple containers, choose one from them.
+| CONTEXT | NAMESPACE | NAME | READY | STATUS | RESTARTS | AGE |
+|------|---------|-------|-------|-------|-------|-------|
+| cluster name | namespace of pod | name of pod | ready containers/total containers | current status |number of restarts | time since starting
 
 Flags:
-- --namespace, -n specify the namespace. This could largely reduce the run time of the command.
-- --container, -c specify the container name. If no container specified, will print first container's log by default.
-- --follow, -f stream pod logs (stdout).
-- --tail, -t lines of recent log file to display.
-- --aggregate, -a enable/disable printing logs from multiple pods.
-- --since, -s Only return logs newer than a relative duration like 5s, 2m, or 3h. Defaults to all logs. Only one of since-time / since may be used.
-- --since-time Only return logs after a specific date (RFC3339). Defaults to all logs. Only one of since-time / since may be used.
+- `--context, -c` specify the contexts. Can reduce the run time.
+- `--namespace, -n` specify the namespace.
 
-### sh [pod] [flags]
-Exec /bin/bash into the container of a specific pod. If the pod has only one container, the container name is
-optional. If the pod has multiple containers, choose one from them.
+### describe pods
+Get a detailed description of the pods matching the name query and context/namespace.
 
 Flag:
-- --namespace, -n specify the namespace. This could largely reduce the run time of the command.
-- --container, -c specify the container name.
-- --shell, -s specify the shell path ((default "/bin/bash")
+- `--context, -c` specify the contexts. Can reduce the run time.
+- `--namespace, -n` specify the namespace.
+
+### log pod [flags]
+Get the logs given a container in a pod specified. If the pod has only one container, the container name is optional. If the pod has multiple containers, choose one from them. If there are multiple pods that match, the command only operates on the first one found.
+
+Flags:
+- `--context, -c` specify the contexts. Can reduce the run time.
+- `--namespace, -n` specify the namespace. This could largely reduce the run time of the command.
+- `--container, -c` specify the container name. If no container specified, the command will fail.
+
+### sh pod [flags]
+Exec /bin/sh into the container of a specific pod. If the pod has only one container, the container name is optional. If the pod has multiple containers, choose one from them. If there are multiple pods that match, the command only operates on the first one found.
+
+
+Flag:
+- `--context, -c` specify the contexts. Can reduce the run time.
+- `--namespace, -n` specify the namespace. This could largely reduce the run time of the command.
+- `--container, -c` specify the container name.
+- `--shell, -s` specify the shell path (default "/bin/sh")
+
+## kron
+Kron is a subcommand of ctl for operations involving cron jobs. Generally, the commands follow the same format but do vary due to different requirements.
+
+### get
+
+Like in ctl, `get` retrieves a list of all cron jobs with namespace and context flags.
+
+| NAME | SCHEDULE | SUSPEND | ACTIVE | LAST SCHEDULE | NEXT RUN | AGE | CONTEXT |
+|------|------|------|------|------|------|------|------|
+| name of cron job | cron schedule | suspended boolean | active pods | time since last run | time until next run | time since adding | cluster name |
+Flags:
+- `--by-last-run, -l` sorts with latest run cron jobs first
+- `--by-last-run-reverse, -L` sorts with oldest run cron jobs first
+- `--by-next-run, -e` sorts with the closest next run cron job first
+- `--by-next-run-reverse, -E` sorts with farthest next run first
+
+### describe
+Print information about the specified cron jobs like in ctl.
+
+Currently displays the following fields: context, name, namespace, schedule, active, last schedule, next run, creation timestamp.
+
+### favorite/unfavorite
+A utility function to create a list of cron jobs for easy use with describe and get.
+Able to set context and namespace for filtering.
+
+### select
+Another utility function to operate on a single function.
+
+These utility commands persist the state throughout runs in `~/.kron/config.yaml`
+
+---
+Other commands still need to be done and are a WIP.
