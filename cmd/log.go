@@ -9,8 +9,6 @@ import (
 
 func init() {
 	rootCmd.AddCommand(logCmd)
-	logCmd.Flags().StringSliceP("context", "c", []string{}, "Specify the context")
-	logCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
 	logCmd.Flags().StringP("container", "t", "", "Specify the container")
 }
 

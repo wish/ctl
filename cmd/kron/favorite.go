@@ -18,8 +18,6 @@ func init() {
 		createConfig()
 		// panic(err.Error())
 	}
-	favoriteCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to match cronjobs from")
-	favoriteCmd.Flags().StringP("namespace", "n", "", "Specific namespace to match cronjobs from within contexts")
 }
 
 var favoriteCmd = &cobra.Command{

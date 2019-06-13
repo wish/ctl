@@ -12,8 +12,6 @@ import (
 func init() {
 	KronCmd.AddCommand(getCmd)
 	// Contexts flag
-	getCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to list cronjobs from")
-	getCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to list cronjobs from within contexts")
 	getCmd.Flags().BoolP("favorites", "f", false, "Get all favorited cron jobs")
 	// Ordering flags
 	getCmd.Flags().BoolP("by-last-run", "l", false, "Sort chronologically by last run")

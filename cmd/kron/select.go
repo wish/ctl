@@ -17,8 +17,6 @@ func init() {
 		createConfig()
 		// panic(err.Error())
 	}
-	selectCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to select cronjobs from")
-	selectCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to select cronjobs from within contexts")
 }
 
 var selectCmd = &cobra.Command{

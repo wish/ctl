@@ -9,8 +9,6 @@ import (
 
 func init() {
 	KronCmd.AddCommand(describeCmd)
-	describeCmd.Flags().StringSliceP("context", "c", []string{}, "Specific contexts to search cronjobs from")
-	describeCmd.Flags().StringP("namespace", "n", "", "Specific namespaces to search cronjobs from within contexts")
 	describeCmd.Flags().BoolP("favorites", "f", false, "Describe all favorited cron jobs")
 }
 

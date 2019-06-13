@@ -8,8 +8,6 @@ import (
 
 func init() {
 	rootCmd.AddCommand(describeCmd)
-	describeCmd.Flags().StringSliceP("context", "c", []string{}, "Specify the context")
-	describeCmd.Flags().StringP("namespace", "n", "", "Specify the namespace")
 }
 
 var describeCmd = &cobra.Command{

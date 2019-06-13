@@ -12,6 +12,8 @@ import (
 
 func init() {
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "print out verbose msg")
+	rootCmd.PersistentFlags().StringSliceP("context", "c", nil, "Specify the context(s) to operate in")
+	rootCmd.PersistentFlags().StringP("namespace", "n", "", "Specify the namespace within all the contexts specified")
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 }
 
@@ -32,7 +34,6 @@ var rootCmd = &cobra.Command{
 			fmt.Println("missing kubeconfig. k8s commands are unavaible.")
 			os.Exit(1)
 		}
-
 	},
 }
 
