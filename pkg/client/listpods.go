@@ -63,3 +63,28 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 	}
 	return ret, nil
 }
+
+func (c *Client) ListPodsOfRun(contexts []string, namespace, runName string, options ListOptions) ([]PodDiscovery, error) {
+	pods, err := c.ListPodsOverContexts(contexts, namespace, options)
+	if err != nil {
+		return nil, err
+	}
+
+	run, err := c.findRun(contexts, namespace, runName)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []PodDiscovery
+	for _, p := range pods {
+		// Check if has owner reference
+		for _, o := range p.OwnerReferences {
+			if o.UID == run.UID { // matches
+				ret = append(ret, p)
+				break
+			}
+		}
+	}
+
+	return ret, nil
+}
