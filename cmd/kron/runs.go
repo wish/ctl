@@ -1,15 +1,9 @@
 package kron
 
 import (
-	"github.com/spf13/cobra"
+	"github.com/ContextLogic/ctl/cmd/kron/runs"
 )
 
 func init() {
-	KronCmd.AddCommand(runsCmd)
-}
-
-var runsCmd = &cobra.Command{
-	Use:   "runs",
-	Short: "Subcommand for operating on runs of a command",
-	Long:  "", // TODO
+	KronCmd.AddCommand(runs.RunsCmd)
 }

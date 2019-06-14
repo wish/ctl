@@ -1,6 +1,7 @@
 package client
 
 import (
+	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -9,6 +10,11 @@ import (
 type CronJobDiscovery struct {
 	Context string
 	batchv1beta1.CronJob
+}
+
+type RunDiscovery struct {
+	Context string
+	batchv1.Job
 }
 
 type PodDiscovery struct {

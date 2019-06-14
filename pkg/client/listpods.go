@@ -20,8 +20,8 @@ func (c *Client) ListPods(context string, namespace string, options ListOptions)
 		return nil, err
 	}
 	items := make([]PodDiscovery, len(pods.Items))
-	for i, p := range pods.Items {
-		items[i] = PodDiscovery{context, p}
+	for i, pod := range pods.Items {
+		items[i] = PodDiscovery{context, pod}
 	}
 	return items, nil
 }
