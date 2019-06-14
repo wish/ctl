@@ -14,7 +14,7 @@ and move bin/<darwin|linux>/ctl to the $PATH
 List pods with/without namespace given and over contexts.
 
 | CONTEXT | NAMESPACE | NAME | READY | STATUS | RESTARTS | AGE |
-|------|---------|-------|-------|-------|-------|-------|
+|------|---------|-------|-------|-------|-------|-------
 | cluster name | namespace of pod | name of pod | ready containers/total containers | current status |number of restarts | time since starting
 
 Flags:
@@ -28,7 +28,7 @@ Flag:
 - `--context, -c` specify the contexts. Can reduce the run time.
 - `--namespace, -n` specify the namespace.
 
-### log pod [flags]
+### logs pod [flags]
 Get the logs given a container in a pod specified. If the pod has only one container, the container name is optional. If the pod has multiple containers, choose one from them. If there are multiple pods that match, the command only operates on the first one found.
 
 Flags:

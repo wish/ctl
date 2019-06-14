@@ -8,13 +8,14 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(logCmd)
-	logCmd.Flags().StringP("container", "t", "", "Specify the container")
+	rootCmd.AddCommand(logsCmd)
+	logsCmd.Flags().StringP("container", "t", "", "Specify the container")
 }
 
-var logCmd = &cobra.Command{
-	Use:   "log pod [flags]",
-	Short: "Get log of a container in a pod",
+var logsCmd = &cobra.Command{
+	Use:     "logs pod [flags]",
+	Aliases: []string{"log"},
+	Short:   "Get log of a container in a pod",
 	Long: `Print a detailed description of the selected pod.
 If namespace not specified, it will get all the pods across all the namespaces.
 If context(s) not specified, it will search through all contexts.`,
@@ -24,7 +25,7 @@ If context(s) not specified, it will search through all contexts.`,
 		namespace, _ := cmd.Flags().GetString("namespace")
 		container, _ := cmd.Flags().GetString("container")
 
-		res, err := client.GetDefaultConfigClient().LogPod(ctxs, namespace, args[0], container, client.LogOptions{})
+		res, err := client.GetDefaultConfigClient().LogPodOverContexts(ctxs, namespace, args[0], container, client.LogOptions{})
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
