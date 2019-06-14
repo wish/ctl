@@ -1,16 +1,16 @@
-package kron
+package helper
 
 import (
-	"k8s.io/client-go/tools/clientcmd"
 	"flag"
+	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
-func getKubeConfigPath() string {
+func GetKubeConfigPath() string {
 	// For multiple calls
-	fl := flag.Lookup("kubeconfig")
-	if fl != nil {
+	if fl := flag.Lookup("kubeconfig"); fl != nil {
 		return fl.Value.String()
 	}
 	// Set kubeconfig value
@@ -30,7 +30,7 @@ func getKubeConfigPath() string {
 
 func GetContexts() []string {
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: getKubeConfigPath()},
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: GetKubeConfigPath()},
 		&clientcmd.ConfigOverrides{}).RawConfig()
 
 	if err != nil {
@@ -39,7 +39,10 @@ func GetContexts() []string {
 
 	ctxs := make([]string, 0, len(config.Contexts))
 	for k, _ := range config.Contexts { // Currently ignoring mappings
-		ctxs = append(ctxs, k)
+		// Hardcode ignore test clusters
+		if !strings.Contains(k, "test") { // REVIEW: Remove this when possible
+			ctxs = append(ctxs, k)
+		}
 	}
 
 	return ctxs
