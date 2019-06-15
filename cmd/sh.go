@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 	"os"
@@ -31,7 +32,8 @@ If the pod has multiple containers, user have to choose one from them.`,
 
 		err := client.GetDefaultConfigClient().ExecInPod(ctxs, namespace, args[0], container, []string{shell}, os.Stdin, os.Stdout, os.Stderr)
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 	},
 }

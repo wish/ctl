@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func init() {
@@ -23,7 +24,8 @@ If context(s) not specified, it will search through all contexts.`,
 
 		pods, err := client.GetDefaultConfigClient().FindPods(ctxs, namespace, args, client.ListOptions{})
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 		if len(pods) == 0 {
 			fmt.Println("Could not find any matching pods!")

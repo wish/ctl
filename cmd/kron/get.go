@@ -46,7 +46,8 @@ If context(s) not specified, it will list from all contexts.`,
 			ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
 
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		if onlyFavorites {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func init() {
@@ -23,7 +24,8 @@ If the cron job is already suspended, does nothing.`,
 		success, err := client.GetDefaultConfigClient().
 			SetCronJobSuspend(ctxs, namespace, args[0], true)
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		if success {

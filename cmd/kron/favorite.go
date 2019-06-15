@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
 )
 
 func init() {
@@ -32,13 +33,15 @@ A namespace and contexts can be specified to limit matches.`,
 
 		f, err := getFavorites()
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		if len(args) == 0 {
 			selected, err := getSelected()
 			if err != nil {
-				panic(err.Error())
+				fmt.Println(err.Error())
+				os.Exit(1)
 			}
 			if l, ok := f[selected.Name]; ok {
 				fmt.Println(overrideFavoriteMessage(selected.Name, l))

@@ -23,7 +23,8 @@ var describeCmd = &cobra.Command{
 		list, err := client.GetDefaultConfigClient().
 			FindRuns(ctxs, namespace, args, client.ListOptions{})
 		if err != nil {
-			panic(err.Error)
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		if len(list) == 0 {

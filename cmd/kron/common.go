@@ -35,6 +35,7 @@ func createConfig() {
 	os.Mkdir(os.Getenv("HOME")+"/.kron/", 0777)
 	err := viper.WriteConfigAs(os.Getenv("HOME") + "/.kron/config.yaml")
 	if err != nil {
+		fmt.Println("Error encountered while trying to write new config file")
 		panic(err.Error())
 	}
 }
@@ -68,7 +69,8 @@ func matchesCronJobLocation(c client.CronJobDiscovery, l location) bool {
 func filterFromFavorites(lst []client.CronJobDiscovery) []client.CronJobDiscovery {
 	f, err := getFavorites()
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 	var filtered []client.CronJobDiscovery
 	for _, c := range lst {

@@ -2,9 +2,9 @@ package kron
 
 import (
 	"fmt"
-
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func init() {
@@ -31,13 +31,15 @@ If context(s) not specified, it will search through all contexts.`,
 		if onlyFavorites {
 			cronjobs, err = client.GetDefaultConfigClient().ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
 			if err != nil {
-				panic(err.Error())
+				fmt.Println(err.Error())
+				os.Exit(1)
 			}
 			cronjobs = filterFromFavorites(cronjobs)
 		} else if len(args) == 0 { // Use selected
 			selected, err := getSelected()
 			if err != nil {
-				panic(err.Error())
+				fmt.Println(err.Error())
+				os.Exit(1)
 			}
 			cronjobs, err = client.GetDefaultConfigClient().FindCronJobs(selected.Location.Contexts, selected.Location.Namespace, []string{selected.Name}, client.ListOptions{})
 		} else {
@@ -46,7 +48,8 @@ If context(s) not specified, it will search through all contexts.`,
 		}
 
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		for _, cronjob := range cronjobs {

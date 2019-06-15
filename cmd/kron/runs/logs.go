@@ -29,7 +29,8 @@ If context(s) not specified, it will search through all contexts.`,
 
 		pods, err := cl.ListPodsOfRun(ctxs, namespace, args[0], client.ListOptions{})
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		for _, pod := range pods {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
 )
 
 func init() {
@@ -36,6 +37,7 @@ If namespace/contexts are not specified, usage will match with all results.`,
 		err := viper.UnmarshalKey("selected", &s)
 		if err != nil {
 			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		viper.Set("selected", selectedJob{job, location{ctxs, namespace}})

@@ -1,8 +1,10 @@
 package runs
 
 import (
+	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // kron/getCmd represents the kron/list command
@@ -26,7 +28,8 @@ If multiple cron jobs matches the parameters, only the first is used.`,
 			ListRunsOfCronJob(ctxs, namespace, args[0], client.ListOptions{})
 
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 
 		printRunList(list)

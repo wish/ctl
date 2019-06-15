@@ -20,7 +20,7 @@ func (c *Client) findRun(contexts []string, namespace, name string) (*RunDiscove
 	}
 
 	if run.Name != name { // Pod not found
-		return nil, errors.New("Run not found") // TODO return value
+		return nil, errors.New("Cron job run with name \"" + name + "\" not found") // TODO return value
 	}
 
 	return &run, nil
