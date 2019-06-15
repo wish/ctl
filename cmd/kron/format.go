@@ -22,10 +22,11 @@ func printCronJobList(lst []client.CronJobDiscovery) {
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
-	fmt.Fprintln(w, "NAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tNEXT RUN\tAGE\tCONTEXT")
+	fmt.Fprintln(w, "CONTEXT\tNAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tNEXT RUN\tAGE")
 
 	for _, v := range lst {
-		fmt.Fprintf(w, "%s\t", v.Name)          // Name
+		fmt.Fprintf(w, "%s\t", v.Context)
+		fmt.Fprintf(w, "%s\t", v.Name)
 		fmt.Fprintf(w, "%s\t", v.Spec.Schedule) // Schedule
 		fmt.Fprintf(w, "%t\t", *v.Spec.Suspend) // Suspend
 		fmt.Fprintf(w, "%d\t", len(v.Status.Active))
@@ -40,9 +41,7 @@ func printCronJobList(lst []client.CronJobDiscovery) {
 		s, _ := cron.ParseStandard(v.Spec.Schedule)
 		fmt.Fprintf(w, "%v\t", time.Until(s.Next(time.Now())).Round(time.Second))
 		// Age
-		fmt.Fprintf(w, "%v\t", time.Since(v.CreationTimestamp.Time).Round(time.Second))
-		// Context
-		fmt.Fprintf(w, "%s\n", v.Context)
+		fmt.Fprintf(w, "%v\n", time.Since(v.CreationTimestamp.Time).Round(time.Second))
 	}
 	w.Flush()
 }
