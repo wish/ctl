@@ -11,6 +11,7 @@ import (
 func printRunList(lst []client.RunDiscovery) {
 	if len(lst) == 0 {
 		fmt.Println("No runs found!")
+		return
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
