@@ -1,5 +1,6 @@
 UNAME_S := $(shell uname -s | tr A-Z a-z)
 SHA  	:= $(shell git rev-parse --short HEAD)
+GOFILES_BUILD := $(shell find . -type f -iname "*.go")
 
 default: bin/${UNAME_S}/ctl bin/ctl ## Builds ctl for your current operating system
 
@@ -7,13 +8,13 @@ default: bin/${UNAME_S}/ctl bin/ctl ## Builds ctl for your current operating sys
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-bin/linux/ctl:
+bin/linux/ctl: $(GOFILES_BUILD)
 	@echo "$@"
 	@GOOS=linux CGO_ENABLED=0 go build -ldflags \
 	       "-X github.com/ContextLogic/ctl/cmd.Version=${SHA}" \
 	       -o bin/linux/ctl github.com/ContextLogic/ctl
 
-bin/darwin/ctl:
+bin/darwin/ctl: $(GOFILES_BUILD)
 	@echo "$@"
 	@GOOS=darwin CGO_ENABLED=0 go build -ldflags \
 		"-X github.com/ContextLogic/ctl/cmd.Version=${SHA}" \
