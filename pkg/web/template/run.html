@@ -45,43 +45,27 @@
         <dt>Namespace</dt>
         <dd>{{ .Namespace }}</dd>
 
-        <dt>Schedule</dt>
-        <dd><code>{{ .Schedule }}</code></dd>
+        <dt>Cronjob</dt>
+        <dd><a href="/cronjob/{{ .Context }}/{{ .Namespace }}/{{ .Cronjob }}">{{ .Cronjob }}</a></dd>
 
-        <dt>Template <a data-toggle="collapse" href="#template" aria-expanded="false" aria-controls="template"><i class="fa fa-compress"></i></a></dt>
+        <dt>Logs</dt>
         <dd>
-          <div class="collapse" id="template">
-            <div class="card card-body bg-dark">
-              <pre><code class="text-white">{{ .Template }}</code></pre>
+          {{ range .Pods }}
+            <div class="card">
+              <div class="card-header">
+                <h2 class="mb-0">
+                  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ .Name }}-collapse" aria-expanded="true" aria-controls="{{ .Name }}-collapse">
+                    {{ .Name }}
+                  </button>
+                </h2>
+              </div>
+              <div id="{{ .Name }}-collapse" class="collapse show">
+                <div class="card-body bg-dark">
+                  <pre><code class="text-white">{{ .Logs }}</code></pre>
+                </div>
+              </div>
             </div>
-          </div>
-        </dd>
-
-        <dt>Last schedule</dt>
-        <dd>{{ .LastSchedule }}</dd>
-
-        <dt>Recent runs</dt>
-        <dd>
-          <table class="table table-sm">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Start</th>
-                <th scope="col">Status</th>
-                <th scope="col">End</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{ range .Runs }}
-                <tr>
-                  <td><a href="/run/{{ $.Context }}/{{ $.Namespace }}/{{ $.Name }}/{{ .Name }}">{{ .Name }}</a></td>
-                  <td>{{ .Start }}</td>
-                  <td>{{ .Status }}</td>
-                  <td>{{ .End }}</td>
-                </tr>
-              {{ end }}
-            </tbody>
-          </table>
+          {{ end }}
         </dd>
       </dl>
     </div>

@@ -76,21 +76,21 @@
 
     <div class = "container">
       <div class="row mt-5">
-        {{ range $_, $cronjob := . }}
+        {{ range . }}
 
-        <div class="card {{ if eq "running" $cronjob.LastRun }}border-info{{ else if $cronjob.Suspend }}border-warning{{ else if eq "failed" $cronjob.LastRun}}border-danger{{ end }} mx-2 mb-3">
+        <div class="card {{ if eq "running" .LastRun }}border-info{{ else if .Suspend }}border-warning{{ else if eq "failed" .LastRun }}border-danger{{ end }} mx-2 mb-3">
           <div class="card-header">
-            <a href="/cronjob/{{ $cronjob.Context }}/{{ $cronjob.Namespace }}/{{ $cronjob.Name }}">{{ $cronjob.Name}}</a> <span class="text-right"><i class="fa fa-star-o"></i></span><br>
-          <small>{{ $cronjob.Context }} | {{ $cronjob.Namespace }}</small>
+            <a href="/cronjob/{{ .Context }}/{{ .Namespace }}/{{ .Name }}">{{ .Name}}</a> <span class="text-right"><i class="fa fa-star-o"></i></span><br>
+          <small>{{ .Context }} | {{ .Namespace }}</small>
           </div>
           <div class="card-body">
             <p class="card-text">
               <!-- Node pool: <br>
               Last run: N/A<br>
               Next run: in 2 hours<br> -->
-              Active: {{ $cronjob.Active }}<br>
-              Suspend: {{ $cronjob.Suspend }}<br>
-              Last run: {{ $cronjob.LastRun }}
+              Active: {{ .Active }}<br>
+              Suspend: {{ .Suspend }}<br>
+              Last run: {{ .LastRun }}
             </p>
           </div>
         </div>

@@ -2,9 +2,11 @@ package web
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/rest"
 	"sort"
 )
 
@@ -149,7 +151,36 @@ func toRunDetailsList(lst []client.RunDiscovery) []runDetails {
 	return ret
 }
 
-//
-// type fullRunDetails struct {
-//
-// }
+type fullRunDetails struct {
+	Name      string
+	Context   string
+	Namespace string
+	Cronjob   string
+	Pods      []runPodDetails
+}
+
+type runPodDetails struct {
+	Name string
+	Logs string
+}
+
+func toFullRunDetails(path []string, run *client.RunDiscovery, logs map[string]*rest.Result) fullRunDetails {
+	pods := make([]runPodDetails, 0, len(logs))
+
+	for p, r := range logs {
+		raw, err := r.Raw()
+		if err != nil {
+			fmt.Println(err.Error())
+			continue
+		}
+		pods = append(pods, runPodDetails{p, string(raw)})
+	}
+
+	return fullRunDetails{
+		Name:      run.Name,
+		Cronjob:   path[3],
+		Context:   path[1],
+		Namespace: path[2],
+		Pods:      pods,
+	}
+}
