@@ -29,10 +29,26 @@ type config struct {
 	Clusters []Cluster
 }
 
-func filterContexts(contextList []string, clusterMap map[string]Cluster, region, az, env map[string]bool) []string {
+var clusterInfo map[string]Cluster
+
+func init() {
+	configpath := os.Getenv("CTL_CONFIG")
+	if configpath == "" {
+		configpath, _ = os.Getwd()
+		configpath = fmt.Sprintf(configpath + "/config/CTL.yml")
+	}
+
+	conf := getConf(configpath)
+	clusterInfo = make(map[string]Cluster)
+	for _, c := range conf.Clusters {
+		clusterInfo[c.Name] = c
+	}
+}
+
+func filterContexts(contextList []string, region, az, env map[string]bool) []string {
 	clusters := make([]string, 0)
 	for _, c := range contextList {
-		if clusterInfo, ok := clusterMap[c]; ok {
+		if clusterInfo, ok := clusterInfo[c]; ok {
 			if (!clusterInfo.Hidden) &&
 				(len(region) == 0 || region[strings.Trim(clusterInfo.Region, " \r\n")]) &&
 				(len(az) == 0 || az[strings.Trim(clusterInfo.Az, " \r\n")]) &&
@@ -47,21 +63,14 @@ func filterContexts(contextList []string, clusterMap map[string]Cluster, region,
 	return clusters
 }
 
-//Gets a filterned list of clusters given region, environment and AZ
+//GetClusterClusterInfo get AZ, region and env from cluster
+func GetClusterClusterInfo(context string) Cluster {
+	return clusterInfo[context]
+}
+
+//GetFilteredClusters Gets a filterned list of clusters given region, environment and AZ
 func GetFilteredClusters(filter ContextFilter) ([]string, error) {
 	clusterList := helper.GetContexts()
-
-	configpath := os.Getenv("CTL_CONFIG")
-	if configpath == "" {
-		configpath, _ = os.Getwd()
-		configpath = fmt.Sprintf(configpath + "/config/CTL.yml")
-	}
-
-	conf := getConf(configpath)
-	clusterMap := make(map[string]Cluster)
-	for _, c := range conf.Clusters {
-		clusterMap[c.Name] = c
-	}
 	regionMap := make(map[string]bool)
 	for _, r := range filter.Region {
 		regionMap[strings.Trim(r, " \r\n")] = true
@@ -75,7 +84,7 @@ func GetFilteredClusters(filter ContextFilter) ([]string, error) {
 		envMap[strings.Trim(e, " \r\n")] = true
 	}
 
-	clusters := filterContexts(clusterList, clusterMap, regionMap, azMap, envMap)
+	clusters := filterContexts(clusterList, regionMap, azMap, envMap)
 
 	return clusters, nil
 }

@@ -36,8 +36,6 @@ var rootCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			ctxs, _ = util.GetFilteredClusters(filter)
-			fmt.Println(ctxs)
-			os.Exit(1)
 		}
 	},
 }
