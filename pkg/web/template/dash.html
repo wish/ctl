@@ -43,19 +43,36 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
-            <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <form action="/" method="get">
+              <div class="form-group form-inline">
+                <!-- <form class="form-inline my-2 my-lg-0"> -->
+                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search" value="{{ .Search }}">
+                <!-- </form> -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" id="contextDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-object-group"></i> Context
+                  </a>
+                  <!-- Context drop down -->
+                  <div class="dropdown-menu">
+                    <div class="form-group">
+                      {{ range $ctx, $set := .Contexts }}
+                      <div class="form-check dropdown-item">
+                        <label class="form-check-label" for="item-{{$ctx}}">
+                        <input type="checkbox" class="form-check-input" id="item-{{$ctx}}" name="context" value="{{ $ctx }}"{{ if $set }} checked{{ end }}>
+                          {{ $ctx }}
+                        </label>
+                      </div>
+                      {{ end }}
+                    </div>
+                  </div>
+                </li>
+                <!-- <form class="form-inline my-2 my-lg-0"> -->
+                <input class="form-control mr-sm-2 bg-light" type="search" placeholder="Namespace" aria-label="Namespace" name="namespace" value="{{ .Namespace }}">
+                <!-- </form> -->
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
             </form>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-object-group"></i> Context
-              </a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-address-card"></i> Namespace
-              </a>
-            </li>
+
             <li class="nav-item d-flex align-items-center">
               <div class="custom-control custom-switch">
                 <input type="checkbox" class="custom-control-input" id="customSwitch1">
@@ -76,7 +93,7 @@
 
     <div class = "container">
       <div class="row mt-5">
-        {{ range . }}
+        {{ range .Cronjobs }}
 
         <div class="card {{ if eq "running" .LastRun }}border-info{{ else if .Suspend }}border-warning{{ else if eq "failed" .LastRun }}border-danger{{ end }} mx-2 mb-3">
           <div class="card-header">

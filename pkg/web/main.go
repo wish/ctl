@@ -3,30 +3,78 @@ package web
 import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/ContextLogic/ctl/pkg/client/helper"
 	"html/template"
 	"k8s.io/client-go/rest"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 func Serve(endpoint string) {
 	cl := client.GetDefaultConfigClient()
 
-	// Main page
 	templates := template.Must(template.ParseFiles("pkg/web/template/dash.html", "pkg/web/template/details.html", "pkg/web/template/run.html"))
 
+	// Main page
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		cronjobs, err := cl.ListCronJobsOverContexts([]string{}, "", client.ListOptions{})
+		// type Search struct {
+		// 	Contexts map[string]bool
+		// 	Namespace string
+		// 	Cronjobs []cardDetails
+		// }
+
+		data := struct {
+			Contexts  map[string]bool
+			Namespace string
+			Search    string
+			Cronjobs  []cardDetails
+		}{Contexts: make(map[string]bool)}
+
+		// Contexts
+		for _, x := range helper.GetContexts() {
+			data.Contexts[x] = false
+		}
+
+		// Check valid
+		ctxs := r.URL.Query()["context"]
+		for _, c := range ctxs {
+			if _, ok := data.Contexts[c]; ok {
+				data.Contexts[c] = true
+			}
+		}
+
+		namespace := r.URL.Query().Get("namespace")
+		data.Namespace = namespace
+
+		search := r.URL.Query().Get("search")
+		data.Search = search
+
+		cronjobs, err := cl.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
 		if err != nil {
 			panic(err.Error())
 		}
 
-		runs, err := cl.ListRunsOverContexts(nil, "", client.ListOptions{})
+		// Filter searches
+		var filtered []client.CronJobDiscovery
+		if search == "" {
+			filtered = cronjobs
+		} else {
+			for _, c := range cronjobs {
+				if strings.Contains(c.Name, search) {
+					filtered = append(filtered, c)
+				}
+			}
+		}
+
+		runs, err := cl.ListRunsOverContexts(ctxs, namespace, client.ListOptions{})
 		if err != nil {
 			panic(err.Error())
 		}
 
-		if err := templates.ExecuteTemplate(w, "dash.html", toCardDetailsList(cronjobs, runs)); err != nil {
+		data.Cronjobs = toCardDetailsList(filtered, runs)
+
+		if err := templates.ExecuteTemplate(w, "dash.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
