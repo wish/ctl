@@ -37,14 +37,28 @@
     </div>
 
     <div class="container mt-3">
-      <h1>{{ .Name }}</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">{{ .Context }}</li>
+          <li class="breadcrumb-item">{{ .Namespace }}</li>
+          <li class="breadcrumb-item active" aria-current="page">{{ .Name }}</li>
+        </ol>
+      </nav>
+
+      <div id="alerts"></div>
+
+      <div class="clearfix">
+        <h1 class="float-left">{{ .Name }}</h1>
+        <p class="float-right">
+          {{ if .Suspend }}
+          <a class="btn btn-success"  href="/unsuspend/{{ .Context }}/{{ .Namespace }}/{{ .Name }}">Unsuspend</a>
+          {{ else }}
+          <a class="btn btn-warning"  href="/suspend/{{ .Context }}/{{ .Namespace }}/{{ .Name }}">Suspend</a>
+          {{ end }}
+          <a class="btn btn-dark" href="/execute/{{ .Context }}/{{ .Namespace }}/{{ .Name }}">Manual Run</a>
+        </p>
+      </div>
       <dl>
-        <dt>Context</dt>
-        <dd>{{ .Context }}</dd>
-
-        <dt>Namespace</dt>
-        <dd>{{ .Namespace }}</dd>
-
         <dt>Schedule</dt>
         <dd><code>{{ .Schedule }}</code></dd>
 
@@ -62,8 +76,8 @@
 
         <dt>Recent runs</dt>
         <dd>
-          <table class="table table-sm">
-            <thead>
+          <table class="table table-sm table-striped">
+            <thead class="thead-dark">
               <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Start</th>

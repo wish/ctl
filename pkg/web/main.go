@@ -38,7 +38,6 @@ func Serve(endpoint string) {
 		path := re.FindStringSubmatch(r.URL.String())
 		if !re.MatchString(r.URL.String()) || len(path) != 4 {
 			http.Error(w, "Invalid cron job path", http.StatusNotFound)
-			fmt.Println("Error")
 		}
 
 		cronjob, err := cl.GetCronJob(path[1], path[2], path[3], client.GetOptions{})
@@ -53,6 +52,64 @@ func Serve(endpoint string) {
 
 		if err := templates.ExecuteTemplate(w, "details.html", toFullDetails(cronjob, runs)); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	// Execute cron job
+	http.HandleFunc("/execute/", func(w http.ResponseWriter, r *http.Request) {
+		re := regexp.MustCompile(`/execute/([^/]*)/([^/]*)/([^/]*)\z`)
+
+		path := re.FindStringSubmatch(r.URL.String())
+		if !re.MatchString(r.URL.String()) || len(path) != 4 {
+			http.Error(w, "Invalid cron job execute path", http.StatusNotFound)
+		}
+
+		_, err := cl.RunCronJob([]string{path[1]}, path[2], path[3])
+
+		if err != nil { // Could not execute
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			http.Redirect(w, r, fmt.Sprintf("/cronjob/%s/%s/%s", path[1], path[2], path[3]), http.StatusSeeOther)
+		}
+	})
+
+	// Suspend cron job
+	http.HandleFunc("/suspend/", func(w http.ResponseWriter, r *http.Request) {
+		re := regexp.MustCompile(`/suspend/([^/]*)/([^/]*)/([^/]*)\z`)
+
+		path := re.FindStringSubmatch(r.URL.String())
+		if !re.MatchString(r.URL.String()) || len(path) != 4 {
+			http.Error(w, "Invalid cron job execute path", http.StatusNotFound)
+		}
+
+		success, err := cl.SetCronJobSuspend([]string{path[1]}, path[2], path[3], true)
+
+		if err != nil { // Could not execute
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else if !success {
+			http.Error(w, "Invalid request! Cron job already suspended.", http.StatusConflict)
+		} else {
+			http.Redirect(w, r, fmt.Sprintf("/cronjob/%s/%s/%s", path[1], path[2], path[3]), http.StatusSeeOther)
+		}
+	})
+
+	// Unsuspend cron job
+	http.HandleFunc("/unsuspend/", func(w http.ResponseWriter, r *http.Request) {
+		re := regexp.MustCompile(`/unsuspend/([^/]*)/([^/]*)/([^/]*)\z`)
+
+		path := re.FindStringSubmatch(r.URL.String())
+		if !re.MatchString(r.URL.String()) || len(path) != 4 {
+			http.Error(w, "Invalid cron job execute path", http.StatusNotFound)
+		}
+
+		success, err := cl.SetCronJobSuspend([]string{path[1]}, path[2], path[3], false)
+
+		if err != nil { // Could not execute
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else if !success {
+			http.Error(w, "Invalid request! Cron job already unsuspended.", http.StatusConflict)
+		} else {
+			http.Redirect(w, r, fmt.Sprintf("/cronjob/%s/%s/%s", path[1], path[2], path[3]), http.StatusSeeOther)
 		}
 	})
 

@@ -37,14 +37,17 @@
     </div>
 
     <div class="container mt-3">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">{{ .Context }}</li>
+          <li class="breadcrumb-item">{{ .Namespace }}</li>
+          <li class="breadcrumb-item">{{ .Cronjob }}</li>
+          <li class="breadcrumb-item active" aria-current="page">{{ .Name }}</li>
+        </ol>
+      </nav>
+
       <h1>{{ .Name }}</h1>
       <dl>
-        <dt>Context</dt>
-        <dd>{{ .Context }}</dd>
-
-        <dt>Namespace</dt>
-        <dd>{{ .Namespace }}</dd>
-
         <dt>Cronjob</dt>
         <dd><a href="/cronjob/{{ .Context }}/{{ .Namespace }}/{{ .Cronjob }}">{{ .Cronjob }}</a></dd>
 

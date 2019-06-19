@@ -75,6 +75,7 @@ type fullDetails struct {
 	Context      string
 	Namespace    string
 	Schedule     string
+	Suspend      bool
 	Template     string
 	LastSchedule string
 	Runs         []runDetails
@@ -112,6 +113,7 @@ func toFullDetails(cronjob *client.CronJobDiscovery, runs []client.RunDiscovery)
 		Name:         cronjob.Name,
 		Context:      cronjob.Context,
 		Namespace:    cronjob.Namespace,
+		Suspend:      *(cronjob.Spec.Suspend),
 		Schedule:     cronjob.Spec.Schedule,
 		Template:     string(template), // Change
 		LastSchedule: lastSchedule,
