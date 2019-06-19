@@ -2,10 +2,11 @@ package helper
 
 import (
 	"flag"
-	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func GetKubeConfigPath() string {

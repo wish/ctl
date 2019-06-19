@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func init() {
@@ -25,8 +26,6 @@ If the pod has only one container, the container name is optional.
 If the pod has multiple containers, user have to choose one from them.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		ctxs, _ := cmd.Flags().GetStringSlice("context")
-		namespace, _ := cmd.Flags().GetString("namespace")
 		container, _ := cmd.Flags().GetString("container")
 		shell, _ := cmd.Flags().GetString("shell")
 
