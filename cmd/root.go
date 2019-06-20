@@ -36,6 +36,10 @@ var rootCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			ctxs, _ = util.GetFilteredClusters(filter)
+			if len(ctxs) == 0 {
+				fmt.Printf("No context(s) with matching criteria found... Exiting")
+				os.Exit(1)
+			}
 		}
 	},
 }
