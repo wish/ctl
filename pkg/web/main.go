@@ -14,7 +14,7 @@ import (
 func Serve(endpoint string) {
 	cl := client.GetDefaultConfigClient()
 
-	templates := template.Must(template.ParseFiles("pkg/web/template/dash.html", "pkg/web/template/details.html", "pkg/web/template/run.html"))
+	templates := template.Must(template.ParseGlob("pkg/web/template/*"))
 
 	// Main page
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -25,11 +25,15 @@ func Serve(endpoint string) {
 		// }
 
 		data := struct {
+			Page      page
 			Contexts  map[string]bool
 			Namespace string
 			Search    string
 			Cronjobs  []cardDetails
-		}{Contexts: make(map[string]bool)}
+		}{
+			Page:     page{Title: "Dashboard - Kron", Active: "dashboard"},
+			Contexts: make(map[string]bool),
+		}
 
 		// Contexts
 		for _, x := range helper.GetContexts() {
@@ -98,7 +102,17 @@ func Serve(endpoint string) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		if err := templates.ExecuteTemplate(w, "details.html", toFullDetails(cronjob, runs)); err != nil {
+		data := struct {
+			Page    page
+			Details fullDetails
+		}{
+			Page: page{
+				Title: fmt.Sprintf("%s - Cron Jobs - Kron", cronjob.Name),
+			},
+			Details: toFullDetails(cronjob, runs),
+		}
+
+		if err := templates.ExecuteTemplate(w, "details.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
@@ -203,7 +217,17 @@ func Serve(endpoint string) {
 			logs[pod.Name] = res
 		}
 
-		if err := templates.ExecuteTemplate(w, "run.html", toFullRunDetails(path, run, logs)); err != nil {
+		data := struct {
+			Page    page
+			Details fullRunDetails
+		}{
+			Page: page{
+				Title: fmt.Sprintf("%s - %s Runs - Kron", run.Name, path[3]),
+			},
+			Details: toFullRunDetails(path, run, logs),
+		}
+
+		if err := templates.ExecuteTemplate(w, "run.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})

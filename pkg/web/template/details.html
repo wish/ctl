@@ -1,109 +1,67 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{{template "header" .Page}}
+{{with .Details}}
+<div class="container mt-3">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">{{.Context}}</li>
+      <li class="breadcrumb-item">{{.Namespace}}</li>
+      <li class="breadcrumb-item active" aria-current="page">{{.Name}}</li>
+    </ol>
+  </nav>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <div id="alerts"></div>
 
-    <title>Kron – A kubernetes cron job tool</title>
-  </head>
-  <body>
-    <div class="navbar-expand-md">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-          <a class="navbar-brand" href="/"><i class="fa fa-clock-o"></i> Kron</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+  <div class="clearfix">
+    <h1 class="float-left">{{.Name}}</h1>
+    <p class="float-right">
+      {{if .Suspend}}
+      <a class="btn btn-success"  href="/unsuspend/{{.Context}}/{{.Namespace}}/{{.Name}}">Unsuspend</a>
+      {{else}}
+      <a class="btn btn-warning"  href="/suspend/{{.Context}}/{{.Namespace}}/{{.Name}}">Suspend</a>
+      {{end}}
+      <a class="btn btn-dark" href="/execute/{{.Context}}/{{.Namespace}}/{{.Name}}">Manual Run</a>
+    </p>
+  </div>
+  <dl>
+    <dt>Schedule</dt>
+    <dd><code>{{.Schedule}}</code></dd>
 
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="/">Dashboard</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Favorites</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Scheduled</a>
-              </li>
-            </ul>
-          </div>
+    <dt>Template <a data-toggle="collapse" href="#template" aria-expanded="false" aria-controls="template"><i class="fa fa-compress"></i></a></dt>
+    <dd>
+      <div class="collapse" id="template">
+        <div class="card card-body bg-dark">
+          <pre><code class="text-white">{{.Template}}</code></pre>
         </div>
-      </nav>
-    </div>
-
-    <div class="container mt-3">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">{{ .Context }}</li>
-          <li class="breadcrumb-item">{{ .Namespace }}</li>
-          <li class="breadcrumb-item active" aria-current="page">{{ .Name }}</li>
-        </ol>
-      </nav>
-
-      <div id="alerts"></div>
-
-      <div class="clearfix">
-        <h1 class="float-left">{{ .Name }}</h1>
-        <p class="float-right">
-          {{ if .Suspend }}
-          <a class="btn btn-success"  href="/unsuspend/{{ .Context }}/{{ .Namespace }}/{{ .Name }}">Unsuspend</a>
-          {{ else }}
-          <a class="btn btn-warning"  href="/suspend/{{ .Context }}/{{ .Namespace }}/{{ .Name }}">Suspend</a>
-          {{ end }}
-          <a class="btn btn-dark" href="/execute/{{ .Context }}/{{ .Namespace }}/{{ .Name }}">Manual Run</a>
-        </p>
       </div>
-      <dl>
-        <dt>Schedule</dt>
-        <dd><code>{{ .Schedule }}</code></dd>
+    </dd>
 
-        <dt>Template <a data-toggle="collapse" href="#template" aria-expanded="false" aria-controls="template"><i class="fa fa-compress"></i></a></dt>
-        <dd>
-          <div class="collapse" id="template">
-            <div class="card card-body bg-dark">
-              <pre><code class="text-white">{{ .Template }}</code></pre>
-            </div>
-          </div>
-        </dd>
+    <dt>Last schedule</dt>
+    <dd>{{.LastSchedule}}</dd>
 
-        <dt>Last schedule</dt>
-        <dd>{{ .LastSchedule }}</dd>
-
-        <dt>Recent runs</dt>
-        <dd>
-          <table class="table table-sm table-striped">
-            <thead class="thead-dark">
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Start</th>
-                <th scope="col">Status</th>
-                <th scope="col">End</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{ range .Runs }}
-                <tr>
-                  <td><a href="/run/{{ $.Context }}/{{ $.Namespace }}/{{ $.Name }}/{{ .Name }}">{{ .Name }}</a></td>
-                  <td>{{ .Start }}</td>
-                  <td>{{ .Status }}</td>
-                  <td>{{ .End }}</td>
-                </tr>
-              {{ end }}
-            </tbody>
-          </table>
-        </dd>
-      </dl>
-    </div>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  </body>
-</html>
+    <dt>Recent runs</dt>
+    <dd>
+      <table class="table table-sm table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Start</th>
+            <th scope="col">Status</th>
+            <th scope="col">End</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .Runs}}
+            <tr>
+              <td><a href="/run/{{$.Details.Context}}/{{$.Details.Namespace}}/{{$.Details.Name}}/{{.Name}}">{{.Name}}</a></td>
+              <td>{{.Start}}</td>
+              <td>{{.Status}}</td>
+              <td>{{.End}}</td>
+            </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </dd>
+  </dl>
+</div>
+{{end}}
+{{template "footer"}}

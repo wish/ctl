@@ -1,125 +1,76 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{{template "header" .Page}}
+<div class="container">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <title>Kron – A kubernetes cron job tool</title>
-  </head>
-  <body>
-    <div class="navbar-expand-md">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-          <a class="navbar-brand" href="/"><i class="fa fa-clock-o"></i> Kron</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
-                <a class="nav-link" href="/">Dashboard</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Favorites</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Scheduled</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </div>
-    <div class="container">
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <form action="/" method="get">
-              <div class="form-group form-inline">
-                <!-- <form class="form-inline my-2 my-lg-0"> -->
-                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search" value="{{ .Search }}">
-                <!-- </form> -->
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" id="contextDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-object-group"></i> Context
-                  </a>
-                  <!-- Context drop down -->
-                  <div class="dropdown-menu">
-                    <div class="form-group">
-                      {{ range $ctx, $set := .Contexts }}
-                      <div class="form-check dropdown-item">
-                        <label class="form-check-label" for="item-{{$ctx}}">
-                        <input type="checkbox" class="form-check-input" id="item-{{$ctx}}" name="context" value="{{ $ctx }}"{{ if $set }} checked{{ end }}>
-                          {{ $ctx }}
-                        </label>
-                      </div>
-                      {{ end }}
-                    </div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <form action="/" method="get">
+          <div class="form-group form-inline">
+            <!-- <form class="form-inline my-2 my-lg-0"> -->
+              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search" value="{{.Search}}">
+            <!-- </form> -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" id="contextDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-object-group"></i> Context
+              </a>
+              <!-- Context drop down -->
+              <div class="dropdown-menu">
+                <div class="form-group">
+                  {{range $ctx, $set := .Contexts}}
+                  <div class="form-check dropdown-item">
+                    <label class="form-check-label" for="item-{{$ctx}}">
+                    <input type="checkbox" class="form-check-input" id="item-{{$ctx}}" name="context" value="{{$ctx}}"{{if $set}} checked{{end}}>
+                      {{$ctx}}
+                    </label>
                   </div>
-                </li>
-                <!-- <form class="form-inline my-2 my-lg-0"> -->
-                <input class="form-control mr-sm-2 bg-light" type="search" placeholder="Namespace" aria-label="Namespace" name="namespace" value="{{ .Namespace }}">
-                <!-- </form> -->
-                <button type="submit" class="btn btn-primary">Submit</button>
-              </div>
-            </form>
-
-            <li class="nav-item d-flex align-items-center">
-              <div class="custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input" id="customSwitch1">
-                <label class="custom-control-label" for="customSwitch1">Advanced</label>
+                  {{end}}
+                </div>
               </div>
             </li>
-          </ul>
-          <div class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-sort"></i> Sort
-            </a>
+            <!-- <form class="form-inline my-2 my-lg-0"> -->
+            <input class="form-control mr-sm-2 bg-light" type="search" placeholder="Namespace" aria-label="Namespace" name="namespace" value="{{.Namespace}}">
+            <!-- </form> -->
+            <button type="submit" class="btn btn-primary">Apply</button>
           </div>
-        </div>
-      </nav>
+        </form>
+
+      </ul>
+      <!-- <div class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-sort"></i> Sort
+        </a>
+      </div> -->
     </div>
+  </nav>
+</div>
 
-    <!-- <br> -->
+<!-- <br> -->
 
-    <div class = "container">
-      <div class="row mt-5">
-        {{ range .Cronjobs }}
+<div class = "container">
+  <div class="row mt-5">
+    {{range .Cronjobs}}
 
-        <div class="card {{ if eq "running" .LastRun }}border-info{{ else if .Suspend }}border-warning{{ else if eq "failed" .LastRun }}border-danger{{ end }} mx-2 mb-3">
-          <div class="card-header">
-            <a href="/cronjob/{{ .Context }}/{{ .Namespace }}/{{ .Name }}">{{ .Name}}</a> <span class="text-right"><i class="fa fa-star-o"></i></span><br>
-          <small>{{ .Context }} | {{ .Namespace }}</small>
-          </div>
-          <div class="card-body">
-            <p class="card-text">
-              <!-- Node pool: <br>
-              Last run: N/A<br>
-              Next run: in 2 hours<br> -->
-              Active: {{ .Active }}<br>
-              Suspend: {{ .Suspend }}<br>
-              Last run: {{ .LastRun }}
-            </p>
-          </div>
-        </div>
-        {{ end }}
-
+    <div class="card {{if eq "running" .LastRun}}border-info{{else if .Suspend}}border-warning{{else if eq "failed" .LastRun}}border-danger{{end}} mx-2 mb-3">
+      <div class="card-header">
+        <a href="/cronjob/{{.Context}}/{{.Namespace}}/{{.Name}}">{{ .Name}}</a> <span class="text-right"><i class="fa fa-star-o"></i></span><br>
+      <small>{{.Context}} | {{.Namespace}}</small>
+      </div>
+      <div class="card-body">
+        <p class="card-text">
+          <!-- Node pool: <br>
+          Last run: N/A<br>
+          Next run: in 2 hours<br> -->
+          Active: {{.Active}}<br>
+          Suspend: {{.Suspend}}<br>
+          Last run: {{.LastRun}}
+        </p>
       </div>
     </div>
+    {{end}}
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  </body>
-</html>
+  </div>
+</div>
+{{template "footer"}}

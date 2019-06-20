@@ -12,6 +12,11 @@ import (
 
 // Processes objects to create easy to print objects
 
+type page struct {
+	Title  string
+	Active string
+}
+
 type cardDetails struct {
 	Name      string
 	Context   string
