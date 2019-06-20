@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
+	"github.com/ContextLogic/ctl/pkg/util"
 	"html/template"
 	"k8s.io/client-go/rest"
 	"net/http"
@@ -17,13 +18,32 @@ func Serve(endpoint string) {
 	templates := template.Must(template.ParseGlob("pkg/web/template/*"))
 
 	// Main page
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// type Search struct {
-		// 	Contexts map[string]bool
-		// 	Namespace string
-		// 	Cronjobs []cardDetails
-		// }
+	http.HandleFunc("/", getDashHandleFunc(cl, templates))
 
+	// Advanced dashboard
+	http.HandleFunc("/advanced", getAdvDashHandleFunc(cl, templates))
+
+	// Cron job detail pages
+	http.HandleFunc("/cronjob/", getDetailsHandleFunc(cl, templates))
+
+	// Execute cron job
+	http.HandleFunc("/execute/", getExecuteHandleFunc(cl, templates))
+
+	// Suspend cron job
+	http.HandleFunc("/suspend/", getSuspendHandleFunc(cl, templates))
+
+	// Unsuspend cron job
+	http.HandleFunc("/unsuspend/", getUnsuspendHandleFunc(cl, templates))
+
+	// Specific run page
+	http.HandleFunc("/run/", getRunHandleFunc(cl, templates))
+
+	fmt.Println("Listening on", endpoint)
+	fmt.Println(http.ListenAndServe(endpoint, nil))
+}
+
+func getAdvDashHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		data := struct {
 			Page      page
 			Contexts  map[string]bool
@@ -31,7 +51,7 @@ func Serve(endpoint string) {
 			Search    string
 			Cronjobs  []cardDetails
 		}{
-			Page:     page{Title: "Dashboard - Kron", Active: "dashboard"},
+			Page:     page{Title: "Advanced Dashboard - Kron", Active: "advanced"},
 			Contexts: make(map[string]bool),
 		}
 
@@ -78,13 +98,97 @@ func Serve(endpoint string) {
 
 		data.Cronjobs = toCardDetailsList(filtered, runs)
 
+		if err := templates.ExecuteTemplate(w, "advanced.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
+func getDashHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := struct {
+			Page      page
+			InputType string // Region or AZ
+			Input     string // Input for region or az
+			Envs      map[string]bool
+			Namespace string
+			Search    string
+			Cronjobs  []cardDetails
+		}{
+			Page: page{Title: "Dashboard - Kron", Active: "dashboard"},
+			Envs: make(map[string]bool),
+		}
+
+		inputType := r.URL.Query().Get("type")
+		data.InputType = inputType
+
+		input := r.URL.Query().Get("input")
+		data.Input = input
+
+		// Env
+		for _, x := range util.GetEnvs() {
+			data.Envs[x] = false
+		}
+
+		// Check valid
+		envs := r.URL.Query()["env"]
+		for _, e := range envs {
+			if _, ok := data.Envs[e]; ok {
+				data.Envs[e] = true
+			}
+		}
+
+		namespace := r.URL.Query().Get("namespace")
+		data.Namespace = namespace
+
+		search := r.URL.Query().Get("search")
+		data.Search = search
+
+		var filter util.ContextFilter
+		if inputType == "region" { // REVIEW: No spaces allowed
+			filter.Region = strings.Split(input, ",")
+		} else if inputType == "az" {
+			filter.Az = strings.Split(input, ",")
+		}
+		filter.Env = envs
+
+		ctxs, err := util.GetFilteredClusters(util.ContextFilter{})
+		if err != nil {
+			http.Error(w, "Could not parse region/env/az", http.StatusInternalServerError)
+		}
+
+		cronjobs, err := cl.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
+		if err != nil {
+			panic(err.Error())
+		}
+
+		// Filter searches
+		var filtered []client.CronJobDiscovery
+		if search == "" {
+			filtered = cronjobs
+		} else {
+			for _, c := range cronjobs {
+				if strings.Contains(c.Name, search) {
+					filtered = append(filtered, c)
+				}
+			}
+		}
+
+		runs, err := cl.ListRunsOverContexts(ctxs, namespace, client.ListOptions{})
+		if err != nil {
+			panic(err.Error())
+		}
+
+		data.Cronjobs = toCardDetailsList(filtered, runs)
+
 		if err := templates.ExecuteTemplate(w, "dash.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-	})
+	}
+}
 
-	// Cron job detail pages
-	http.HandleFunc("/cronjob/", func(w http.ResponseWriter, r *http.Request) {
+func getDetailsHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		re := regexp.MustCompile(`/cronjob/([^/]*)/([^/]*)/([^/]*)\z`)
 
 		path := re.FindStringSubmatch(r.URL.String())
@@ -115,10 +219,11 @@ func Serve(endpoint string) {
 		if err := templates.ExecuteTemplate(w, "details.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-	})
+	}
+}
 
-	// Execute cron job
-	http.HandleFunc("/execute/", func(w http.ResponseWriter, r *http.Request) {
+func getExecuteHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		re := regexp.MustCompile(`/execute/([^/]*)/([^/]*)/([^/]*)\z`)
 
 		path := re.FindStringSubmatch(r.URL.String())
@@ -133,10 +238,11 @@ func Serve(endpoint string) {
 		} else {
 			http.Redirect(w, r, fmt.Sprintf("/cronjob/%s/%s/%s", path[1], path[2], path[3]), http.StatusSeeOther)
 		}
-	})
+	}
+}
 
-	// Suspend cron job
-	http.HandleFunc("/suspend/", func(w http.ResponseWriter, r *http.Request) {
+func getSuspendHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		re := regexp.MustCompile(`/suspend/([^/]*)/([^/]*)/([^/]*)\z`)
 
 		path := re.FindStringSubmatch(r.URL.String())
@@ -153,10 +259,11 @@ func Serve(endpoint string) {
 		} else {
 			http.Redirect(w, r, fmt.Sprintf("/cronjob/%s/%s/%s", path[1], path[2], path[3]), http.StatusSeeOther)
 		}
-	})
+	}
+}
 
-	// Unsuspend cron job
-	http.HandleFunc("/unsuspend/", func(w http.ResponseWriter, r *http.Request) {
+func getUnsuspendHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		re := regexp.MustCompile(`/unsuspend/([^/]*)/([^/]*)/([^/]*)\z`)
 
 		path := re.FindStringSubmatch(r.URL.String())
@@ -173,10 +280,11 @@ func Serve(endpoint string) {
 		} else {
 			http.Redirect(w, r, fmt.Sprintf("/cronjob/%s/%s/%s", path[1], path[2], path[3]), http.StatusSeeOther)
 		}
-	})
+	}
+}
 
-	// Specific run page
-	http.HandleFunc("/run/", func(w http.ResponseWriter, r *http.Request) {
+func getRunHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		re := regexp.MustCompile(`/run/([^/]*)/([^/]*)/([^/]*)/([^/]*)\z`)
 
 		path := re.FindStringSubmatch(r.URL.String())
@@ -230,8 +338,5 @@ func Serve(endpoint string) {
 		if err := templates.ExecuteTemplate(w, "run.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-	})
-
-	fmt.Println("Listening on", endpoint)
-	fmt.Println(http.ListenAndServe(endpoint, nil))
+	}
 }

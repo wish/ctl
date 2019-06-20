@@ -106,3 +106,20 @@ func getConf(configpath string) *config {
 
 	return conf
 }
+
+func GetEnvs() []string {
+	clusterList := helper.GetContexts()
+
+	set := make(map[string]struct{})
+	var ret []string
+
+	for _, ctx := range clusterList {
+		env := GetClusterClusterInfo(ctx).Environment
+		if _, ok := set[env]; !ok {
+			set[env] = struct{}{}
+			ret = append(ret, env)
+		}
+	}
+
+	return ret
+}

@@ -7,36 +7,30 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <form action="/" method="get">
+        <form action="/advanced" method="get">
           <div class="form-group form-inline">
             <!-- <form class="form-inline my-2 my-lg-0"> -->
-            <input class="form-control form-control-sm mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search" value="{{.Search}}">
+              <input class="form-control form-control-sm mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search" value="{{.Search}}">
             <!-- </form> -->
-            <select class="form-control form-control-sm" name="type">
-              <option value="region"{{if eq "region" .InputType}} selected{{end}}>Region</option>
-              <option value="az"{{if eq "az" .InputType}} selected{{end}}>Availability Zone</option>
-            </select>
-            <input class="form-control form-control-sm mr-sm-2 bg-light" type="search" placeholder="" aria-label="" name="input" value="{{.Input}}">
-            <!-- <form class="form-inline my-2 my-lg-0"> -->
-
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" id="envDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-globe"></i> Environment
+              <a class="nav-link dropdown-toggle" id="contextDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-object-group"></i> Context
               </a>
+              <!-- Context drop down -->
               <div class="dropdown-menu">
                 <div class="form-group">
-                  {{range $env, $set := .Envs}}
+                  {{range $ctx, $set := .Contexts}}
                   <div class="form-check dropdown-item">
-                    <label class="form-check-label" for="item-{{$env}}">
-                    <input type="checkbox" class="form-check-input" id="item-{{$env}}" name="env" value="{{$env}}"{{if $set}} checked{{end}}>
-                      {{$env}}
+                    <label class="form-check-label" for="item-{{$ctx}}">
+                    <input type="checkbox" class="form-check-input" id="item-{{$ctx}}" name="context" value="{{$ctx}}"{{if $set}} checked{{end}}>
+                      {{$ctx}}
                     </label>
                   </div>
                   {{end}}
                 </div>
               </div>
             </li>
-
+            <!-- <form class="form-inline my-2 my-lg-0"> -->
             <input class="form-control form-control-sm mr-sm-2 bg-light" type="search" placeholder="Namespace" aria-label="Namespace" name="namespace" value="{{.Namespace}}">
             <!-- </form> -->
             <button type="submit" class="btn btn-sm btn-primary">Apply</button>
@@ -62,13 +56,10 @@
     <div class="card {{if eq "running" .LastRun}}border-info{{else if .Suspend}}border-warning{{else if eq "failed" .LastRun}}border-danger{{end}} mx-2 mb-3">
       <div class="card-header">
         <a href="/cronjob/{{.Context}}/{{.Namespace}}/{{.Name}}">{{ .Name}}</a> <span class="text-right"><i class="fa fa-star-o"></i></span><br>
-      <!-- <small>{{.Context}} | {{.Namespace}}</small> -->
+      <small>{{.Context}} | {{.Namespace}}</small>
       </div>
       <div class="card-body">
         <p class="card-text">
-          Region: {{.Region}}<br>
-          Env: {{.Env}}<br>
-          Zone: {{.Az}}<hr>
           Active: {{.Active}}<br>
           Suspend: {{.Suspend}}<br>
           Last run: {{.LastRun}}
