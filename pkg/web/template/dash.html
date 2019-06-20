@@ -61,7 +61,7 @@
 
     <div class="card {{if eq "running" .LastRun}}border-info{{else if .Suspend}}border-warning{{else if eq "failed" .LastRun}}border-danger{{end}} mx-2 mb-3">
       <div class="card-header">
-        <a href="/cronjob/{{.Context}}/{{.Namespace}}/{{.Name}}">{{ .Name}}</a> <span class="text-right"><i class="fa fa-star-o"></i></span><br>
+        <a href="/cronjob/{{.Context}}/{{.Namespace}}/{{.Name}}">{{ .Name}}</a><br>
       <!-- <small>{{.Context}} | {{.Namespace}}</small> -->
       </div>
       <div class="card-body">

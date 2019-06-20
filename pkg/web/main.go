@@ -332,7 +332,7 @@ func getRunHandleFunc(cl *client.Client, templates *template.Template) func(http
 			Page: page{
 				Title: fmt.Sprintf("%s - %s Runs - Kron", run.Name, path[3]),
 			},
-			Details: toFullRunDetails(path, run, logs),
+			Details: toFullRunDetails(path, *run, logs),
 		}
 
 		if err := templates.ExecuteTemplate(w, "run.html", data); err != nil {
