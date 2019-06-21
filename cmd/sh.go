@@ -10,7 +10,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(shCmd)
-	shCmd.Flags().StringP("container", "t", "", "Specify the container")
+	shCmd.Flags().StringP("container", "c", "", "Specify the container")
 	shCmd.Flags().StringP("shell", "s", "/bin/bash", "Specify the shell path")
 }
 

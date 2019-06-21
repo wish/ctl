@@ -16,7 +16,7 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringSliceVarP(&ctxs, "context", "c", nil, "Specify the context(s) to operate in")
+	rootCmd.PersistentFlags().StringSliceVarP(&ctxs, "context", "x", nil, "Specify the context(s) to operate in")
 	rootCmd.PersistentFlags().StringVarP(&namespace, "namespace", "n", "", "Specify the namespace within all the contexts specified")
 	rootCmd.PersistentFlags().StringSliceVar(&filter.Region, "region", nil, "Specify the context(s) to operate in")
 	rootCmd.PersistentFlags().StringSliceVar(&filter.Az, "az", nil, "Specify the context(s) to operate in")

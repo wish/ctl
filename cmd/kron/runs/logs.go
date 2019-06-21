@@ -9,7 +9,7 @@ import (
 
 func init() {
 	RunsCmd.AddCommand(logsCmd)
-	logsCmd.Flags().StringP("container", "t", "", "Specify the container")
+	logsCmd.Flags().StringP("container", "c", "", "Specify the container")
 }
 
 var logsCmd = &cobra.Command{
