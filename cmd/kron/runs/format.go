@@ -5,6 +5,7 @@ import (
 	"github.com/ContextLogic/ctl/pkg/client"
 	"os"
 	"text/tabwriter"
+	"gopkg.in/yaml.v2"
 )
 
 // TODO: Add better formatting and more fields
@@ -36,4 +37,9 @@ func printRunList(lst []client.RunDiscovery) {
 		}
 	}
 	w.Flush()
+}
+
+func describeRun(run client.RunDiscovery) {
+	b, _ := yaml.Marshal(run)
+	fmt.Println(string(b))
 }

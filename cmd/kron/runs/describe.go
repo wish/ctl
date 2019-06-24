@@ -32,7 +32,7 @@ var describeCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		for _, r := range list {
-			fmt.Println(r) // TODO improve printing
+			describeRun(r)
 		}
 	},
 }
