@@ -3,9 +3,9 @@ package runs
 import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
+	"gopkg.in/yaml.v2"
 	"os"
 	"text/tabwriter"
-	"gopkg.in/yaml.v2"
 )
 
 // TODO: Add better formatting and more fields

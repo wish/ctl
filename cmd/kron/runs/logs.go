@@ -3,6 +3,7 @@ package runs
 import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/ContextLogic/ctl/pkg/util"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -21,7 +22,11 @@ If namespace not specified, it will get all the pods across all the namespaces.
 If context(s) not specified, it will search through all contexts.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		ctxs, _ := cmd.Flags().GetStringSlice("context")
+		ctxs, err := util.GetContexts(cmd)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 		namespace, _ := cmd.Flags().GetString("namespace")
 		container, _ := cmd.Flags().GetString("container")
 

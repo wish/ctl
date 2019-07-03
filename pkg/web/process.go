@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
-	"github.com/ContextLogic/ctl/pkg/util"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
@@ -25,9 +24,6 @@ type cardDetails struct {
 	Active    int
 	Suspend   bool
 	LastRun   RunStatus
-	Region    string
-	Env       string
-	Az        string
 }
 
 type RunStatus string
@@ -51,8 +47,6 @@ func toCardDetails(c *client.CronJobDiscovery, r *client.RunDiscovery) cardDetai
 		runStatus = RunRunning
 	}
 
-	ctxinfo := util.GetClusterClusterInfo(c.Context)
-
 	return cardDetails{
 		Name:      c.Name,
 		Context:   c.Context,
@@ -60,9 +54,6 @@ func toCardDetails(c *client.CronJobDiscovery, r *client.RunDiscovery) cardDetai
 		Active:    len(c.Status.Active),
 		Suspend:   *(c.Spec.Suspend),
 		LastRun:   runStatus,
-		Region:    ctxinfo.Region,
-		Env:       ctxinfo.Environment,
-		Az:        ctxinfo.Az,
 	}
 }
 
@@ -88,9 +79,6 @@ type fullDetails struct {
 	Name         string
 	Context      string
 	Namespace    string
-	Region       string
-	Env          string
-	Az           string
 	Schedule     string
 	Suspend      bool
 	Template     string
@@ -126,14 +114,9 @@ func toFullDetails(cronjob *client.CronJobDiscovery, runs []client.RunDiscovery)
 	// b, err := cronjob.Spec.JobTemplate.Marshal()
 	template, _ := json.MarshalIndent(cronjob.Spec.JobTemplate, "", "  ")
 
-	ctxinfo := util.GetClusterClusterInfo(cronjob.Context)
-
 	return fullDetails{
 		Name:         cronjob.Name,
 		Context:      cronjob.Context,
-		Region:       ctxinfo.Region,
-		Env:          ctxinfo.Environment,
-		Az:           ctxinfo.Az,
 		Namespace:    cronjob.Namespace,
 		Suspend:      *(cronjob.Spec.Suspend),
 		Schedule:     cronjob.Spec.Schedule,

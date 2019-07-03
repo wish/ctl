@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>Kron – A kubernetes cron job tool</title>
+  </head>
+  <body>
+    <div class="navbar-expand-md">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+          <a class="navbar-brand" href="#"><i class="fa fa-clock-o"></i> Kron</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="#">Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Favorites</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Scheduled</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <form class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            </form>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-object-group"></i> Context
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-address-card"></i> Namespace
+              </a>
+            </li>
+            <li class="nav-item d-flex align-items-center">
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="customSwitch1">
+                <label class="custom-control-label" for="customSwitch1">Advanced</label>
+              </div>
+            </li>
+          </ul>
+          <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-sort"></i> Sort
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <br>
+
+    <div class = "container">
+      <div class="card-deck">
+        <div class="card border-warning">
+          <div class="card-header">
+            DPA_Feed_Update <span class="text-right"><i class="fa fa-star-o"></i></span><br>
+          <small>app-05-dev.k8s.local | default</small>
+          </div>
+          <div class="card-body">
+            <p class="card-text">
+              Schedule: <code>0 2 * * 1</code><br>
+              Node pool: campaign-cron-4<br>
+              Last run: N/A<br>
+              Next run: in 2 hours<br>
+              Status: suspended
+            </p>
+          </div>
+        </div>
+        <div class="card border-danger">
+          <div class="card-header">
+            Sentry_Worker_Daily <span class="text-right"><i class="fa fa-star-o"></i></span><br>
+          <small>app-05-dev.k8s.local | sentry</small>
+          </div>
+          <div class="card-body">
+            <p class="card-text">
+              Schedule: <code>0 0 * * *</code><br>
+              Node pool: sentry-cron-1<br>
+              Last run: failed<br>
+              Next run: in 22 hours<br>
+              Status: active
+            </p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            TD_Aggregator_Hourly <span class="text-right"><i class="fa fa-star-o"></i></span><br>
+          <small>app-07-prod.k8s.local | td-aggregator</small>
+          </div>
+          <div class="card-body">
+            <p class="card-text">
+              Schedule: <code>10 * * * *</code><br>
+              Node pool: aggregator-prod<br>
+              Last run: success<br>
+              Next run: in 30 min<br>
+              Status: active
+            </p>
+          </div>
+        </div>
+        <div class="card border-info">
+          <div class="card-header">
+            Kubelet_Proxy_Metrics <span class="text-right"><i class="fa fa-star"></i></span><br>
+          <small>app-06-prod.k8s.local | metrics</small>
+          </div>
+          <div class="card-body">
+            <p class="card-text">
+              Schedule: <code>*/30 * * * *</code><br>
+              Node pool: metrics-native-2<br>
+              Last run: in progress<br>
+              Next run: in 29 seconds<br>
+              Status: active
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>

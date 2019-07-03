@@ -32,7 +32,7 @@ func toLocation(obj interface{}) location {
 }
 
 func createConfig() {
-	os.Mkdir(os.Getenv("HOME")+"/.kron/", 0777)
+	os.Mkdir(os.Getenv("HOME")+"/.kron/", 0644)
 	err := viper.WriteConfigAs(os.Getenv("HOME") + "/.kron/config.yaml")
 	if err != nil {
 		fmt.Println("Error encountered while trying to write new config file")

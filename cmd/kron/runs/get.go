@@ -3,6 +3,7 @@ package runs
 import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/ContextLogic/ctl/pkg/util"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -21,7 +22,11 @@ If multiple cron jobs matches the parameters, only the first is used.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// Get flags
-		ctxs, _ := cmd.Flags().GetStringSlice("context")
+		ctxs, err := util.GetContexts(cmd)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 		namespace, _ := cmd.Flags().GetString("namespace")
 
 		list, err := client.GetDefaultConfigClient().

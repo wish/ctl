@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/ContextLogic/ctl/pkg/client/helper"
-	"github.com/ContextLogic/ctl/pkg/util"
 	"html/template"
 	"k8s.io/client-go/rest"
 	"net/http"
@@ -18,7 +17,7 @@ func Serve(endpoint string) {
 	templates := template.Must(template.ParseGlob("pkg/web/template/*"))
 
 	// Main page
-	http.HandleFunc("/", getDashHandleFunc(cl, templates))
+	http.HandleFunc("/", getAdvDashHandleFunc(cl, templates))
 
 	// Advanced dashboard
 	http.HandleFunc("/advanced", getAdvDashHandleFunc(cl, templates))
@@ -99,89 +98,6 @@ func getAdvDashHandleFunc(cl *client.Client, templates *template.Template) func(
 		data.Cronjobs = toCardDetailsList(filtered, runs)
 
 		if err := templates.ExecuteTemplate(w, "advanced.html", data); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-}
-
-func getDashHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		data := struct {
-			Page      page
-			InputType string // Region or AZ
-			Input     string // Input for region or az
-			Envs      map[string]bool
-			Namespace string
-			Search    string
-			Cronjobs  []cardDetails
-		}{
-			Page: page{Title: "Dashboard - Kron", Active: "dashboard"},
-			Envs: make(map[string]bool),
-		}
-
-		inputType := r.URL.Query().Get("type")
-		data.InputType = inputType
-
-		input := r.URL.Query().Get("input")
-		data.Input = input
-
-		// Env
-		for _, x := range util.GetEnvs() {
-			data.Envs[x] = false
-		}
-
-		// Check valid
-		envs := r.URL.Query()["env"]
-		for _, e := range envs {
-			if _, ok := data.Envs[e]; ok {
-				data.Envs[e] = true
-			}
-		}
-
-		namespace := r.URL.Query().Get("namespace")
-		data.Namespace = namespace
-
-		search := r.URL.Query().Get("search")
-		data.Search = search
-
-		var filter util.ContextFilter
-		if inputType == "region" { // REVIEW: No spaces allowed
-			filter.Region = strings.Split(input, ",")
-		} else if inputType == "az" {
-			filter.Az = strings.Split(input, ",")
-		}
-		filter.Env = envs
-
-		ctxs, err := util.GetFilteredClusters(util.ContextFilter{})
-		if err != nil {
-			http.Error(w, "Could not parse region/env/az", http.StatusInternalServerError)
-		}
-
-		cronjobs, err := cl.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
-		if err != nil {
-			panic(err.Error())
-		}
-
-		// Filter searches
-		var filtered []client.CronJobDiscovery
-		if search == "" {
-			filtered = cronjobs
-		} else {
-			for _, c := range cronjobs {
-				if strings.Contains(c.Name, search) {
-					filtered = append(filtered, c)
-				}
-			}
-		}
-
-		runs, err := cl.ListRunsOverContexts(ctxs, namespace, client.ListOptions{})
-		if err != nil {
-			panic(err.Error())
-		}
-
-		data.Cronjobs = toCardDetailsList(filtered, runs)
-
-		if err := templates.ExecuteTemplate(w, "dash.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}

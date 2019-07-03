@@ -6,7 +6,7 @@ import (
 	"os"
 	"text/tabwriter"
 	"time"
-	"gopkg.in/yaml.v2"
+	// "gopkg.in/yaml.v2"
 )
 
 // REVIEW: Most of the processing here was guessed with reverse engineering
@@ -45,8 +45,12 @@ func printPodList(lst []client.PodDiscovery) {
 func describePod(pod client.PodDiscovery) {
 	fmt.Printf("Context: %s\n", pod.Context)
 	// fmt.Printf("Namespace: %s\n", pod.Namespace)
-	b, _ := yaml.Marshal(pod.Pod)
+	// b, _ := yaml.Marshal(pod.Pod)
+
+	b, s := pod.Pod.Descriptor()
+
 	fmt.Println(string(b))
+	fmt.Println(s)
 }
 
 func describePodList(lst []client.PodDiscovery) {
