@@ -11,12 +11,12 @@ import (
 
 // Client object for all operations
 type Client struct {
-	config     string                           // Config file location
-	clientsets map[string]*kubernetes.Clientset // maps from context name to client
-	cslock     sync.RWMutex                     // For concurrent access of clientsets
+	config     string                          // Config file location
+	clientsets map[string]kubernetes.Interface // maps from context name to client
+	cslock     sync.RWMutex                    // For concurrent access of clientsets
 }
 
-func clientsetHelper(getConfig func() (*restclient.Config, error)) (*kubernetes.Clientset, error) {
+func clientsetHelper(getConfig func() (*restclient.Config, error)) (kubernetes.Interface, error) {
 	config, err := getConfig()
 
 	if err != nil {
@@ -31,10 +31,10 @@ func clientsetHelper(getConfig func() (*restclient.Config, error)) (*kubernetes.
 // TODO: Add more constructors??
 // Creates a client from the kubeconfig file
 func GetDefaultConfigClient() *Client {
-	return &Client{config: helper.GetKubeConfigPath(), clientsets: make(map[string]*kubernetes.Clientset)}
+	return &Client{config: helper.GetKubeConfigPath(), clientsets: make(map[string]kubernetes.Interface)}
 }
 
-func (c *Client) getContextClientset(context string) (*kubernetes.Clientset, error) {
+func (c *Client) getContextClientset(context string) (kubernetes.Interface, error) {
 	c.cslock.RLock()
 	if cs, ok := c.clientsets[context]; ok {
 		c.cslock.RUnlock()
