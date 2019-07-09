@@ -31,3 +31,6 @@ clean: ## Removes build artifacts
 bin/ctl: ## Make a link to the executable for this OS type for convenience
 	$(shell ln -s ${UNAME_S}/ctl bin/ctl)
 
+.PHONY: test
+test: ## Runs go tests on all subdirs
+	go test ./...
