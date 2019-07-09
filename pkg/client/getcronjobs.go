@@ -6,7 +6,7 @@ import (
 )
 
 func (c *Client) GetCronJob(context, namespace string, name string, options GetOptions) (*CronJobDiscovery, error) {
-	cs, err := c.getContextClientset(context)
+	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
 	}

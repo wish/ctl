@@ -14,7 +14,7 @@ func (c *Client) RunCronJob(contexts []string, namespace, cronjobName string) (*
 		return nil, err
 	}
 
-	cl, err := c.getContextClientset(cronjob.Context)
+	cl, err := c.getContextInterface(cronjob.Context)
 	if err != nil {
 		panic(err.Error())
 	}

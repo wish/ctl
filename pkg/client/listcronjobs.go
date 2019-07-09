@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]CronJobDiscovery, error) {
-	cs, err := c.getContextClientset(context)
+	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
 	}

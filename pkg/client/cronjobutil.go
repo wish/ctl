@@ -12,7 +12,7 @@ func (c *Client) SetCronJobSuspend(contexts []string, namespace, name string, su
 	}
 	*cronjob.Spec.Suspend = suspend
 
-	cl, err := c.getContextClientset(cronjob.Context)
+	cl, err := c.getContextInterface(cronjob.Context)
 	if err != nil {
 		panic(err.Error())
 	}

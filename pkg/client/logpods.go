@@ -12,7 +12,7 @@ func (c *Client) LogPodOverContexts(contexts []string, namespace, name, containe
 		return nil, err
 	}
 
-	cl, err := c.getContextClientset(pod.Context)
+	cl, err := c.getContextInterface(pod.Context)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -25,7 +25,7 @@ func (c *Client) LogPodOverContexts(contexts []string, namespace, name, containe
 // Only logs first container if container not specified
 // TODO: The usage of this function is odd (support all containers???)
 func (c *Client) LogPod(context, namespace, name, container string, options LogOptions) (*rest.Result, error) {
-	cl, err := c.getContextClientset(context)
+	cl, err := c.getContextInterface(context)
 	if err != nil {
 		panic(err.Error())
 	}

@@ -16,7 +16,7 @@ func (c *Client) ExecInPod(contexts []string, namespace, name, container string,
 		return err
 	}
 
-	cl, err := c.getContextClientset(pod.Context)
+	cl, err := c.getContextInterface(pod.Context)
 	if err != nil {
 		panic(err.Error())
 	}

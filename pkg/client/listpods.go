@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Client) ListPods(context string, namespace string, options ListOptions) ([]PodDiscovery, error) {
-	cs, err := c.getContextClientset(context)
+	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
 	}

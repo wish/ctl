@@ -6,7 +6,7 @@ import (
 )
 
 func (c *Client) GetRun(context, namespace string, name string, options GetOptions) (*RunDiscovery, error) {
-	cs, err := c.getContextClientset(context)
+	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
 	}
