@@ -3,7 +3,6 @@ package client
 import (
 	"errors"
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client/helper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"strings"
@@ -28,7 +27,7 @@ func (c *Client) ListCronJobs(context string, namespace string, options ListOpti
 
 func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, options ListOptions) ([]CronJobDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = helper.GetContexts()
+		contexts = c.GetAllContexts()
 	}
 
 	var wait sync.WaitGroup

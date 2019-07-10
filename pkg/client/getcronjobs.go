@@ -1,7 +1,6 @@
 package client
 
 import (
-	"github.com/ContextLogic/ctl/pkg/client/helper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -20,7 +19,7 @@ func (c *Client) GetCronJob(context, namespace string, name string, options GetO
 
 func (c *Client) FindCronJobs(contexts []string, namespace string, names []string, options ListOptions) ([]CronJobDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = helper.GetContexts()
+		contexts = c.GetAllContexts()
 	}
 	// Creating set of names
 	positive := make(map[string]struct{})

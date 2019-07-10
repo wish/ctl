@@ -3,7 +3,6 @@ package web
 import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
-	"github.com/ContextLogic/ctl/pkg/client/helper"
 	"html/template"
 	"k8s.io/client-go/rest"
 	"net/http"
@@ -55,7 +54,7 @@ func getAdvDashHandleFunc(cl *client.Client, templates *template.Template) func(
 		}
 
 		// Contexts
-		for _, x := range helper.GetContexts() {
+		for _, x := range cl.GetAllContexts() {
 			data.Contexts[x] = false
 		}
 

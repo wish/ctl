@@ -1,7 +1,6 @@
 package client
 
 import (
-	"github.com/ContextLogic/ctl/pkg/client/helper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -19,7 +18,7 @@ func (c *Client) GetPod(context, namespace string, name string, options GetOptio
 
 func (c *Client) FindPods(contexts []string, namespace string, names []string, options ListOptions) ([]PodDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = helper.GetContexts()
+		contexts = c.GetAllContexts()
 	}
 	// Creating set of names
 	positive := make(map[string]struct{})

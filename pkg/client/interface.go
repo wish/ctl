@@ -2,10 +2,7 @@ package client
 
 import (
 	"errors"
-	"github.com/ContextLogic/ctl/pkg/client/helper"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/kubernetes/fake"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sync"
@@ -43,15 +40,6 @@ func (d *configClientsetGetter) getContextInterface(context string) (kubernetes.
 	return v, nil
 }
 
-func GetDefaultConfigClient() *Client {
-	return &Client{
-		&configClientsetGetter{
-			clientsets: make(map[string]kubernetes.Interface),
-			config:     helper.GetKubeConfigPath(),
-		},
-	}
-}
-
 type fakeClientsetGetter struct {
 	clientsets map[string]kubernetes.Interface
 	cslock     sync.Mutex
@@ -64,16 +52,4 @@ func (f *fakeClientsetGetter) getContextInterface(context string) (kubernetes.In
 		return cs, nil
 	}
 	return nil, errors.New("The context specified does not exist")
-}
-
-func GetFakeConfigClient(clusters map[string][]runtime.Object) *Client {
-	clientsets := make(map[string]kubernetes.Interface)
-	for context, objs := range clusters {
-		clientsets[context] = fake.NewSimpleClientset(objs...)
-	}
-	return &Client{
-		&fakeClientsetGetter{
-			clientsets: clientsets,
-		},
-	}
 }

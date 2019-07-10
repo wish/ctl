@@ -5,38 +5,34 @@ import (
 	"os"
 
 	"github.com/ContextLogic/ctl/pkg/client"
-	"github.com/ContextLogic/ctl/pkg/util"
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	rootCmd.AddCommand(getCmd)
-}
+func GetGetCmd(c *client.Client) *cobra.Command {
+	return &cobra.Command{
+		Use:   "get [flags]",
+		Short: "Get a list of pods",
+		Long: `Get a list of pods in the specified namespace and context(s).
+	If namespace not specified, it will get all the pods across all the namespaces.
+	If context(s) not specified, it will list from all contexts.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			ctxs, err := cmd.Flags().GetStringSlice("context")
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
+			namespace, _ := cmd.Flags().GetString("namespace")
 
-var getCmd = &cobra.Command{
-	Use:   "get [flags]",
-	Short: "Get a list of pods",
-	Long: `Get a list of pods in the specified namespace and context(s).
-If namespace not specified, it will get all the pods across all the namespaces.
-If context(s) not specified, it will list from all contexts.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		ctxs, err := util.GetContexts(cmd)
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-		namespace, _ := cmd.Flags().GetString("namespace")
-
-		list, err := client.GetDefaultConfigClient().
-			ListPodsOverContexts(ctxs, namespace, client.ListOptions{})
-		// NOTE: List is unsorted and could be in an inconsistent order
-		// Output
-		if list != nil {
-			printPodList(list)
-		}
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-	},
+			list, err := c.ListPodsOverContexts(ctxs, namespace, client.ListOptions{})
+			// NOTE: List is unsorted and could be in an inconsistent order
+			// Output
+			if list != nil {
+				printPodList(list)
+			}
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
+		},
+	}
 }

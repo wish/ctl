@@ -2,16 +2,23 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	// "reflect"
-
-	// "github.com/ContextLogic/ctl/pkg/util"
+	"github.com/ContextLogic/ctl/cmd/kron"
+	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func init() {
 	rootCmd.PersistentFlags().StringSliceP("context", "x", nil, "Specify the context(s) to operate in")
 	rootCmd.PersistentFlags().StringP("namespace", "n", "", "Specify the namespace within all the contexts specified")
+
+	// Commands'
+	c := client.GetDefaultConfigClient()
+	rootCmd.AddCommand(GetDescribeCmd(c))
+	rootCmd.AddCommand(GetGetCmd(c))
+	rootCmd.AddCommand(GetLogsCmd(c))
+	rootCmd.AddCommand(GetShCmd(c))
+	rootCmd.AddCommand(kron.GetKronCmd(c))
 }
 
 // rootCmd represents the base command when called without any subcommands

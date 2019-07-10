@@ -29,9 +29,9 @@ func GetKubeConfigPath() string {
 	return *kubeconfig
 }
 
-func GetContexts() []string {
+func GetContexts(configpath string) []string {
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: GetKubeConfigPath()},
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: configpath},
 		&clientcmd.ConfigOverrides{}).RawConfig()
 
 	if err != nil {
