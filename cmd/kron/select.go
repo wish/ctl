@@ -5,7 +5,6 @@ import (
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 func init() {
@@ -28,7 +27,7 @@ func GetSelectCmd(c *client.Client) *cobra.Command {
 	A namespace and contexts can be specified to limit matches.
 	If namespace/contexts are not specified, usage will match with all results.`,
 		Args: cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// args/flags
 			job := args[0]
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
@@ -37,12 +36,13 @@ func GetSelectCmd(c *client.Client) *cobra.Command {
 			var s selectedJob
 			err := viper.UnmarshalKey("selected", &s)
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
 
 			viper.Set("selected", selectedJob{job, location{ctxs, namespace}})
 			viper.WriteConfig()
+
+			return nil
 		},
 	}
 }

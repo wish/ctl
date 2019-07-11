@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -15,12 +12,8 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 		Long: `Get a list of pods in the specified namespace and context(s).
 	If namespace not specified, it will get all the pods across all the namespaces.
 	If context(s) not specified, it will list from all contexts.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			ctxs, err := cmd.Flags().GetStringSlice("context")
-			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
-			}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 
 			list, err := c.ListPodsOverContexts(ctxs, namespace, client.ListOptions{})
@@ -30,9 +23,9 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 				printPodList(list)
 			}
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
+			return nil
 		},
 	}
 }

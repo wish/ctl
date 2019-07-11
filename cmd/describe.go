@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
+	"errors"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -16,24 +14,20 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 	If namespace not specified, it will get all the pods across all the namespaces.
 	If context(s) not specified, it will search through all contexts.`,
 		Args: cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			ctxs, err := cmd.Flags().GetStringSlice("context")
-			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
-			}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 
 			pods, err := c.FindPods(ctxs, namespace, args, client.ListOptions{})
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
 			if len(pods) == 0 {
-				fmt.Println("Could not find any matching pods!")
+				return errors.New("Could not find any matching pods!")
 			} else {
 				describePodList(pods)
 			}
+			return nil
 		},
 	}
 }

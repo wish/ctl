@@ -5,7 +5,6 @@ import (
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 func init() {
@@ -27,31 +26,29 @@ func GetFavoriteCmd(c *client.Client) *cobra.Command {
 		Short: "Adds jobs to favorite list",
 		Long: `Adds specified job(s) to the favorite list. If no job was specified the selected job is added.
 	A namespace and contexts can be specified to limit matches.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// args/flags
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			nss, _ := cmd.Flags().GetString("namespace")
 
 			f, err := getFavorites()
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
 
 			if len(args) == 0 {
 				selected, err := getSelected()
 				if err != nil {
-					fmt.Println(err.Error())
-					os.Exit(1)
+					return err
 				}
 				if l, ok := f[selected.Name]; ok {
-					fmt.Println(overrideFavoriteMessage(selected.Name, l))
+					cmd.Println(overrideFavoriteMessage(selected.Name, l))
 				}
 				f[selected.Name] = selected.Location
 			} else {
 				for _, job := range args {
 					if l, ok := f[job]; ok {
-						fmt.Println(overrideFavoriteMessage(job, l))
+						cmd.Println(overrideFavoriteMessage(job, l))
 					}
 					f[job] = location{ctxs, nss}
 				}
@@ -59,6 +56,8 @@ func GetFavoriteCmd(c *client.Client) *cobra.Command {
 
 			viper.Set("favorites", f)
 			viper.WriteConfig()
+
+			return nil
 		},
 	}
 }

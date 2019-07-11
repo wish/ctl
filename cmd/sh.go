@@ -1,11 +1,9 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func GetShCmd(c *client.Client) *cobra.Command {
@@ -20,21 +18,17 @@ func GetShCmd(c *client.Client) *cobra.Command {
 	If the pod has only one container, the container name is optional.
 	If the pod has multiple containers, user have to choose one from them.`,
 		Args: cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			ctxs, err := cmd.Flags().GetStringSlice("context")
-			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
-			}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 			container, _ := cmd.Flags().GetString("container")
 			shell, _ := cmd.Flags().GetString("shell")
 
-			err = c.ExecInPod(ctxs, namespace, args[0], container, []string{shell}, os.Stdin, os.Stdout, os.Stderr)
+			err := c.ExecInPod(ctxs, namespace, args[0], container, []string{shell}, os.Stdin, os.Stdout, os.Stderr)
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
+			return nil
 		},
 	}
 

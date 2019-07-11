@@ -27,14 +27,12 @@ func GetUnfavoriteCmd(c *client.Client) *cobra.Command {
 		Long: `Removes job(s) from favorite list.
 	If no jobs are specified, removes selected job.`,
 		Args: cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			// args/flags
-
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// Behaviour when
 			var f map[string]location
 			err := viper.UnmarshalKey("favorites", &f)
 			if err != nil {
-				fmt.Println(err.Error())
+				return err
 			}
 
 			for _, job := range args {
@@ -43,6 +41,8 @@ func GetUnfavoriteCmd(c *client.Client) *cobra.Command {
 
 			viper.Set("favorites", f)
 			viper.WriteConfig()
+
+			return nil
 		},
 	}
 }

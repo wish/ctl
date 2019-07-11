@@ -1,10 +1,8 @@
 package runs
 
 import (
-	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func GetLogsCmd(c *client.Client) *cobra.Command {
@@ -16,19 +14,17 @@ func GetLogsCmd(c *client.Client) *cobra.Command {
 	If namespace not specified, it will get all the pods across all the namespaces.
 	If context(s) not specified, it will search through all contexts.`,
 		Args: cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, err := cmd.Flags().GetStringSlice("context")
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
 			namespace, _ := cmd.Flags().GetString("namespace")
 			container, _ := cmd.Flags().GetString("container")
 
 			pods, err := c.ListPodsOfRun(ctxs, namespace, args[0], client.ListOptions{})
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
 
 			for _, pod := range pods {
@@ -36,14 +32,14 @@ func GetLogsCmd(c *client.Client) *cobra.Command {
 
 				raw, err := res.Raw()
 				if err != nil {
-					fmt.Println(err.Error())
-					os.Exit(1)
+					return err
 				}
 				// REVIEW: Format??
-				fmt.Printf("Logs from %s:\n", pod.Name)
-				fmt.Print(string(raw))
-				fmt.Println("------")
+				cmd.Printf("Logs from %s:\n", pod.Name)
+				cmd.Print(string(raw))
+				cmd.Println("------")
 			}
+			return nil
 		},
 	}
 

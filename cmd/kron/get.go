@@ -1,10 +1,9 @@
 package kron
 
 import (
-	"fmt"
+	"errors"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
-	"os"
 	"sort"
 )
 
@@ -15,7 +14,7 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 		Long: `Get a list of cron jobs in the specified namespace and context(s).
 	If namespace not specified, it will get all the cron jobs across all the namespaces.
 	If context(s) not specified, it will list from all contexts.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// Get flags
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
@@ -27,15 +26,13 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 			E, _ := cmd.Flags().GetBool("by-next-run-reverse")
 
 			if l && L || l && e || l && E || L && e || L && E || e && E { // More than one
-				fmt.Println("Only at most one ordering flag may be set!")
-				os.Exit(1)
+				return errors.New("Only at most one ordering flag may be set!")
 			}
 
 			list, err := c.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
 
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
 
 			if onlyFavorites {
@@ -49,6 +46,7 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 			}
 
 			printCronJobList(list)
+			return nil
 		},
 	}
 

@@ -1,10 +1,8 @@
 package kron
 
 import (
-	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // Currently does not support selected job
@@ -16,7 +14,7 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 		Long: `Show details about specific cron jobs, or the selected job if none is specified.
 	If namespace not specified, it will get all the cron jobs across all the namespaces.
 	If context(s) not specified, it will search through all contexts.`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 			onlyFavorites, _ := cmd.Flags().GetBool("favorites")
@@ -27,15 +25,13 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 			if onlyFavorites {
 				cronjobs, err = c.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
 				if err != nil {
-					fmt.Println(err.Error())
-					os.Exit(1)
+					return err
 				}
 				cronjobs = filterFromFavorites(cronjobs)
 			} else if len(args) == 0 { // Use selected
 				selected, err := getSelected()
 				if err != nil {
-					fmt.Println(err.Error())
-					os.Exit(1)
+					return err
 				}
 				cronjobs, err = c.FindCronJobs(selected.Location.Contexts, selected.Location.Namespace, []string{selected.Name}, client.ListOptions{})
 			} else {
@@ -43,8 +39,7 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 			}
 
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
 
 			for _, cronjob := range cronjobs {
@@ -52,8 +47,10 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 			}
 
 			if len(cronjobs) == 0 {
-				fmt.Println("Did not find any matching jobs")
+				cmd.Println("Did not find any matching jobs")
 			}
+
+			return nil
 		},
 	}
 
