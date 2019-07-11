@@ -9,7 +9,7 @@ import (
 func (c *Client) findPod(contexts []string, namespace, name string) (*PodDiscovery, error) {
 	list, err := c.ListPodsOverContexts(contexts, namespace, ListOptions{})
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	var pod PodDiscovery

@@ -175,6 +175,31 @@ func TestGetCronJob(t *testing.T) {
 	}
 }
 
+func TestGetCronJobBadContext(t *testing.T) {
+	vals := map[string][]runtime.Object{"c1": getRandomCronJobsObject(5), "c2": getRandomCronJobsObject(6)}
+	cl := GetFakeConfigClient(vals)
+
+	var queries = []struct {
+		context   string
+		namespace string
+		name      string
+	}{
+		{"c3", "", "1"},
+		{"c3", "0", "0"},
+		{"c3", "", "0"},
+		{"c3", "5", "5"},
+	}
+
+	for _, q := range queries {
+		c, err := cl.GetCronJob(q.context, q.namespace, q.name, GetOptions{})
+		if err != nil && c == nil {
+			t.Log("Errored as expected:", err)
+		} else {
+			t.Error("Cronjob get did not error!")
+		}
+	}
+}
+
 func TestFindCronJobs(t *testing.T) {
 	cl := GetFakeConfigClient(map[string][]runtime.Object{"c1": getRandomCronJobsObject(5), "c2": getRandomCronJobsObject(6), "c3": getRandomCronJobsObject(3), "c4": nil})
 
@@ -228,6 +253,53 @@ func TestFindCronJobsError(t *testing.T) {
 			t.Error("FindCronJobs did not fail!")
 		} else {
 			t.Log("FindCronJobs failed as expected: ", err.Error())
+		}
+	}
+}
+
+func TestFindCronJob(t *testing.T) {
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"c1": getRandomCronJobsObject(5), "c2": getRandomCronJobsObject(6), "c3": getRandomCronJobsObject(3)})
+	var queries = []struct {
+		contexts  []string
+		namespace string
+		name      string
+	}{
+		{nil, "", "1"},
+		{nil, "5", "5"},
+		{[]string{"c2", "c3"}, "", "2"},
+		{[]string{"c2", "c3"}, "3", "3"},
+		{[]string{}, "", "2"},
+	}
+
+	for _, q := range queries {
+		c, err := cl.findCronJob(q.contexts, q.namespace, q.name)
+
+		if c == nil || err != nil {
+			t.Error("Could not find pod with error:", err)
+		} else if c.Name != q.name {
+			t.Errorf("The found pod does not match the name requested: %s != %s", c.Name, q.name)
+		}
+	}
+}
+
+func TestFindCronJobError(t *testing.T) {
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"c1": getRandomCronJobsObject(5), "c2": getRandomCronJobsObject(6), "c3": getRandomCronJobsObject(3)})
+	var queries = []struct {
+		contexts  []string
+		namespace string
+		name      string
+	}{
+		{[]string{"c2", "c3"}, "", "10"},
+		{[]string{"c4"}, "3", "3"},
+	}
+
+	for _, q := range queries {
+		_, err := cl.findCronJob(q.contexts, q.namespace, q.name)
+
+		if err != nil {
+			t.Log("Errored as expected:", err)
+		} else {
+			t.Error("Function did not error when finding log")
 		}
 	}
 }

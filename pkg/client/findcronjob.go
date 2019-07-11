@@ -8,7 +8,7 @@ import (
 func (c *Client) findCronJob(contexts []string, namespace, name string) (*CronJobDiscovery, error) {
 	list, err := c.ListCronJobsOverContexts(contexts, namespace, ListOptions{})
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	var cron CronJobDiscovery
