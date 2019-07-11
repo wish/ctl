@@ -44,7 +44,9 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 			pods, err := c.ListPods(ctx, namespace, options)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Could not connect to cluster \"%s\": %v\n", ctx, err)
+				mutex.Lock()
 				failed = append(failed, ctx)
+				mutex.Unlock()
 				return
 			}
 

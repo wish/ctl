@@ -42,13 +42,10 @@ func (d *configClientsetGetter) getContextInterface(context string) (kubernetes.
 
 type fakeClientsetGetter struct {
 	clientsets map[string]kubernetes.Interface
-	cslock     sync.Mutex
 }
 
 func (f *fakeClientsetGetter) getContextInterface(context string) (kubernetes.Interface, error) {
-	f.cslock.Lock()
 	if cs, ok := f.clientsets[context]; ok {
-		f.cslock.Unlock()
 		return cs, nil
 	}
 	return nil, errors.New("The context specified does not exist")

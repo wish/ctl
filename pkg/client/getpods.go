@@ -27,9 +27,6 @@ func (c *Client) FindPods(contexts []string, namespace string, names []string, o
 	}
 
 	all, err := c.ListPodsOverContexts(contexts, namespace, options)
-	if err != nil {
-		return nil, err
-	}
 
 	var ret []PodDiscovery
 
@@ -39,5 +36,5 @@ func (c *Client) FindPods(contexts []string, namespace string, names []string, o
 		}
 	}
 
-	return ret, nil
+	return ret, err
 }
