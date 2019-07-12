@@ -1,4 +1,4 @@
-package client
+package types
 
 import (
 	batchv1 "k8s.io/api/batch/v1"
@@ -12,12 +12,24 @@ type CronJobDiscovery struct {
 	batchv1beta1.CronJob
 }
 
+func (c CronJobDiscovery) GetLabels() map[string]string {
+	return c.Labels
+}
+
 type RunDiscovery struct {
 	Context string
 	batchv1.Job
 }
 
+func (c RunDiscovery) GetLabels() map[string]string {
+	return c.Labels
+}
+
 type PodDiscovery struct {
 	Context string
 	corev1.Pod
+}
+
+func (c PodDiscovery) GetLabels() map[string]string {
+	return c.Labels
 }

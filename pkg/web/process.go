@@ -3,7 +3,7 @@ package web
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client"
+	dtypes "github.com/ContextLogic/ctl/pkg/client/types"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
@@ -35,7 +35,7 @@ const (
 	RunRunning RunStatus = "running"
 )
 
-func toCardDetails(c *client.CronJobDiscovery, r *client.RunDiscovery) cardDetails {
+func toCardDetails(c *dtypes.CronJobDiscovery, r *dtypes.RunDiscovery) cardDetails {
 	var runStatus RunStatus
 	if r == nil {
 		runStatus = RunNA
@@ -57,9 +57,9 @@ func toCardDetails(c *client.CronJobDiscovery, r *client.RunDiscovery) cardDetai
 	}
 }
 
-func toCardDetailsList(lst []client.CronJobDiscovery, runs []client.RunDiscovery) []cardDetails {
+func toCardDetailsList(lst []dtypes.CronJobDiscovery, runs []dtypes.RunDiscovery) []cardDetails {
 	ret := make([]cardDetails, len(lst))
-	recent := make(map[types.UID]*client.RunDiscovery)
+	recent := make(map[types.UID]*dtypes.RunDiscovery)
 
 	for i, _ := range runs {
 		if len(runs[i].OwnerReferences) == 1 {
@@ -93,7 +93,7 @@ type runDetails struct {
 	End    string
 }
 
-type byStartTime []client.RunDiscovery
+type byStartTime []dtypes.RunDiscovery
 
 func (l byStartTime) Len() int      { return len(l) }
 func (l byStartTime) Swap(i, j int) { l[i], l[j] = l[j], l[i] }
@@ -101,7 +101,7 @@ func (l byStartTime) Less(i, j int) bool {
 	return l[i].Status.StartTime.After(l[j].Status.StartTime.Time)
 }
 
-func toFullDetails(cronjob *client.CronJobDiscovery, runs []client.RunDiscovery) fullDetails {
+func toFullDetails(cronjob *dtypes.CronJobDiscovery, runs []dtypes.RunDiscovery) fullDetails {
 	sort.Sort(byStartTime(runs))
 
 	// Last schedule
@@ -126,7 +126,7 @@ func toFullDetails(cronjob *client.CronJobDiscovery, runs []client.RunDiscovery)
 	}
 }
 
-func toRunDetails(run client.RunDiscovery) runDetails {
+func toRunDetails(run dtypes.RunDiscovery) runDetails {
 	// Get condition:
 	condition := "Running"
 	for _, x := range run.Status.Conditions {
@@ -148,7 +148,7 @@ func toRunDetails(run client.RunDiscovery) runDetails {
 	}
 }
 
-func toRunDetailsList(lst []client.RunDiscovery) []runDetails {
+func toRunDetailsList(lst []dtypes.RunDiscovery) []runDetails {
 	ret := make([]runDetails, len(lst))
 
 	for i := range lst {
@@ -174,7 +174,7 @@ type runPodDetails struct {
 	Logs string
 }
 
-func toFullRunDetails(path []string, run client.RunDiscovery, logs map[string]*rest.Result) fullRunDetails {
+func toFullRunDetails(path []string, run dtypes.RunDiscovery, logs map[string]*rest.Result) fullRunDetails {
 	pods := make([]runPodDetails, 0, len(logs))
 
 	for p, r := range logs {

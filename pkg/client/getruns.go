@@ -1,10 +1,13 @@
 package client
 
 import (
+	"errors"
+	"github.com/ContextLogic/ctl/pkg/client/filter"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (c *Client) GetRun(context, namespace string, name string, options GetOptions) (*RunDiscovery, error) {
+func (c *Client) GetRun(context, namespace string, name string, options GetOptions) (*types.RunDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
@@ -13,10 +16,15 @@ func (c *Client) GetRun(context, namespace string, name string, options GetOptio
 	if err != nil {
 		return nil, err
 	}
-	return &RunDiscovery{context, *job}, nil
+
+	d := types.RunDiscovery{context, *job}
+	if !filter.MatchLabel(d, options.LabelMatch) {
+		return nil, errors.New("Found object does not satisfy filters")
+	}
+	return &d, nil
 }
 
-func (c *Client) FindRuns(contexts []string, namespace string, names []string, options ListOptions) ([]RunDiscovery, error) {
+func (c *Client) FindRuns(contexts []string, namespace string, names []string, options ListOptions) ([]types.RunDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()
 	}
@@ -31,7 +39,7 @@ func (c *Client) FindRuns(contexts []string, namespace string, names []string, o
 		return nil, err
 	}
 
-	var ret []RunDiscovery
+	var ret []types.RunDiscovery
 
 	for _, j := range all {
 		if _, ok := positive[j.Name]; ok {

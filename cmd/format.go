@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	"os"
 	"text/tabwriter"
 	"time"
@@ -11,7 +11,7 @@ import (
 
 // REVIEW: Most of the processing here was guessed with reverse engineering
 // by comparing with the output of kubectl
-func printPodList(lst []client.PodDiscovery) {
+func printPodList(lst []types.PodDiscovery) {
 	if len(lst) == 0 {
 		fmt.Println("No pods found")
 		return
@@ -42,7 +42,7 @@ func printPodList(lst []client.PodDiscovery) {
 	w.Flush()
 }
 
-func describePod(pod client.PodDiscovery) {
+func describePod(pod types.PodDiscovery) {
 	fmt.Printf("Context: %s\n", pod.Context)
 	// fmt.Printf("Namespace: %s\n", pod.Namespace)
 	// b, _ := yaml.Marshal(pod.Pod)
@@ -53,7 +53,7 @@ func describePod(pod client.PodDiscovery) {
 	fmt.Println(s)
 }
 
-func describePodList(lst []client.PodDiscovery) {
+func describePodList(lst []types.PodDiscovery) {
 	for _, pod := range lst {
 		describePod(pod)
 	}

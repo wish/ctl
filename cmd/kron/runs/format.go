@@ -2,14 +2,14 @@ package runs
 
 import (
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	"gopkg.in/yaml.v2"
 	"os"
 	"text/tabwriter"
 )
 
 // TODO: Add better formatting and more fields
-func printRunList(lst []client.RunDiscovery) {
+func printRunList(lst []types.RunDiscovery) {
 	if len(lst) == 0 {
 		fmt.Println("No runs found!")
 		return
@@ -39,7 +39,7 @@ func printRunList(lst []client.RunDiscovery) {
 	w.Flush()
 }
 
-func describeRun(run client.RunDiscovery) {
+func describeRun(run types.RunDiscovery) {
 	b, _ := yaml.Marshal(run)
 	fmt.Println(string(b))
 }

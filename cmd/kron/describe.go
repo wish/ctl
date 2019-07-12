@@ -2,6 +2,7 @@ package kron
 
 import (
 	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +20,7 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 			namespace, _ := cmd.Flags().GetString("namespace")
 			onlyFavorites, _ := cmd.Flags().GetBool("favorites")
 
-			var cronjobs []client.CronJobDiscovery
+			var cronjobs []types.CronJobDiscovery
 			var err error
 
 			if onlyFavorites {

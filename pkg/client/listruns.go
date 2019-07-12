@@ -3,13 +3,15 @@ package client
 import (
 	"errors"
 	"fmt"
+	"github.com/ContextLogic/ctl/pkg/client/filter"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"strings"
 	"sync"
 )
 
-func (c *Client) ListRuns(context string, namespace string, options ListOptions) ([]RunDiscovery, error) {
+func (c *Client) ListRuns(context string, namespace string, options ListOptions) ([]types.RunDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
@@ -18,14 +20,17 @@ func (c *Client) ListRuns(context string, namespace string, options ListOptions)
 	if err != nil {
 		return nil, err
 	}
-	items := make([]RunDiscovery, len(runs.Items))
-	for i, run := range runs.Items {
-		items[i] = RunDiscovery{context, run}
+	var items []types.RunDiscovery
+	for _, run := range runs.Items {
+		r := types.RunDiscovery{context, run}
+		if filter.MatchLabel(r, options.LabelMatch) {
+			items = append(items, r)
+		}
 	}
 	return items, nil
 }
 
-func (c *Client) ListRunsOverContexts(contexts []string, namespace string, options ListOptions) ([]RunDiscovery, error) {
+func (c *Client) ListRunsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.RunDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()
 	}
@@ -34,7 +39,7 @@ func (c *Client) ListRunsOverContexts(contexts []string, namespace string, optio
 	wait.Add(len(contexts))
 
 	var mutex sync.Mutex
-	var ret []RunDiscovery
+	var ret []types.RunDiscovery
 	var failed []string
 
 	for _, ctx := range contexts {
@@ -64,7 +69,7 @@ func (c *Client) ListRunsOverContexts(contexts []string, namespace string, optio
 }
 
 // Also over contexts
-func (c *Client) ListRunsOfCronJob(contexts []string, namespace, cronjobName string, options ListOptions) ([]RunDiscovery, error) {
+func (c *Client) ListRunsOfCronJob(contexts []string, namespace, cronjobName string, options ListOptions) ([]types.RunDiscovery, error) {
 	cronjob, err := c.findCronJob(contexts, namespace, cronjobName)
 	if err != nil {
 		return nil, err
@@ -76,7 +81,7 @@ func (c *Client) ListRunsOfCronJob(contexts []string, namespace, cronjobName str
 		return nil, err
 	}
 
-	var ret []RunDiscovery
+	var ret []types.RunDiscovery
 	for _, r := range list {
 		// Check if has owner reference
 		for _, o := range r.OwnerReferences {

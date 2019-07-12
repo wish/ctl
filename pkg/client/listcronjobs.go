@@ -3,13 +3,15 @@ package client
 import (
 	"errors"
 	"fmt"
+	"github.com/ContextLogic/ctl/pkg/client/filter"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"strings"
 	"sync"
 )
 
-func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]CronJobDiscovery, error) {
+func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]types.CronJobDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
@@ -18,14 +20,17 @@ func (c *Client) ListCronJobs(context string, namespace string, options ListOpti
 	if err != nil {
 		return nil, err
 	}
-	items := make([]CronJobDiscovery, len(cronjobs.Items))
-	for i, j := range cronjobs.Items {
-		items[i] = CronJobDiscovery{context, j}
+	var items []types.CronJobDiscovery
+	for _, cj := range cronjobs.Items {
+		cjd := types.CronJobDiscovery{context, cj}
+		if filter.MatchLabel(cjd, options.LabelMatch) { // TODO: Modularize to allow adding more search parameters
+			items = append(items, cjd)
+		}
 	}
 	return items, nil
 }
 
-func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, options ListOptions) ([]CronJobDiscovery, error) {
+func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.CronJobDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()
 	}
@@ -34,7 +39,7 @@ func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, o
 	wait.Add(len(contexts))
 
 	var mutex sync.Mutex
-	var ret []CronJobDiscovery
+	var ret []types.CronJobDiscovery
 	var failed []string
 
 	for _, ctx := range contexts {

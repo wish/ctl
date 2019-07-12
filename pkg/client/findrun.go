@@ -2,16 +2,17 @@ package client
 
 import (
 	"errors"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 )
 
 // Helpers for finding a specific run
-func (c *Client) findRun(contexts []string, namespace, name string) (*RunDiscovery, error) {
+func (c *Client) findRun(contexts []string, namespace, name string) (*types.RunDiscovery, error) {
 	list, err := c.ListRunsOverContexts(contexts, namespace, ListOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
 
-	var run RunDiscovery
+	var run types.RunDiscovery
 	for _, r := range list {
 		if r.Name == name {
 			run = r

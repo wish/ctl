@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	"html/template"
 	"k8s.io/client-go/rest"
 	"net/http"
@@ -78,7 +79,7 @@ func getAdvDashHandleFunc(cl *client.Client, templates *template.Template) func(
 		}
 
 		// Filter searches
-		var filtered []client.CronJobDiscovery
+		var filtered []types.CronJobDiscovery
 		if search == "" {
 			filtered = cronjobs
 		} else {
@@ -212,7 +213,7 @@ func getRunHandleFunc(cl *client.Client, templates *template.Template) func(http
 			http.Error(w, "Error finding runs", http.StatusInternalServerError)
 		}
 
-		var run *client.RunDiscovery
+		var run *types.RunDiscovery
 		for _, x := range runs {
 			if x.Name == path[4] {
 				run = &x

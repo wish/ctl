@@ -2,7 +2,7 @@ package kron
 
 import (
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	"github.com/robfig/cron"
 	"os"
 	"text/tabwriter"
@@ -15,7 +15,7 @@ func overrideFavoriteMessage(job string, val location) string {
     Namespace: %v\n`, job, val.Contexts, val.Namespace)
 }
 
-func printCronJobList(lst []client.CronJobDiscovery) {
+func printCronJobList(lst []types.CronJobDiscovery) {
 	if len(lst) == 0 {
 		fmt.Println("No cron jobs found!")
 		return
@@ -46,7 +46,7 @@ func printCronJobList(lst []client.CronJobDiscovery) {
 	w.Flush()
 }
 
-func describeCronJob(c client.CronJobDiscovery) {
+func describeCronJob(c types.CronJobDiscovery) {
 	fmt.Printf("Context: %s\n", c.Context)
 	fmt.Printf("\tName: %s\n", c.Name)
 	fmt.Printf("\tNamespace: %s\n", c.Namespace)

@@ -2,16 +2,17 @@ package client
 
 import (
 	"errors"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 )
 
 // Helpers for finding a specific cron job
-func (c *Client) findCronJob(contexts []string, namespace, name string) (*CronJobDiscovery, error) {
+func (c *Client) findCronJob(contexts []string, namespace, name string) (*types.CronJobDiscovery, error) {
 	list, err := c.ListCronJobsOverContexts(contexts, namespace, ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	var cron CronJobDiscovery
+	var cron types.CronJobDiscovery
 	for _, cj := range list {
 		if cj.Name == name {
 			cron = cj

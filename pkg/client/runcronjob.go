@@ -2,13 +2,14 @@ package client
 
 import (
 	"fmt"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	batchv1 "k8s.io/api/batch/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"time"
 )
 
 // Creates a new job with timestamp from the specified cron job template
-func (c *Client) RunCronJob(contexts []string, namespace, cronjobName string) (*RunDiscovery, error) {
+func (c *Client) RunCronJob(contexts []string, namespace, cronjobName string) (*types.RunDiscovery, error) {
 	cronjob, err := c.findCronJob(contexts, namespace, cronjobName)
 	if err != nil {
 		return nil, err
@@ -41,5 +42,5 @@ func (c *Client) RunCronJob(contexts []string, namespace, cronjobName string) (*
 		return nil, err
 	}
 
-	return &RunDiscovery{cronjob.Context, *job}, nil
+	return &types.RunDiscovery{cronjob.Context, *job}, nil
 }

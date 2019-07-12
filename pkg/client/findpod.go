@@ -2,17 +2,18 @@ package client
 
 import (
 	"errors"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	"strings"
 )
 
 // Helpers for finding a specific pod
-func (c *Client) findPod(contexts []string, namespace, name string) (*PodDiscovery, error) {
+func (c *Client) findPod(contexts []string, namespace, name string) (*types.PodDiscovery, error) {
 	list, err := c.ListPodsOverContexts(contexts, namespace, ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	var pod PodDiscovery
+	var pod types.PodDiscovery
 	for _, p := range list {
 		if p.Name == name {
 			pod = p
@@ -27,7 +28,7 @@ func (c *Client) findPod(contexts []string, namespace, name string) (*PodDiscove
 	return &pod, nil
 }
 
-func (c *Client) findPodWithContainer(contexts []string, namespace, name, container string) (*PodDiscovery, string, error) {
+func (c *Client) findPodWithContainer(contexts []string, namespace, name, container string) (*types.PodDiscovery, string, error) {
 	pod, err := c.findPod(contexts, namespace, name)
 	if err != nil {
 		return pod, "", err

@@ -2,7 +2,7 @@ package kron
 
 import (
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	"github.com/robfig/cron"
 	"github.com/spf13/viper"
 	"os"
@@ -51,7 +51,7 @@ func getFavorites() (f map[string]location, err error) {
 	return
 }
 
-func matchesCronJobLocation(c client.CronJobDiscovery, l location) bool {
+func matchesCronJobLocation(c types.CronJobDiscovery, l location) bool {
 	if l.Namespace != "" && l.Namespace != c.Namespace {
 		return false
 	}
@@ -66,13 +66,13 @@ func matchesCronJobLocation(c client.CronJobDiscovery, l location) bool {
 	return false
 }
 
-func filterFromFavorites(lst []client.CronJobDiscovery) []client.CronJobDiscovery {
+func filterFromFavorites(lst []types.CronJobDiscovery) []types.CronJobDiscovery {
 	f, err := getFavorites()
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	var filtered []client.CronJobDiscovery
+	var filtered []types.CronJobDiscovery
 	for _, c := range lst {
 		if l, ok := f[c.Name]; ok && matchesCronJobLocation(c, l) {
 			filtered = append(filtered, c)
@@ -81,7 +81,7 @@ func filterFromFavorites(lst []client.CronJobDiscovery) []client.CronJobDiscover
 	return filtered
 }
 
-type byLastRun []client.CronJobDiscovery
+type byLastRun []types.CronJobDiscovery
 
 func (l byLastRun) Len() int      { return len(l) }
 func (l byLastRun) Swap(i, j int) { l[i], l[j] = l[j], l[i] }
@@ -89,7 +89,7 @@ func (l byLastRun) Less(i, j int) bool {
 	return l[i].Status.LastScheduleTime.Time.After(l[j].Status.LastScheduleTime.Time)
 }
 
-type byNextRun []client.CronJobDiscovery
+type byNextRun []types.CronJobDiscovery
 
 func (l byNextRun) Len() int      { return len(l) }
 func (l byNextRun) Swap(i, j int) { l[i], l[j] = l[j], l[i] }

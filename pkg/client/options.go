@@ -1,14 +1,15 @@
 package client
 
-// REVIEW: All optiosn are added for consistency and compatibility
-// so that features can be added easily in the future
-// Will probably keep for fuzzy searching for cronjobs
+import "github.com/ContextLogic/ctl/pkg/client/filter"
+
 type ListOptions struct {
-	// TODO add more options
+	filter.LabelMatch
 }
 
 type GetOptions struct {
+	filter.LabelMatch
 }
 
 type LogOptions struct {
+	filter.LabelMatch
 }

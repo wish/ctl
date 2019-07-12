@@ -3,13 +3,15 @@ package client
 import (
 	"errors"
 	"fmt"
+	"github.com/ContextLogic/ctl/pkg/client/filter"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"strings"
 	"sync"
 )
 
-func (c *Client) ListPods(context string, namespace string, options ListOptions) ([]PodDiscovery, error) {
+func (c *Client) ListPods(context string, namespace string, options ListOptions) ([]types.PodDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
@@ -18,14 +20,17 @@ func (c *Client) ListPods(context string, namespace string, options ListOptions)
 	if err != nil {
 		return nil, err
 	}
-	items := make([]PodDiscovery, len(pods.Items))
-	for i, pod := range pods.Items {
-		items[i] = PodDiscovery{context, pod}
+	var items []types.PodDiscovery
+	for _, pod := range pods.Items {
+		p := types.PodDiscovery{context, pod}
+		if filter.MatchLabel(p, options.LabelMatch) {
+			items = append(items, p)
+		}
 	}
 	return items, nil
 }
 
-func (c *Client) ListPodsOverContexts(contexts []string, namespace string, options ListOptions) ([]PodDiscovery, error) {
+func (c *Client) ListPodsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.PodDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()
 	}
@@ -34,7 +39,7 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 	wait.Add(len(contexts))
 
 	var mutex sync.Mutex
-	var ret []PodDiscovery
+	var ret []types.PodDiscovery
 	var failed []string
 
 	for _, ctx := range contexts {
@@ -65,7 +70,7 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 	return ret, nil
 }
 
-func (c *Client) ListPodsOfRun(contexts []string, namespace, runName string, options ListOptions) ([]PodDiscovery, error) {
+func (c *Client) ListPodsOfRun(contexts []string, namespace, runName string, options ListOptions) ([]types.PodDiscovery, error) {
 	pods, err := c.ListPodsOverContexts(contexts, namespace, options)
 	if err != nil {
 		return nil, err
@@ -76,7 +81,7 @@ func (c *Client) ListPodsOfRun(contexts []string, namespace, runName string, opt
 		return nil, err
 	}
 
-	var ret []PodDiscovery
+	var ret []types.PodDiscovery
 	for _, p := range pods {
 		// Check if has owner reference
 		for _, o := range p.OwnerReferences {

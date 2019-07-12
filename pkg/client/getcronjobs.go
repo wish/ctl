@@ -1,10 +1,13 @@
 package client
 
 import (
+	"errors"
+	"github.com/ContextLogic/ctl/pkg/client/filter"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (c *Client) GetCronJob(context, namespace string, name string, options GetOptions) (*CronJobDiscovery, error) {
+func (c *Client) GetCronJob(context, namespace string, name string, options GetOptions) (*types.CronJobDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
@@ -14,10 +17,15 @@ func (c *Client) GetCronJob(context, namespace string, name string, options GetO
 	if err != nil {
 		return nil, err
 	}
-	return &CronJobDiscovery{context, *cronjob}, nil
+
+	d := types.CronJobDiscovery{context, *cronjob}
+	if !filter.MatchLabel(d, options.LabelMatch) {
+		return nil, errors.New("Found object does not satisfy filters")
+	}
+	return &d, nil
 }
 
-func (c *Client) FindCronJobs(contexts []string, namespace string, names []string, options ListOptions) ([]CronJobDiscovery, error) {
+func (c *Client) FindCronJobs(contexts []string, namespace string, names []string, options ListOptions) ([]types.CronJobDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()
 	}
@@ -32,7 +40,7 @@ func (c *Client) FindCronJobs(contexts []string, namespace string, names []strin
 		return nil, err
 	}
 
-	var ret []CronJobDiscovery
+	var ret []types.CronJobDiscovery
 
 	for _, p := range all {
 		if _, ok := positive[p.Name]; ok {

@@ -1,10 +1,13 @@
 package client
 
 import (
+	"errors"
+	"github.com/ContextLogic/ctl/pkg/client/filter"
+	"github.com/ContextLogic/ctl/pkg/client/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (c *Client) GetPod(context, namespace string, name string, options GetOptions) (*PodDiscovery, error) {
+func (c *Client) GetPod(context, namespace string, name string, options GetOptions) (*types.PodDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
@@ -13,10 +16,15 @@ func (c *Client) GetPod(context, namespace string, name string, options GetOptio
 	if err != nil {
 		return nil, err
 	}
-	return &PodDiscovery{context, *pod}, nil
+
+	d := types.PodDiscovery{context, *pod}
+	if !filter.MatchLabel(d, options.LabelMatch) {
+		return nil, errors.New("Found object does not satisfy filters")
+	}
+	return &d, nil
 }
 
-func (c *Client) FindPods(contexts []string, namespace string, names []string, options ListOptions) ([]PodDiscovery, error) {
+func (c *Client) FindPods(contexts []string, namespace string, names []string, options ListOptions) ([]types.PodDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()
 	}
@@ -28,7 +36,7 @@ func (c *Client) FindPods(contexts []string, namespace string, names []string, o
 
 	all, err := c.ListPodsOverContexts(contexts, namespace, options)
 
-	var ret []PodDiscovery
+	var ret []types.PodDiscovery
 
 	for _, p := range all {
 		if _, ok := positive[p.Name]; ok {
