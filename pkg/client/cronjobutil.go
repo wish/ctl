@@ -2,8 +2,8 @@ package client
 
 // Sets the cron job suspend state to given value.
 // Does nothing (and returns false) if already set.
-func (c *Client) SetCronJobSuspend(contexts []string, namespace, name string, suspend bool) (bool, error) {
-	cronjob, err := c.findCronJob(contexts, namespace, name)
+func (c *Client) SetCronJobSuspend(contexts []string, namespace, name string, suspend bool, options ListOptions) (bool, error) {
+	cronjob, err := c.findCronJob(contexts, namespace, name, options)
 	if err != nil {
 		return false, err
 	}

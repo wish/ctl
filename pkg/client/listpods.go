@@ -76,7 +76,7 @@ func (c *Client) ListPodsOfRun(contexts []string, namespace, runName string, opt
 		return nil, err
 	}
 
-	run, err := c.findRun(contexts, namespace, runName)
+	run, err := c.findRun(contexts, namespace, runName, options)
 	if err != nil {
 		return nil, err
 	}

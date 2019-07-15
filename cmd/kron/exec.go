@@ -1,6 +1,7 @@
 package kron
 
 import (
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -10,14 +11,18 @@ func GetExecCmd(c *client.Client) *cobra.Command {
 		Use:   "exec cronjob [flags]",
 		Short: "Executes a job now",
 		Long: `Executes the specified job or the selected job if none.
-	Namespace and context flags can be set to help find the right cron job.
-	If multiple cron job are found, only the first one will be executed.`,
+Namespace and context flags can be set to help find the right cron job.
+If multiple cron job are found, only the first one will be executed.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
+			options, err := parsing.ListOptions(cmd)
+			if err != nil {
+				return err
+			}
 
-			job, err := c.RunCronJob(ctxs, namespace, args[0])
+			job, err := c.RunCronJob(ctxs, namespace, args[0], options)
 
 			if err != nil {
 				return err

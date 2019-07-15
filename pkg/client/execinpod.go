@@ -10,8 +10,8 @@ import (
 )
 
 // TODO: Add options param???
-func (c *Client) ExecInPod(contexts []string, namespace, name, container string, commands []string, stdin io.Reader, stdout, stderr io.Writer) error {
-	pod, container, err := c.findPodWithContainer(contexts, namespace, name, container)
+func (c *Client) ExecInPod(contexts []string, namespace, name, container string, options ListOptions, commands []string, stdin io.Reader, stdout, stderr io.Writer) error {
+	pod, container, err := c.findPodWithContainer(contexts, namespace, name, container, options)
 	if err != nil {
 		return err
 	}

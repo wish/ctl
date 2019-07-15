@@ -1,6 +1,7 @@
 package kron
 
 import (
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -10,13 +11,17 @@ func GetSuspendCmd(c *client.Client) *cobra.Command {
 		Use:   "suspend cronjob [flags]",
 		Short: "Suspend a cron job",
 		Long: `Suspends the specified cron job.
-	If the cron job is already suspended, does nothing.`,
+If the cron job is already suspended, does nothing.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
+			options, err := parsing.ListOptions(cmd)
+			if err != nil {
+				return err
+			}
 
-			success, err := c.SetCronJobSuspend(ctxs, namespace, args[0], true)
+			success, err := c.SetCronJobSuspend(ctxs, namespace, args[0], true, options)
 			if err != nil {
 				return err
 			}

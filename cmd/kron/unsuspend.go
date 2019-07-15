@@ -1,6 +1,7 @@
 package kron
 
 import (
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -15,8 +16,12 @@ func GetUnsuspendCmd(c *client.Client) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
+			options, err := parsing.ListOptions(cmd)
+			if err != nil {
+				return err
+			}
 
-			success, err := c.SetCronJobSuspend(ctxs, namespace, args[0], false)
+			success, err := c.SetCronJobSuspend(ctxs, namespace, args[0], false, options)
 			if err != nil {
 				return err
 			}

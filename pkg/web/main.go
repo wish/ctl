@@ -147,7 +147,7 @@ func getExecuteHandleFunc(cl *client.Client, templates *template.Template) func(
 			http.Error(w, "Invalid cron job execute path", http.StatusNotFound)
 		}
 
-		_, err := cl.RunCronJob([]string{path[1]}, path[2], path[3])
+		_, err := cl.RunCronJob([]string{path[1]}, path[2], path[3], client.ListOptions{})
 
 		if err != nil { // Could not execute
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -166,7 +166,7 @@ func getSuspendHandleFunc(cl *client.Client, templates *template.Template) func(
 			http.Error(w, "Invalid cron job execute path", http.StatusNotFound)
 		}
 
-		success, err := cl.SetCronJobSuspend([]string{path[1]}, path[2], path[3], true)
+		success, err := cl.SetCronJobSuspend([]string{path[1]}, path[2], path[3], true, client.ListOptions{})
 
 		if err != nil { // Could not execute
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -187,7 +187,7 @@ func getUnsuspendHandleFunc(cl *client.Client, templates *template.Template) fun
 			http.Error(w, "Invalid cron job execute path", http.StatusNotFound)
 		}
 
-		success, err := cl.SetCronJobSuspend([]string{path[1]}, path[2], path[3], false)
+		success, err := cl.SetCronJobSuspend([]string{path[1]}, path[2], path[3], false, client.ListOptions{})
 
 		if err != nil { // Could not execute
 			http.Error(w, err.Error(), http.StatusInternalServerError)

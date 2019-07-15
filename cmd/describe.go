@@ -12,8 +12,8 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 		Use:   "describe pods [flags]",
 		Short: "Show details of a specific pod(s)",
 		Long: `Print a detailed description of the pods specified by name.
-	If namespace not specified, it will get all the pods across all the namespaces.
-	If context(s) not specified, it will search through all contexts.`,
+If namespace not specified, it will get all the pods across all the namespaces.
+If context(s) not specified, it will search through all contexts.`,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")

@@ -11,7 +11,7 @@ func GetWebCmd(c *client.Client) *cobra.Command {
 		Use:   "web [port]",
 		Short: "Serves a web ui of kron features",
 		Long: `Runs a web server on the specified localhost port.
-	If no port is specified, runs on port 5766.`,
+If no port is specified, runs on port 5766.`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {

@@ -272,7 +272,7 @@ func TestFindCronJob(t *testing.T) {
 	}
 
 	for _, q := range queries {
-		c, err := cl.findCronJob(q.contexts, q.namespace, q.name)
+		c, err := cl.findCronJob(q.contexts, q.namespace, q.name, ListOptions{})
 
 		if c == nil || err != nil {
 			t.Error("Could not find pod with error:", err)
@@ -294,7 +294,7 @@ func TestFindCronJobError(t *testing.T) {
 	}
 
 	for _, q := range queries {
-		_, err := cl.findCronJob(q.contexts, q.namespace, q.name)
+		_, err := cl.findCronJob(q.contexts, q.namespace, q.name, ListOptions{})
 
 		if err != nil {
 			t.Log("Errored as expected:", err)

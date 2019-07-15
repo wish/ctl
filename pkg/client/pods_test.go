@@ -272,7 +272,7 @@ func TestFindPod(t *testing.T) {
 	}
 
 	for _, q := range queries {
-		p, err := cl.findPod(q.contexts, q.namespace, q.name)
+		p, err := cl.findPod(q.contexts, q.namespace, q.name, ListOptions{})
 
 		if p == nil || err != nil {
 			t.Error("Could not find pod with error:", err)
@@ -294,7 +294,7 @@ func TestFindPodError(t *testing.T) {
 	}
 
 	for _, q := range queries {
-		_, err := cl.findPod(q.contexts, q.namespace, q.name)
+		_, err := cl.findPod(q.contexts, q.namespace, q.name, ListOptions{})
 
 		if err != nil {
 			t.Log("Errored as expected:", err)

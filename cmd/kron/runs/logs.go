@@ -1,6 +1,7 @@
 package runs
 
 import (
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -11,8 +12,8 @@ func GetLogsCmd(c *client.Client) *cobra.Command {
 		Aliases: []string{"log"},
 		Short:   "Get log of a container in a pod",
 		Long: `Print logs from the pods belonging to a cron job run.
-	If namespace not specified, it will get all the pods across all the namespaces.
-	If context(s) not specified, it will search through all contexts.`,
+If namespace not specified, it will get all the pods across all the namespaces.
+If context(s) not specified, it will search through all contexts.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, err := cmd.Flags().GetStringSlice("context")
@@ -21,14 +22,15 @@ func GetLogsCmd(c *client.Client) *cobra.Command {
 			}
 			namespace, _ := cmd.Flags().GetString("namespace")
 			container, _ := cmd.Flags().GetString("container")
+			lm, err := parsing.LabelMatchFromCmd(cmd)
 
-			pods, err := c.ListPodsOfRun(ctxs, namespace, args[0], client.ListOptions{})
+			pods, err := c.ListPodsOfRun(ctxs, namespace, args[0], client.ListOptions{lm})
 			if err != nil {
 				return err
 			}
 
 			for _, pod := range pods {
-				res, err := c.LogPod(pod.Context, pod.Namespace, pod.Name, container, client.LogOptions{})
+				res, err := c.LogPod(pod.Context, pod.Namespace, pod.Name, container, client.LogOptions{lm})
 
 				raw, err := res.Raw()
 				if err != nil {

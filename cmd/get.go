@@ -11,8 +11,8 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 		Use:   "get [flags]",
 		Short: "Get a list of pods",
 		Long: `Get a list of pods in the specified namespace and context(s).
-	If namespace not specified, it will get all the pods across all the namespaces.
-	If context(s) not specified, it will list from all contexts.`,
+If namespace not specified, it will get all the pods across all the namespaces.
+If context(s) not specified, it will list from all contexts.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")

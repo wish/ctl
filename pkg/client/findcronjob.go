@@ -6,8 +6,8 @@ import (
 )
 
 // Helpers for finding a specific cron job
-func (c *Client) findCronJob(contexts []string, namespace, name string) (*types.CronJobDiscovery, error) {
-	list, err := c.ListCronJobsOverContexts(contexts, namespace, ListOptions{})
+func (c *Client) findCronJob(contexts []string, namespace, name string, options ListOptions) (*types.CronJobDiscovery, error) {
+	list, err := c.ListCronJobsOverContexts(contexts, namespace, options)
 	if err != nil {
 		return nil, err
 	}

@@ -70,7 +70,7 @@ func (c *Client) ListRunsOverContexts(contexts []string, namespace string, optio
 
 // Also over contexts
 func (c *Client) ListRunsOfCronJob(contexts []string, namespace, cronjobName string, options ListOptions) ([]types.RunDiscovery, error) {
-	cronjob, err := c.findCronJob(contexts, namespace, cronjobName)
+	cronjob, err := c.findCronJob(contexts, namespace, cronjobName, options)
 	if err != nil {
 		return nil, err
 	}

@@ -25,7 +25,7 @@ func GetUnfavoriteCmd(c *client.Client) *cobra.Command {
 		Use:   "unfavorite jobs",
 		Short: "Removes job(s) from favorite list",
 		Long: `Removes job(s) from favorite list.
-	If no jobs are specified, removes selected job.`,
+If no jobs are specified, removes selected job.`,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Behaviour when

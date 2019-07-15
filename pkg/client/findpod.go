@@ -7,8 +7,8 @@ import (
 )
 
 // Helpers for finding a specific pod
-func (c *Client) findPod(contexts []string, namespace, name string) (*types.PodDiscovery, error) {
-	list, err := c.ListPodsOverContexts(contexts, namespace, ListOptions{})
+func (c *Client) findPod(contexts []string, namespace, name string, options ListOptions) (*types.PodDiscovery, error) {
+	list, err := c.ListPodsOverContexts(contexts, namespace, options)
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +28,8 @@ func (c *Client) findPod(contexts []string, namespace, name string) (*types.PodD
 	return &pod, nil
 }
 
-func (c *Client) findPodWithContainer(contexts []string, namespace, name, container string) (*types.PodDiscovery, string, error) {
-	pod, err := c.findPod(contexts, namespace, name)
+func (c *Client) findPodWithContainer(contexts []string, namespace, name, container string, options ListOptions) (*types.PodDiscovery, string, error) {
+	pod, err := c.findPod(contexts, namespace, name, options)
 	if err != nil {
 		return pod, "", err
 	}

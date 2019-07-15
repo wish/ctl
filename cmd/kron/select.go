@@ -24,8 +24,8 @@ func GetSelectCmd(c *client.Client) *cobra.Command {
 		Use:   "select job [flags]",
 		Short: "Uses list to select a job to operate on",
 		Long: `Uses list to select a job on which other commands can conveniently operate on.
-	A namespace and contexts can be specified to limit matches.
-	If namespace/contexts are not specified, usage will match with all results.`,
+A namespace and contexts can be specified to limit matches.
+If namespace/contexts are not specified, usage will match with all results.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// args/flags

@@ -6,8 +6,8 @@ import (
 )
 
 // Helpers for finding a specific run
-func (c *Client) findRun(contexts []string, namespace, name string) (*types.RunDiscovery, error) {
-	list, err := c.ListRunsOverContexts(contexts, namespace, ListOptions{})
+func (c *Client) findRun(contexts []string, namespace, name string, options ListOptions) (*types.RunDiscovery, error) {
+	list, err := c.ListRunsOverContexts(contexts, namespace, options)
 	if err != nil {
 		panic(err.Error())
 	}

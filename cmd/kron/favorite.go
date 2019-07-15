@@ -25,7 +25,7 @@ func GetFavoriteCmd(c *client.Client) *cobra.Command {
 		Use:   "favorite [jobs] [flags]",
 		Short: "Adds jobs to favorite list",
 		Long: `Adds specified job(s) to the favorite list. If no job was specified the selected job is added.
-	A namespace and contexts can be specified to limit matches.`,
+A namespace and contexts can be specified to limit matches.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// args/flags
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
