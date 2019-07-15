@@ -10,6 +10,7 @@ import (
 func init() {
 	rootCmd.PersistentFlags().StringSliceP("context", "x", nil, "Specify the context(s) to operate in")
 	rootCmd.PersistentFlags().StringP("namespace", "n", "", "Specify the namespace within all the contexts specified")
+	rootCmd.PersistentFlags().StringArrayP("labels", "l", nil, "Filter objects by label")
 
 	// Commands'
 	c := client.GetDefaultConfigClient()

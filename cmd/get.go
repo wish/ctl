@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -15,8 +16,12 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
+			options, err := parsing.ListOptions(cmd)
+			if err != nil {
+				return err
+			}
 
-			list, err := c.ListPodsOverContexts(ctxs, namespace, client.ListOptions{})
+			list, err := c.ListPodsOverContexts(ctxs, namespace, options)
 			// NOTE: List is unsorted and could be in an inconsistent order
 			// Output
 			if list != nil {

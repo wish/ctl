@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -19,8 +20,12 @@ func GetLogsCmd(c *client.Client) *cobra.Command {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 			container, _ := cmd.Flags().GetString("container")
+			options, err := parsing.LogOptions(cmd)
+			if err != nil {
+				return err
+			}
 
-			res, err := c.LogPodOverContexts(ctxs, namespace, args[0], container, client.LogOptions{})
+			res, err := c.LogPodOverContexts(ctxs, namespace, args[0], container, options)
 			if err != nil {
 				return err
 			}

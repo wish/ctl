@@ -1,6 +1,7 @@
 package kron
 
 import (
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/ContextLogic/ctl/pkg/client/types"
 	"github.com/spf13/cobra"
@@ -19,12 +20,15 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 			onlyFavorites, _ := cmd.Flags().GetBool("favorites")
+			options, err := parsing.ListOptions(cmd)
+			if err != nil {
+				return err
+			}
 
 			var cronjobs []types.CronJobDiscovery
-			var err error
 
 			if onlyFavorites {
-				cronjobs, err = c.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
+				cronjobs, err = c.ListCronJobsOverContexts(ctxs, namespace, options)
 				if err != nil {
 					return err
 				}

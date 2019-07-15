@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -17,8 +18,12 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
+			options, err := parsing.ListOptions(cmd)
+			if err != nil {
+				return err
+			}
 
-			pods, err := c.FindPods(ctxs, namespace, args, client.ListOptions{})
+			pods, err := c.FindPods(ctxs, namespace, args, options)
 			if err != nil {
 				return err
 			}

@@ -1,6 +1,7 @@
 package runs
 
 import (
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -17,8 +18,12 @@ func GetDescribeCmd(c *client.Client) *cobra.Command {
 				return err
 			}
 			namespace, _ := cmd.Flags().GetString("namespace")
+			options, err := parsing.ListOptions(cmd)
+			if err != nil {
+				return err
+			}
 
-			list, err := c.FindRuns(ctxs, namespace, args, client.ListOptions{})
+			list, err := c.FindRuns(ctxs, namespace, args, options)
 			if err != nil {
 				return err
 			}

@@ -1,6 +1,7 @@
 package runs
 
 import (
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -20,8 +21,12 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 				return err
 			}
 			namespace, _ := cmd.Flags().GetString("namespace")
+			options, err := parsing.ListOptions(cmd)
+			if err != nil {
+				return err
+			}
 
-			list, err := c.ListRunsOfCronJob(ctxs, namespace, args[0], client.ListOptions{})
+			list, err := c.ListRunsOfCronJob(ctxs, namespace, args[0], options)
 
 			if err != nil {
 				return err

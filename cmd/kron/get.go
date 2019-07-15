@@ -2,6 +2,7 @@ package kron
 
 import (
 	"errors"
+	"github.com/ContextLogic/ctl/cmd/util/parsing"
 	"github.com/ContextLogic/ctl/pkg/client"
 	"github.com/spf13/cobra"
 	"sort"
@@ -19,6 +20,10 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 			onlyFavorites, _ := cmd.Flags().GetBool("favorites")
+			options, err := parsing.ListOptions(cmd)
+			if err != nil {
+				return err
+			}
 			// Ordering of list
 			l, _ := cmd.Flags().GetBool("by-last-run")
 			L, _ := cmd.Flags().GetBool("by-last-run-reverse")
@@ -29,7 +34,7 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 				return errors.New("Only at most one ordering flag may be set!")
 			}
 
-			list, err := c.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
+			list, err := c.ListCronJobsOverContexts(ctxs, namespace, options)
 
 			if err != nil {
 				return err
@@ -53,10 +58,10 @@ func GetGetCmd(c *client.Client) *cobra.Command {
 	// Contexts flag
 	cmd.Flags().BoolP("favorites", "f", false, "Get all favorited cron jobs")
 	// Ordering flags
-	cmd.Flags().BoolP("by-last-run", "l", false, "Sort chronologically by last run")
-	cmd.Flags().BoolP("by-last-run-reverse", "L", false, "Sort reverse chronologically by last run")
-	cmd.Flags().BoolP("by-next-run", "e", false, "Sort cronologically by next scheduled run")
-	cmd.Flags().BoolP("by-next-run-reverse", "E", false, "Sort reverse chronologically by next scheduled run")
+	cmd.Flags().Bool("by-last-run", false, "Sort chronologically by last run")
+	cmd.Flags().Bool("by-last-run-reverse", false, "Sort reverse chronologically by last run")
+	cmd.Flags().Bool("by-next-run", false, "Sort cronologically by next scheduled run")
+	cmd.Flags().Bool("by-next-run-reverse", false, "Sort reverse chronologically by next scheduled run")
 
 	return cmd
 }
