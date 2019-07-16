@@ -7,7 +7,7 @@ import (
 )
 
 func LabelMatchFromCmd(cmd *cobra.Command) (filter.LabelMatch, error) {
-	s, _ := cmd.Flags().GetStringArray("labels")
+	s, _ := cmd.Flags().GetStringArray("label")
 	return LabelMatchSlice(s)
 }
 
