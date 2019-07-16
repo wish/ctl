@@ -1,8 +1,8 @@
 package kron
 
 import (
-	"github.com/ContextLogic/ctl/cmd/kron/runs"
-	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/wish/ctl/cmd/kron/runs"
+	"github.com/wish/ctl/pkg/client"
 	"github.com/spf13/cobra"
 )
 

@@ -2,8 +2,8 @@ package client
 
 import (
 	"errors"
-	"github.com/ContextLogic/ctl/pkg/client/filter"
-	"github.com/ContextLogic/ctl/pkg/client/types"
+	"github.com/wish/ctl/pkg/client/filter"
+	"github.com/wish/ctl/pkg/client/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

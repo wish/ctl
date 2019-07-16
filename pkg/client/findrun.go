@@ -2,7 +2,7 @@ package client
 
 import (
 	"errors"
-	"github.com/ContextLogic/ctl/pkg/client/types"
+	"github.com/wish/ctl/pkg/client/types"
 )
 
 // Helpers for finding a specific run

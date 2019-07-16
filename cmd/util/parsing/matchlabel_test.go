@@ -1,7 +1,7 @@
 package parsing
 
 import (
-	"github.com/ContextLogic/ctl/pkg/client/filter"
+	"github.com/wish/ctl/pkg/client/filter"
 	"testing"
 )
 

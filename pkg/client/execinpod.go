@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/ContextLogic/ctl/pkg/client/helper"
+	"github.com/wish/ctl/pkg/client/helper"
 	"io"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"

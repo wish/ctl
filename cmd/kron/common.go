@@ -2,7 +2,7 @@ package kron
 
 import (
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client/types"
+	"github.com/wish/ctl/pkg/client/types"
 	"github.com/robfig/cron"
 	"github.com/spf13/viper"
 	"os"

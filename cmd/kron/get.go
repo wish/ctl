@@ -2,8 +2,8 @@ package kron
 
 import (
 	"errors"
-	"github.com/ContextLogic/ctl/cmd/util/parsing"
-	"github.com/ContextLogic/ctl/pkg/client"
+	"github.com/wish/ctl/cmd/util/parsing"
+	"github.com/wish/ctl/pkg/client"
 	"github.com/spf13/cobra"
 	"sort"
 )

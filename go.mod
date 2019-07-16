@@ -1,4 +1,4 @@
-module github.com/ContextLogic/ctl
+module github.com/wish/ctl
 
 go 1.12
 

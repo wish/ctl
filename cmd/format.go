@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client/types"
+	"github.com/wish/ctl/pkg/client/types"
 	"os"
 	"text/tabwriter"
 	"time"

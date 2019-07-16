@@ -2,7 +2,7 @@ package parsing
 
 import (
 	"errors"
-	"github.com/ContextLogic/ctl/pkg/client/filter"
+	"github.com/wish/ctl/pkg/client/filter"
 	"regexp"
 	"strings"
 )

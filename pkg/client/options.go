@@ -1,6 +1,6 @@
 package client
 
-import "github.com/ContextLogic/ctl/pkg/client/filter"
+import "github.com/wish/ctl/pkg/client/filter"
 
 type ListOptions struct {
 	filter.LabelMatch

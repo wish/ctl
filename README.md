@@ -2,7 +2,7 @@
 wrapper tool of kubectl for multi-clusters and easy pod/log discovering
 
 # prerequisites
-[Setting up k8s envs](https://github.com/ContextLogic/k8s/wiki/Setting-up-your-environment-for-k8s), (kubectl + kubeconfig)
+[Setting up k8s envs](https://github.com/wish/k8s/wiki/Setting-up-your-environment-for-k8s), (kubectl + kubeconfig)
 
 ## build from source
 make build/ctl.<darwin|linux>

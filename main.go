@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ContextLogic/ctl/cmd"
+	"github.com/wish/ctl/cmd"
 )
 
 func main() {

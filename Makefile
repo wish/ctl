@@ -11,14 +11,14 @@ help: ## Show this help
 bin/linux/ctl: $(GOFILES_BUILD)
 	@echo "$@"
 	@GOOS=linux CGO_ENABLED=0 go build -ldflags \
-	       "-X github.com/ContextLogic/ctl/cmd.Version=${SHA}" \
-	       -o bin/linux/ctl github.com/ContextLogic/ctl
+	       "-X github.com/wish/ctl/cmd.Version=${SHA}" \
+	       -o bin/linux/ctl github.com/wish/ctl
 
 bin/darwin/ctl: $(GOFILES_BUILD)
 	@echo "$@"
 	@GOOS=darwin CGO_ENABLED=0 go build -ldflags \
-		"-X github.com/ContextLogic/ctl/cmd.Version=${SHA}" \
-	     -o bin/darwin/ctl github.com/ContextLogic/ctl
+		"-X github.com/wish/ctl/cmd.Version=${SHA}" \
+	     -o bin/darwin/ctl github.com/wish/ctl
 
 .PHONY: all
 all: bin/linux/ctl bin/darwin/ctl ## Builds ctl binaries for linux and osx

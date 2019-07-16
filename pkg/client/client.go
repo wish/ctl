@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/ContextLogic/ctl/pkg/client/helper"
+	"github.com/wish/ctl/pkg/client/helper"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"

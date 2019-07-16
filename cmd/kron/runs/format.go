@@ -2,7 +2,7 @@ package runs
 
 import (
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client/types"
+	"github.com/wish/ctl/pkg/client/types"
 	"gopkg.in/yaml.v2"
 	"os"
 	"text/tabwriter"

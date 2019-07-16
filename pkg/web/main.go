@@ -2,8 +2,8 @@ package web
 
 import (
 	"fmt"
-	"github.com/ContextLogic/ctl/pkg/client"
-	"github.com/ContextLogic/ctl/pkg/client/types"
+	"github.com/wish/ctl/pkg/client"
+	"github.com/wish/ctl/pkg/client/types"
 	"html/template"
 	"k8s.io/client-go/rest"
 	"net/http"
