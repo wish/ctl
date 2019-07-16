@@ -1,0 +1,22 @@
+language: go
+
+go:
+  - "1.12.x"
+
+before_install:
+  - go get -u golang.org/x/lint/golint
+
+git:
+  depth: 1
+
+notifications:
+  email: false
+
+script:
+  - env GO111MODULE=on make all
+  - env GO111MODULE=on make lint
+  - env GO111MODULE=on make vet
+  - env GO111MODULE=on make test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
