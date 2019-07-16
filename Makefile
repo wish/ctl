@@ -1,6 +1,7 @@
 UNAME_S := $(shell uname -s | tr A-Z a-z)
 SHA  	:= $(shell git rev-parse --short HEAD)
-GOFILES_BUILD := $(shell find . -type f -iname "*.go")
+GOFILES_BUILD 	:= $(shell find . -type f -iname "*.go")
+PKGS 		:= $(shell go list ./...)
 
 default: bin/${UNAME_S}/ctl bin/ctl ## Builds ctl for your current operating system
 
@@ -24,6 +25,14 @@ bin/darwin/ctl: $(GOFILES_BUILD)
 all: bin/linux/ctl bin/darwin/ctl ## Builds ctl binaries for linux and osx
 
 
+.PHONY: lint
+lint: ## Runs linter
+	@golint -set_exit_status ${PKGS}
+
+.PHONY: vet
+vet: ## Runs go vet
+	@go vet ${PKGS}
+
 .PHONY: clean
 clean: ## Removes build artifacts
 	rm -rf bin
@@ -33,4 +42,5 @@ bin/ctl: ## Make a link to the executable for this OS type for convenience
 
 .PHONY: test
 test: ## Runs go tests on all subdirs
-	go test ./...
+	@go test -coverprofile coverage.txt -covermode=atomic ./...
+
