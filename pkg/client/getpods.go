@@ -7,6 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// GetPod returns a single pod
 func (c *Client) GetPod(context, namespace string, name string, options GetOptions) (*types.PodDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
@@ -19,11 +20,12 @@ func (c *Client) GetPod(context, namespace string, name string, options GetOptio
 
 	d := types.PodDiscovery{context, *pod}
 	if !filter.MatchLabel(d, options.LabelMatch) {
-		return nil, errors.New("Found object does not satisfy filters")
+		return nil, errors.New("found object does not satisfy filters")
 	}
 	return &d, nil
 }
 
+// FindPods simultaneously searches for multiple pods and returns all results
 func (c *Client) FindPods(contexts []string, namespace string, names []string, options ListOptions) ([]types.PodDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()

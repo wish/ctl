@@ -48,5 +48,5 @@ func (f *fakeClientsetGetter) getContextInterface(context string) (kubernetes.In
 	if cs, ok := f.clientsets[context]; ok {
 		return cs, nil
 	}
-	return nil, errors.New("The context specified does not exist")
+	return nil, errors.New("the context specified does not exist")
 }

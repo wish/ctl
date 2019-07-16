@@ -9,6 +9,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// GetKubeConfigPath returns the default location of a kubeconfig file
 func GetKubeConfigPath() string {
 	// For multiple calls
 	if fl := flag.Lookup("kubeconfig"); fl != nil {
@@ -29,6 +30,7 @@ func GetKubeConfigPath() string {
 	return *kubeconfig
 }
 
+// GetContexts returns a list of clusters from a config file
 func GetContexts(configpath string) []string {
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		&clientcmd.ClientConfigLoadingRules{ExplicitPath: configpath},
@@ -39,7 +41,7 @@ func GetContexts(configpath string) []string {
 	}
 
 	ctxs := make([]string, 0, len(config.Contexts))
-	for k, _ := range config.Contexts { // Currently ignoring mappings
+	for k := range config.Contexts { // Currently ignoring mappings
 		// Hardcode ignore test clusters
 		if !strings.Contains(k, "test") { // REVIEW: Remove this when possible
 			ctxs = append(ctxs, k)

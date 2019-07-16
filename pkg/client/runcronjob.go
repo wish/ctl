@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Creates a new job with timestamp from the specified cron job template
+// RunCronJob creates a new job with timestamp from the specified cron job template
 func (c *Client) RunCronJob(contexts []string, namespace, cronjobName string, options ListOptions) (*types.RunDiscovery, error) {
 	cronjob, err := c.findCronJob(contexts, namespace, cronjobName, options)
 	if err != nil {

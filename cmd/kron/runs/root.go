@@ -1,11 +1,12 @@
 package runs
 
 import (
-	"github.com/wish/ctl/pkg/client"
 	"github.com/spf13/cobra"
+	"github.com/wish/ctl/pkg/client"
 )
 
-func GetRunsCmd(c *client.Client) *cobra.Command {
+// Cmd returns the kron/runs subcommand given a client
+func Cmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "runs",
 		Short: "Subcommand on recent runs of a cron job",
@@ -13,9 +14,9 @@ func GetRunsCmd(c *client.Client) *cobra.Command {
 Has a bunch of subcommand just like kron`,
 	}
 
-	cmd.AddCommand(GetDescribeCmd(c))
-	cmd.AddCommand(GetGetCmd(c))
-	cmd.AddCommand(GetLogsCmd(c))
+	cmd.AddCommand(describeCmd(c))
+	cmd.AddCommand(getCmd(c))
+	cmd.AddCommand(logsCmd(c))
 
 	return cmd
 }

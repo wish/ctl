@@ -1,12 +1,12 @@
 package kron
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/web"
-	"github.com/spf13/cobra"
 )
 
-func GetWebCmd(c *client.Client) *cobra.Command {
+func webCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
 		Use:   "web [port]",
 		Short: "Serves a web ui of kron features",

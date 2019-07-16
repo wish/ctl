@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/spf13/cobra"
 )
 
-func GetLogsCmd(c *client.Client) *cobra.Command {
+func logsCmd(c *client.Client) *cobra.Command {
 	ret := &cobra.Command{
 		Use:     "logs pod [flags]",
 		Aliases: []string{"log"},

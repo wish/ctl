@@ -1,13 +1,13 @@
 package cmd
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/spf13/cobra"
 	"os"
 )
 
-func GetShCmd(c *client.Client) *cobra.Command {
+func shCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "sh pod [flags]",
 		Short: "Exec $SHELL into the container of a specific pod",

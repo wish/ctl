@@ -1,8 +1,9 @@
 package filter
 
-func MatchLabel(l Labeled, m LabelMatch) bool {
-	if m == nil {
+// MatchLabel checks if an object satisfies the requirements of a Labelmatch
+func MatchLabel(obj Labeled, lm LabelMatch) bool {
+	if lm == nil {
 		return true
 	}
-	return m.Match(l.GetLabels())
+	return lm.Match(obj.GetLabels())
 }

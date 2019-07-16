@@ -9,7 +9,7 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 )
 
-// TODO: Add options param???
+// ExecInPod executes a command on a pod interactively
 func (c *Client) ExecInPod(contexts []string, namespace, name, container string, options ListOptions, commands []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	pod, container, err := c.findPodWithContainer(contexts, namespace, name, container, options)
 	if err != nil {

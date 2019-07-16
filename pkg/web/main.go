@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// Serve runs a webserver for kron at the specified url
 func Serve(endpoint string) {
 	cl := client.GetDefaultConfigClient()
 

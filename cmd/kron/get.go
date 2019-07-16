@@ -2,13 +2,13 @@ package kron
 
 import (
 	"errors"
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/spf13/cobra"
 	"sort"
 )
 
-func GetGetCmd(c *client.Client) *cobra.Command {
+func getCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get [flags]",
 		Short: "Get a list of cronjobs",
@@ -31,7 +31,7 @@ If context(s) not specified, it will list from all contexts.`,
 			E, _ := cmd.Flags().GetBool("by-next-run-reverse")
 
 			if l && L || l && e || l && E || L && e || L && E || e && E { // More than one
-				return errors.New("Only at most one ordering flag may be set!")
+				return errors.New("at most one ordering flag may be set")
 			}
 
 			list, err := c.ListCronJobsOverContexts(ctxs, namespace, options)

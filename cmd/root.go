@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/kron"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/spf13/cobra"
 	"os"
 )
 
@@ -14,11 +14,11 @@ func init() {
 
 	// Commands'
 	c := client.GetDefaultConfigClient()
-	rootCmd.AddCommand(GetDescribeCmd(c))
-	rootCmd.AddCommand(GetGetCmd(c))
-	rootCmd.AddCommand(GetLogsCmd(c))
-	rootCmd.AddCommand(GetShCmd(c))
-	rootCmd.AddCommand(kron.GetKronCmd(c))
+	rootCmd.AddCommand(describeCmd(c))
+	rootCmd.AddCommand(getCmd(c))
+	rootCmd.AddCommand(logsCmd(c))
+	rootCmd.AddCommand(shCmd(c))
+	rootCmd.AddCommand(kron.Cmd(c))
 }
 
 // rootCmd represents the base command when called without any subcommands

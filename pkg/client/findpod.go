@@ -22,7 +22,7 @@ func (c *Client) findPod(contexts []string, namespace, name string, options List
 	}
 
 	if pod.Name != name { // Pod not found
-		return nil, errors.New("Pod not found") // TODO return value
+		return nil, errors.New("pod not found") // TODO return value
 	}
 
 	return &pod, nil

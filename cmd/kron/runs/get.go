@@ -1,12 +1,12 @@
 package runs
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/spf13/cobra"
 )
 
-func GetGetCmd(c *client.Client) *cobra.Command {
+func getCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get cronjob [flags]",
 		Short: "Get a list of runs of a cron job",

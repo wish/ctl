@@ -23,28 +23,29 @@ type cardDetails struct {
 	Namespace string
 	Active    int
 	Suspend   bool
-	LastRun   RunStatus
+	LastRun   runStatus
 }
 
-type RunStatus string
+//
+type runStatus string
 
 const (
-	RunFailed  RunStatus = "failed"
-	RunSuccess RunStatus = "success"
-	RunNA      RunStatus = "N/A"
-	RunRunning RunStatus = "running"
+	runFailed  runStatus = "failed"
+	runSuccess runStatus = "success"
+	runNA      runStatus = "N/A"
+	runRunning runStatus = "running"
 )
 
 func toCardDetails(c *dtypes.CronJobDiscovery, r *dtypes.RunDiscovery) cardDetails {
-	var runStatus RunStatus
+	var runStatus runStatus
 	if r == nil {
-		runStatus = RunNA
+		runStatus = runNA
 	} else if r.Status.Failed > 0 {
-		runStatus = RunFailed
+		runStatus = runFailed
 	} else if r.Status.CompletionTime != nil {
-		runStatus = RunSuccess
+		runStatus = runSuccess
 	} else {
-		runStatus = RunRunning
+		runStatus = runRunning
 	}
 
 	return cardDetails{
@@ -61,7 +62,7 @@ func toCardDetailsList(lst []dtypes.CronJobDiscovery, runs []dtypes.RunDiscovery
 	ret := make([]cardDetails, len(lst))
 	recent := make(map[types.UID]*dtypes.RunDiscovery)
 
-	for i, _ := range runs {
+	for i := range runs {
 		if len(runs[i].OwnerReferences) == 1 {
 			if x, ok := recent[runs[i].OwnerReferences[0].UID]; !ok || runs[i].Status.StartTime.After(x.Status.StartTime.Time) {
 				recent[runs[i].OwnerReferences[0].UID] = &runs[i]
@@ -69,7 +70,7 @@ func toCardDetailsList(lst []dtypes.CronJobDiscovery, runs []dtypes.RunDiscovery
 		}
 	}
 
-	for i, _ := range lst {
+	for i := range lst {
 		ret[i] = toCardDetails(&lst[i], recent[lst[i].UID])
 	}
 	return ret

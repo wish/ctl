@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"errors"
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/spf13/cobra"
 )
 
-func GetDescribeCmd(c *client.Client) *cobra.Command {
+func describeCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
 		Use:   "describe pods [flags]",
 		Short: "Show details of a specific pod(s)",
@@ -28,10 +28,9 @@ If context(s) not specified, it will search through all contexts.`,
 				return err
 			}
 			if len(pods) == 0 {
-				return errors.New("Could not find any matching pods!")
-			} else {
-				describePodList(pods)
+				return errors.New("could not find any matching pods")
 			}
+			describePodList(pods)
 			return nil
 		},
 	}
