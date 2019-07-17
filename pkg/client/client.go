@@ -16,6 +16,11 @@ type Client struct {
 	contextsGetter
 }
 
+// GetPlaceholderClient returns an empty client
+func GetPlaceholderClient() *Client {
+	return &Client{}
+}
+
 func clientsetHelper(getConfig func() (*restclient.Config, error)) (kubernetes.Interface, error) {
 	config, err := getConfig()
 
@@ -30,13 +35,18 @@ func clientsetHelper(getConfig func() (*restclient.Config, error)) (kubernetes.I
 
 // GetDefaultConfigClient returns a functioning client from the default kubeconfig path
 func GetDefaultConfigClient() *Client {
+	return GetConfigClient(helper.GetKubeConfigPath())
+}
+
+// GetConfigClient returns a client with a specific kubeconfig path
+func GetConfigClient(path string) *Client {
 	return &Client{
 		&configClientsetGetter{
 			clientsets: make(map[string]kubernetes.Interface),
-			config:     helper.GetKubeConfigPath(),
+			config:     path,
 		},
 		StaticContextsGetter{
-			contexts: helper.GetContexts(helper.GetKubeConfigPath()),
+			contexts: helper.GetContexts(path),
 		},
 	}
 }
