@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// LabelMatch takes in a single label specification string and returns
+// a corresponding filter.LabelMatch.
 func LabelMatch(s string) (filter.LabelMatch, error) {
 	if sub := regexp.MustCompile(`\A(\w+)=(\w+)\z`).FindStringSubmatch(s); len(sub) > 1 {
 		return &filter.LabelMatchEq{sub[1], sub[2]}, nil
@@ -19,10 +21,11 @@ func LabelMatch(s string) (filter.LabelMatch, error) {
 		}
 		return lm, nil
 	} else { // Did not match any
-		return nil, errors.New("No label format found")
+		return nil, errors.New("no label format found")
 	}
 }
 
+// LabelMatchSlice is like LabelMatch but handles multiple labels
 func LabelMatchSlice(s []string) (filter.LabelMatch, error) {
 	if len(s) == 0 {
 		return nil, nil

@@ -5,7 +5,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-// Retrieves logs of a single pod (uses first found if multiple)
+// LogPodOverContexts retrieves logs of a single pod (uses first found if multiple)
 func (c *Client) LogPodOverContexts(contexts []string, namespace, name, container string, options LogOptions) (*rest.Result, error) {
 	pod, container, err := c.findPodWithContainer(contexts, namespace, name, container, ListOptions{options.LabelMatch})
 	if err != nil {
@@ -22,7 +22,8 @@ func (c *Client) LogPodOverContexts(contexts []string, namespace, name, containe
 	return &res, nil
 }
 
-// Only logs first container if container not specified
+// LogPod retrieves logs from a container of a pod.
+// Operates on the first container if none specified.
 // TODO: The usage of this function is odd (support all containers???)
 func (c *Client) LogPod(context, namespace, name, container string, options LogOptions) (*rest.Result, error) {
 	cl, err := c.getContextInterface(context)

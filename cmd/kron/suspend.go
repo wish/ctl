@@ -1,12 +1,12 @@
 package kron
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/spf13/cobra"
 )
 
-func GetSuspendCmd(c *client.Client) *cobra.Command {
+func suspendCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
 		Use:   "suspend cronjob [flags]",
 		Short: "Suspend a cron job",

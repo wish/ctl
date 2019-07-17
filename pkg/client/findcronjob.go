@@ -21,7 +21,7 @@ func (c *Client) findCronJob(contexts []string, namespace, name string, options 
 	}
 
 	if cron.Name != name { // Pod not found
-		return nil, errors.New("Cron job not found") // TODO return value
+		return nil, errors.New("cron job not found") // TODO return value
 	}
 
 	return &cron, nil

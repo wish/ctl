@@ -1,15 +1,15 @@
 package kron
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/client/types"
-	"github.com/spf13/cobra"
 )
 
 // Currently does not support selected job
 // Requires job name
-func GetDescribeCmd(c *client.Client) *cobra.Command {
+func describeCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "describe [jobs] [flags]",
 		Short: "Show details about specified cron jobs",

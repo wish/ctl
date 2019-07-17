@@ -1,12 +1,12 @@
 package runs
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/spf13/cobra"
 )
 
-func GetDescribeCmd(c *client.Client) *cobra.Command {
+func describeCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
 		Use:   "describe run",
 		Short: "Get info about a run",

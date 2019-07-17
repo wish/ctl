@@ -11,6 +11,7 @@ import (
 	"sync"
 )
 
+// ListPods returns a list of all pod that match the query
 func (c *Client) ListPods(context string, namespace string, options ListOptions) ([]types.PodDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
@@ -30,6 +31,7 @@ func (c *Client) ListPods(context string, namespace string, options ListOptions)
 	return items, nil
 }
 
+// ListPodsOverContexts is like ListPods but operates over multiple clusters
 func (c *Client) ListPodsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.PodDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()
@@ -65,11 +67,12 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 
 	wait.Wait()
 	if failed != nil {
-		return ret, errors.New("Failed connecting to the following contexts: " + strings.Join(failed, ", "))
+		return ret, errors.New("failed connecting to the following contexts: " + strings.Join(failed, ", "))
 	}
 	return ret, nil
 }
 
+// ListPodsOfRun returns a list of all pods belonging to a job
 func (c *Client) ListPodsOfRun(contexts []string, namespace, runName string, options ListOptions) ([]types.PodDiscovery, error) {
 	pods, err := c.ListPodsOverContexts(contexts, namespace, options)
 	if err != nil {

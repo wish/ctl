@@ -1,12 +1,12 @@
 package kron
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/spf13/cobra"
 )
 
-func GetExecCmd(c *client.Client) *cobra.Command {
+func execCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
 		Use:   "exec cronjob [flags]",
 		Short: "Executes a job now",

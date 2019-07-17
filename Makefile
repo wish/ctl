@@ -31,7 +31,7 @@ lint: ## Runs linter
 
 .PHONY: vet
 vet: ## Runs go vet
-	@go vet ${PKGS}
+	@go vet -composites=false ${PKGS}
 
 .PHONY: clean
 clean: ## Removes build artifacts
@@ -43,4 +43,3 @@ bin/ctl: ## Make a link to the executable for this OS type for convenience
 .PHONY: test
 test: ## Runs go tests on all subdirs
 	@go test -coverprofile coverage.txt -covermode=atomic ./...
-

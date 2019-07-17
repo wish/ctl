@@ -11,6 +11,7 @@ import (
 	"sync"
 )
 
+// ListCronJobs returns a list of all cron jobs that match the query
 func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]types.CronJobDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
@@ -30,6 +31,7 @@ func (c *Client) ListCronJobs(context string, namespace string, options ListOpti
 	return items, nil
 }
 
+// ListCronJobsOverContexts is like ListCronJobs but operates over multiple clusters
 func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.CronJobDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()
@@ -63,7 +65,7 @@ func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, o
 
 	wait.Wait()
 	if failed != nil {
-		return ret, errors.New("Failed connecting to the following contexts: " + strings.Join(failed, ", "))
+		return ret, errors.New("failed connecting to the following contexts: " + strings.Join(failed, ", "))
 	}
 	return ret, nil
 }

@@ -7,6 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// GetCronJob returns a single cron job
 func (c *Client) GetCronJob(context, namespace string, name string, options GetOptions) (*types.CronJobDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
@@ -20,11 +21,12 @@ func (c *Client) GetCronJob(context, namespace string, name string, options GetO
 
 	d := types.CronJobDiscovery{context, *cronjob}
 	if !filter.MatchLabel(d, options.LabelMatch) {
-		return nil, errors.New("Found object does not satisfy filters")
+		return nil, errors.New("found object does not satisfy filters")
 	}
 	return &d, nil
 }
 
+// FindCronJobs simultaneously searches for multiple cron jobs and returns all results
 func (c *Client) FindCronJobs(contexts []string, namespace string, names []string, options ListOptions) ([]types.CronJobDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.GetAllContexts()

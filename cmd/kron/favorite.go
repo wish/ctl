@@ -1,31 +1,28 @@
 package kron
 
 import (
-	"fmt"
-	"github.com/wish/ctl/pkg/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/wish/ctl/pkg/client"
 )
 
-func init() {
-	viper.SetDefault("favorites", make(map[string]location))
-	viper.SetConfigName("config")
-	viper.AddConfigPath("$HOME/.kron")
-	err := viper.ReadInConfig()
-	if err != nil {
-		// Write config file
-		fmt.Println("Creating new config file")
-		createConfig()
-		// panic(err.Error())
-	}
-}
-
-func GetFavoriteCmd(c *client.Client) *cobra.Command {
+func favoriteCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
 		Use:   "favorite [jobs] [flags]",
 		Short: "Adds jobs to favorite list",
 		Long: `Adds specified job(s) to the favorite list. If no job was specified the selected job is added.
 A namespace and contexts can be specified to limit matches.`,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			viper.SetDefault("favorites", make(map[string]location))
+			viper.SetConfigName("config")
+			viper.AddConfigPath("$HOME/.kron")
+			err := viper.ReadInConfig()
+			if err != nil {
+				// Write config file
+				cmd.Println("Creating new config file")
+				createConfig()
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// args/flags
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
