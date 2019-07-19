@@ -7,7 +7,7 @@ import (
 )
 
 func getCmd(c *client.Client) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get [flags]",
 		Short: "Get a list of pods",
 		Long: `Get a list of pods in the specified namespace and context(s).
@@ -25,7 +25,8 @@ If context(s) not specified, it will list from all contexts.`,
 			// NOTE: List is unsorted and could be in an inconsistent order
 			// Output
 			if list != nil {
-				printPodList(list)
+				labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
+				printPodList(list, labelColumns)
 			}
 			if err != nil {
 				return err
@@ -33,4 +34,8 @@ If context(s) not specified, it will list from all contexts.`,
 			return nil
 		},
 	}
+
+	cmd.Flags().StringSlice("label-columns", nil, "Prints with columns that contain the value of the specified label")
+
+	return cmd
 }
