@@ -50,7 +50,8 @@ If context(s) not specified, it will list from all contexts.`,
 				sort.Sort(sort.Reverse(byLastRun(list)))
 			}
 
-			printCronJobList(list)
+			labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
+			printCronJobList(list, labelColumns)
 			return nil
 		},
 	}
@@ -62,6 +63,7 @@ If context(s) not specified, it will list from all contexts.`,
 	cmd.Flags().Bool("by-last-run-reverse", false, "Sort reverse chronologically by last run")
 	cmd.Flags().Bool("by-next-run", false, "Sort cronologically by next scheduled run")
 	cmd.Flags().Bool("by-next-run-reverse", false, "Sort reverse chronologically by next scheduled run")
+	cmd.Flags().StringSlice("label-columns", nil, "Prints with columns that contain the value of the specified label")
 
 	return cmd
 }
