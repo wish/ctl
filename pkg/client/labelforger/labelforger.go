@@ -2,6 +2,7 @@ package labelforger
 
 import (
 	"github.com/wish/ctl/pkg/client/types"
+	"log"
 )
 
 // LabelForger is an object that inserts cluster entries into the labels of objects
@@ -36,6 +37,6 @@ func (l LabelForger) Transform(i interface{}) {
 	case *types.RunDiscovery:
 		transformObjectMeta(l.ClusterExt[v.Context], &(v.Labels))
 	default:
-		panic("Unknown object")
+		log.Printf("Unsupported type %T\n", v)
 	}
 }

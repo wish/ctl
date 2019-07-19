@@ -1,7 +1,6 @@
 package labelforger
 
 import (
-	"fmt"
 	"github.com/wish/ctl/pkg/client/filter"
 	"github.com/wish/ctl/pkg/client/types"
 	batchv1 "k8s.io/api/batch/v1"
@@ -89,9 +88,12 @@ func TestTransform(t *testing.T) {
 		for _, obj := range test.objs {
 			res := obj.obj.(filter.Labeled)
 			if l.Transform(obj.obj); !reflect.DeepEqual(res.GetLabels(), obj.ans) {
-				fmt.Println(res.GetLabels(), obj.ans)
 				t.Error("Transform did not modify obj correctly: ", res.GetLabels(), obj.ans)
 			}
 		}
 	}
+}
+
+func TestBadTransform(t *testing.T) { // should not crash
+	LabelForger{map[string]map[string]string{"x": map[string]string{"x": "x"}}}.Transform(1)
 }
