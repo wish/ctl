@@ -2,6 +2,7 @@ package client
 
 import (
 	"github.com/wish/ctl/pkg/client/helper"
+	"github.com/wish/ctl/pkg/client/labelforger"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
@@ -14,11 +15,17 @@ type Client struct {
 	// Add more functionality here...?
 	clientsetGetter
 	contextsGetter
+	forger labelforger.LabelForger
 }
 
 // GetPlaceholderClient returns an empty client
 func GetPlaceholderClient() *Client {
 	return &Client{}
+}
+
+// AttachLabelForger creates and adds a LabelForger to the client
+func (c *Client) AttachLabelForger(m map[string]map[string]string) {
+	c.forger = labelforger.LabelForger{m}
 }
 
 func clientsetHelper(getConfig func() (*restclient.Config, error)) (kubernetes.Interface, error) {
@@ -41,11 +48,11 @@ func GetDefaultConfigClient() *Client {
 // GetConfigClient returns a client with a specific kubeconfig path
 func GetConfigClient(path string) *Client {
 	return &Client{
-		&configClientsetGetter{
+		clientsetGetter: &configClientsetGetter{
 			clientsets: make(map[string]kubernetes.Interface),
 			config:     path,
 		},
-		StaticContextsGetter{
+		contextsGetter: StaticContextsGetter{
 			contexts: helper.GetContexts(path),
 		},
 	}
@@ -60,9 +67,9 @@ func GetFakeConfigClient(clusters map[string][]runtime.Object) *Client {
 		contexts = append(contexts, context)
 	}
 	return &Client{
-		&fakeClientsetGetter{
+		clientsetGetter: &fakeClientsetGetter{
 			clientsets: clientsets,
 		},
-		StaticContextsGetter{contexts: contexts},
+		contextsGetter: StaticContextsGetter{contexts: contexts},
 	}
 }

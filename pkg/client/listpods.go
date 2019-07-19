@@ -22,10 +22,11 @@ func (c *Client) ListPods(context string, namespace string, options ListOptions)
 		return nil, err
 	}
 	var items []types.PodDiscovery
-	for _, pod := range pods.Items {
+	for i, pod := range pods.Items {
 		p := types.PodDiscovery{context, pod}
 		if filter.MatchLabel(p, options.LabelMatch) {
 			items = append(items, p)
+			c.forger.Transform(&items[i])
 		}
 	}
 	return items, nil

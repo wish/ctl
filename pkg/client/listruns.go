@@ -22,10 +22,11 @@ func (c *Client) ListRuns(context string, namespace string, options ListOptions)
 		return nil, err
 	}
 	var items []types.RunDiscovery
-	for _, run := range runs.Items {
+	for i, run := range runs.Items {
 		r := types.RunDiscovery{context, run}
 		if filter.MatchLabel(r, options.LabelMatch) {
 			items = append(items, r)
+			c.forger.Transform(&items[i])
 		}
 	}
 	return items, nil

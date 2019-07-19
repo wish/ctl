@@ -22,6 +22,7 @@ func (c *Client) GetPod(context, namespace string, name string, options GetOptio
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
 	}
+	c.forger.Transform(&d)
 	return &d, nil
 }
 
@@ -43,6 +44,7 @@ func (c *Client) FindPods(contexts []string, namespace string, names []string, o
 	for _, p := range all {
 		if _, ok := positive[p.Name]; ok {
 			ret = append(ret, p)
+			c.forger.Transform(&ret[len(ret)-1])
 		}
 	}
 

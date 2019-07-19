@@ -23,6 +23,7 @@ func (c *Client) GetCronJob(context, namespace string, name string, options GetO
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
 	}
+	c.forger.Transform(&d)
 	return &d, nil
 }
 
@@ -44,9 +45,10 @@ func (c *Client) FindCronJobs(contexts []string, namespace string, names []strin
 
 	var ret []types.CronJobDiscovery
 
-	for _, p := range all {
-		if _, ok := positive[p.Name]; ok {
-			ret = append(ret, p)
+	for _, j := range all {
+		if _, ok := positive[j.Name]; ok {
+			ret = append(ret, j)
+			c.forger.Transform(&ret[len(ret)-1])
 		}
 	}
 

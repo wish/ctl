@@ -22,6 +22,7 @@ func (c *Client) GetRun(context, namespace string, name string, options GetOptio
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
 	}
+	c.forger.Transform(&d)
 	return &d, nil
 }
 
@@ -43,9 +44,10 @@ func (c *Client) FindRuns(contexts []string, namespace string, names []string, o
 
 	var ret []types.RunDiscovery
 
-	for _, j := range all {
-		if _, ok := positive[j.Name]; ok {
-			ret = append(ret, j)
+	for _, r := range all {
+		if _, ok := positive[r.Name]; ok {
+			ret = append(ret, r)
+			c.forger.Transform(&ret[len(ret)-1])
 		}
 	}
 
