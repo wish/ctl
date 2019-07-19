@@ -1,17 +1,18 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/kron"
 	"github.com/wish/ctl/pkg/client"
-	"os"
 )
 
 func cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "ctl",
 		Short:        "A CLI tool for discovering k8s pods/logs across multiple clusters",
-		Long:         `ctl is a CLI tool for easily getting/exec pods/logs across multiple clusters/namespaces. If you have any questions, problems, or requests please ask #automation.`,
+		Long:         "ctl is a CLI tool for easily getting/exec pods/logs across multiple clusters/namespaces.",
 		SilenceUsage: true,
 	}
 
