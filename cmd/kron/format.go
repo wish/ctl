@@ -56,4 +56,9 @@ func describeCronJob(c types.CronJobDiscovery) {
 	s, _ := cron.ParseStandard(c.Spec.Schedule)
 	fmt.Printf("\tNext run: %v\n", time.Until(s.Next(time.Now())).Round(time.Second))
 	fmt.Printf("\tCreated on: %v\n", c.CreationTimestamp)
+
+	fmt.Printf("\tLabels: \n")
+	for k, v := range c.Labels {
+		fmt.Printf("\t\t%s: %s\n", k, v)
+	}
 }

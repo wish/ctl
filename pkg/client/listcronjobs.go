@@ -22,10 +22,11 @@ func (c *Client) ListCronJobs(context string, namespace string, options ListOpti
 		return nil, err
 	}
 	var items []types.CronJobDiscovery
-	for _, cj := range cronjobs.Items {
+	for i, cj := range cronjobs.Items {
 		cjd := types.CronJobDiscovery{context, cj}
 		if filter.MatchLabel(cjd, options.LabelMatch) { // TODO: Modularize to allow adding more search parameters
 			items = append(items, cjd)
+			c.forger.Transform(&items[i])
 		}
 	}
 	return items, nil
