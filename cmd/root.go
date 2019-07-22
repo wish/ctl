@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	configcmd "github.com/wish/ctl/cmd/config"
 	"github.com/wish/ctl/cmd/kron"
 	"github.com/wish/ctl/cmd/util/config"
 	"github.com/wish/ctl/pkg/client"
@@ -67,6 +68,7 @@ func cmd() *cobra.Command {
 	cmd.AddCommand(shCmd(c))
 	cmd.AddCommand(versionCmd(c))
 	cmd.AddCommand(kron.Cmd(c))
+	cmd.AddCommand(configcmd.Cmd(c))
 
 	cmd.PersistentFlags().StringSliceP("context", "x", nil, "Specify the context(s) to operate in")
 	cmd.PersistentFlags().StringP("namespace", "n", "", "Specify the namespace within all the contexts specified")
