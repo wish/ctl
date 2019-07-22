@@ -15,8 +15,9 @@ func TestAllOptions(t *testing.T) {
 		{[]string{`-l`, `a=b`, `-l=a!=b`}, false},
 		{[]string{`-l`, `a in (a,b,c)`}, false},
 		{[]string{`-l`, `c in(a,z)`, `-l`, `a=b`}, false},
-		{[]string{`-l`, `c in (a),b=a`}, true},
+		{[]string{`-l`, `c in (a),b=a`}, false},
 		{[]string{`-l`, `a in (x),a`}, true},
+		{[]string{`-l`, `123.2.1/a=b`, `-l=a/z!=b`}, false},
 		{[]string{`--label`, `a=b`}, false},
 		{[]string{`--label`, `a in (a)`}, false},
 		{[]string{`--label=a in (a)`}, false},
@@ -25,6 +26,7 @@ func TestAllOptions(t *testing.T) {
 		{[]string{`--label=a in (a, b, c)`}, false},
 		{[]string{`--label=c in(a,z)`, `--label=a=b`}, false},
 		{[]string{`--label=c in (a)`}, false},
+		{[]string{`--label=a/c in (a)`}, false},
 	}
 
 	for _, test := range tests {
