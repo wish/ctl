@@ -1,4 +1,4 @@
-package labelforger
+package clusterext
 
 import (
 	"github.com/wish/ctl/pkg/client/filter"
@@ -84,10 +84,10 @@ func TestTransform(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		l := LabelForger{test.lf}
+		e := Extension{test.lf}
 		for _, obj := range test.objs {
 			res := obj.obj.(filter.Labeled)
-			if l.Transform(obj.obj); !reflect.DeepEqual(res.GetLabels(), obj.ans) {
+			if e.Transform(obj.obj); !reflect.DeepEqual(res.GetLabels(), obj.ans) {
 				t.Error("Transform did not modify obj correctly: ", res.GetLabels(), obj.ans)
 			}
 		}
@@ -95,5 +95,5 @@ func TestTransform(t *testing.T) {
 }
 
 func TestBadTransform(t *testing.T) { // should not crash
-	LabelForger{map[string]map[string]string{"x": map[string]string{"x": "x"}}}.Transform(1)
+	Extension{map[string]map[string]string{"x": map[string]string{"x": "x"}}}.Transform(1)
 }

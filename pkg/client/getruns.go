@@ -19,17 +19,19 @@ func (c *Client) GetRun(context, namespace string, name string, options GetOptio
 	}
 
 	d := types.RunDiscovery{context, *job}
+	c.extension.Transform(&d)
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
 	}
-	c.forger.Transform(&d)
 	return &d, nil
 }
 
 // FindRuns simultaneously searches for multiple jobs and returns all results
 func (c *Client) FindRuns(contexts []string, namespace string, names []string, options ListOptions) ([]types.RunDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.GetAllContexts()
+		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+	} else {
+		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
 	}
 	// Creating set of names
 	positive := make(map[string]struct{})
@@ -47,7 +49,6 @@ func (c *Client) FindRuns(contexts []string, namespace string, names []string, o
 	for _, r := range all {
 		if _, ok := positive[r.Name]; ok {
 			ret = append(ret, r)
-			c.forger.Transform(&ret[len(ret)-1])
 		}
 	}
 

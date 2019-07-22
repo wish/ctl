@@ -22,11 +22,11 @@ func (c *Client) ListRuns(context string, namespace string, options ListOptions)
 		return nil, err
 	}
 	var items []types.RunDiscovery
-	for i, run := range runs.Items {
+	for _, run := range runs.Items {
 		r := types.RunDiscovery{context, run}
+		c.extension.Transform(&r)
 		if filter.MatchLabel(r, options.LabelMatch) {
 			items = append(items, r)
-			c.forger.Transform(&items[i])
 		}
 	}
 	return items, nil
@@ -35,7 +35,9 @@ func (c *Client) ListRuns(context string, namespace string, options ListOptions)
 // ListRunsOverContexts is like ListRuns but operates over multiple clusters
 func (c *Client) ListRunsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.RunDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.GetAllContexts()
+		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+	} else {
+		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
 	}
 
 	var wait sync.WaitGroup
