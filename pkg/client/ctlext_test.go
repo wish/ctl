@@ -15,7 +15,7 @@ func generateCtlExt(data map[string]string) runtime.Object {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "ctl-ext",
+			Name:      "ctl-config",
 			Namespace: "kube-system",
 		},
 		Data: data,

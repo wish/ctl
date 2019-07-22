@@ -16,7 +16,7 @@ func (c *Client) GetCtlExt() map[string]map[string]string {
 			continue
 		}
 
-		cf, err := ci.CoreV1().ConfigMaps("kube-system").Get("ctl-ext", metav1.GetOptions{})
+		cf, err := ci.CoreV1().ConfigMaps("kube-system").Get("ctl-config", metav1.GetOptions{})
 		if err != nil {
 			m[ctx] = nil
 			continue
