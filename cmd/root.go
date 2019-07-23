@@ -74,8 +74,8 @@ func cmd() *cobra.Command {
 	cmd.AddCommand(kron.Cmd(c))
 	cmd.AddCommand(configcmd.Cmd(c))
 
-	cmd.PersistentFlags().StringSliceP("context", "x", nil, "Specify the context(s) to operate in")
-	cmd.PersistentFlags().StringP("namespace", "n", "", "Specify the namespace within all the contexts specified")
+	cmd.PersistentFlags().StringSliceP("context", "x", nil, "Specify the context(s) to operate in. Defaults to all contexts.")
+	cmd.PersistentFlags().StringP("namespace", "n", "", "Specify the namespace within all the contexts specified. Defaults to all namespaces.")
 	cmd.PersistentFlags().StringArrayP("label", "l", nil, "Filter objects by label")
 	cmd.PersistentFlags().String("kubeconfig", "", "Custom kubeconfig file")
 	cmd.PersistentFlags().String("config", "", "Choose a different directory for ctl config")

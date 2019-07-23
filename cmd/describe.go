@@ -2,23 +2,34 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/client/types"
+	"strings"
 )
 
 var supportedDescribeTypes = [][]string{
 	{"pods", "pod", "po"},
 }
 
+func describeResourceStr() string {
+	var str strings.Builder
+
+	fmt.Fprintln(&str, "Choose from the list of supported resources:")
+	for _, names := range supportedGetTypes {
+		fmt.Fprintf(&str, " * %s\n", names[0])
+	}
+
+	return str.String()
+}
+
 func describeCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "describe pods [flags]",
 		Short: "Show details of a specific pod(s)",
-		Long: `Print a detailed description of the pods specified by name.
-If namespace not specified, it will get all the pods across all the namespaces.
-If context(s) not specified, it will search through all contexts.`,
+		Long:  "Print a detailed description of the pods specified by name.\n\n" + describeResourceStr(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
@@ -56,14 +67,6 @@ See 'ctl describe'`)
 			return nil
 		},
 	}
-
-	cmd.SetUsageFunc(func(cmd *cobra.Command) error {
-		cmd.Println("Choose from the list of supported resources:")
-		for _, names := range supportedGetTypes {
-			cmd.Printf(" * %s\n", names[0])
-		}
-		return nil
-	})
 
 	return cmd
 }

@@ -13,9 +13,7 @@ func describeCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "describe [jobs] [flags]",
 		Short: "Show details about specified cron jobs",
-		Long: `Show details about specific cron jobs, or the selected job if none is specified.
-If namespace not specified, it will get all the cron jobs across all the namespaces.
-If context(s) not specified, it will search through all contexts.`,
+		Long:  `Show details about specific cron jobs, or the selected job if none is specified.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")

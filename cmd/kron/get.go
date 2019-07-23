@@ -12,9 +12,7 @@ func getCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get [flags]",
 		Short: "Get a list of cronjobs",
-		Long: `Get a list of cron jobs in the specified namespace and context(s).
-If namespace not specified, it will get all the cron jobs across all the namespaces.
-If context(s) not specified, it will list from all contexts.`,
+		Long:  `Get a list of cron jobs in the specified namespace and context(s).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Get flags
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
