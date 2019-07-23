@@ -3,11 +3,11 @@ package cmd
 import (
 	"fmt"
 	"github.com/wish/ctl/pkg/client/types"
+	"gopkg.in/yaml.v2"
 	"os"
 	"strings"
 	"text/tabwriter"
 	"time"
-	// "gopkg.in/yaml.v2"
 )
 
 // REVIEW: Most of the processing here was guessed with reverse engineering
@@ -56,14 +56,9 @@ func printPodList(lst []types.PodDiscovery, labelColumns []string) {
 }
 
 func describePod(pod types.PodDiscovery) {
-	fmt.Printf("Context: %s\n", pod.Context)
-	// fmt.Printf("Namespace: %s\n", pod.Namespace)
-	// b, _ := yaml.Marshal(pod.Pod)
-
-	b, s := pod.Pod.Descriptor()
-
+	fmt.Printf("context: %s\n", pod.Context)
+	b, _ := yaml.Marshal(pod.Pod)
 	fmt.Println(string(b))
-	fmt.Println(s)
 }
 
 func describePodList(lst []types.PodDiscovery) {
