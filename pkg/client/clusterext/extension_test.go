@@ -8,6 +8,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -88,7 +89,7 @@ func TestTransform(t *testing.T) {
 		for _, obj := range test.objs {
 			res := obj.obj.(filter.Labeled)
 			if e.Transform(obj.obj); !reflect.DeepEqual(res.GetLabels(), obj.ans) {
-				t.Error("Transform did not modify obj correctly: ", res.GetLabels(), obj.ans)
+				t.Error("transform did not modify obj correctly: ", res.GetLabels(), obj.ans)
 			}
 		}
 	}
@@ -96,4 +97,40 @@ func TestTransform(t *testing.T) {
 
 func TestBadTransform(t *testing.T) { // should not crash
 	Extension{map[string]map[string]string{"x": map[string]string{"x": "x"}}}.Transform(1)
+}
+
+func TestEmptyExtension(t *testing.T) {
+	var lists = [][]string{
+		[]string{"abc", "def", "ghi", "jkl"},
+		[]string{""},
+		[]string{"wow"},
+		[]string{},
+	}
+
+	equal := func(a []string, b []string) bool {
+		if len(a) != len(b) {
+			return false
+		}
+		sort.Strings(a)
+		sort.Strings(b)
+		return reflect.DeepEqual(a, b)
+	}
+
+	for _, l := range lists {
+		e := EmptyExtension(l)
+		l1 := &filter.LabelMatchEq{"any", "bad"}
+		if !equal(l, e.FilterContexts(l, l1)) {
+			t.Error("empty extension failed FilterContexts with LabelMatchEq on list", l)
+		}
+		if !equal(l, e.GetFilteredContexts(l1)) {
+			t.Error("empty extension failed GetFilteredContexts with LabelMatchEq on list", l)
+		}
+		l2 := &filter.LabelMatchNeq{"any", "bad"}
+		if !equal(l, e.FilterContexts(l, l2)) {
+			t.Error("empty extension failed FilterContexts with LabelMatchNeq on list", l)
+		}
+		if !equal(l, e.GetFilteredContexts(l2)) {
+			t.Error("empty extension failed GetFilteredContexts with LabelMatchNeq on list", l)
+		}
+	}
 }
