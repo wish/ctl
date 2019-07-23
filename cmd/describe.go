@@ -14,7 +14,7 @@ func describeCmd(c *client.Client) *cobra.Command {
 		Long: `Print a detailed description of the pods specified by name.
 If namespace not specified, it will get all the pods across all the namespaces.
 If context(s) not specified, it will search through all contexts.`,
-		Args: cobra.MinimumNArgs(1),
+		Args: cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
@@ -23,14 +23,19 @@ If context(s) not specified, it will search through all contexts.`,
 				return err
 			}
 
-			pods, err := c.FindPods(ctxs, namespace, args, options)
-			if err != nil {
-				return err
+			switch args[0] {
+			case "pods":
+				pods, err := c.FindPods(ctxs, namespace, args[1:], options)
+				if err != nil {
+					return err
+				}
+				if len(pods) == 0 {
+					return errors.New("could not find any matching pods")
+				}
+				describePodList(pods)
+			default:
+				return errors.New(`The resource type "` + args[0] + `" was not found`)
 			}
-			if len(pods) == 0 {
-				return errors.New("could not find any matching pods")
-			}
-			describePodList(pods)
 			return nil
 		},
 	}

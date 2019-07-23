@@ -24,7 +24,7 @@ func TestDescribeSingle(t *testing.T) {
 
 	cmd := describeCmd(cl)
 	cmd.Flags().StringSliceP("context", "x", nil, "Context")
-	cmd.SetArgs([]string{"test"})
+	cmd.SetArgs([]string{"pods", "test"})
 
 	_, err := cmd.ExecuteC()
 
@@ -49,7 +49,7 @@ func TestDescribeBadContext(t *testing.T) {
 
 	cmd := describeCmd(cl)
 	cmd.Flags().StringSliceP("context", "x", nil, "Context")
-	cmd.SetArgs([]string{"test", "--context=wow"})
+	cmd.SetArgs([]string{"pods", "test", "--context=wow"})
 
 	_, err := cmd.ExecuteC()
 
@@ -76,7 +76,7 @@ func TestDescribeUnfound(t *testing.T) {
 
 	cmd := describeCmd(cl)
 	cmd.Flags().StringSliceP("context", "x", nil, "Context")
-	cmd.SetArgs([]string{"pew"})
+	cmd.SetArgs([]string{"pods", "pew"})
 
 	_, err := cmd.ExecuteC()
 
