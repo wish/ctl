@@ -24,6 +24,7 @@ func (c *Client) ListCronJobs(context string, namespace string, options ListOpti
 	var items []types.CronJobDiscovery
 	for _, cj := range cronjobs.Items {
 		cjd := types.CronJobDiscovery{context, cj}
+		c.extension.Transform(&cjd)
 		if filter.MatchLabel(cjd, options.LabelMatch) { // TODO: Modularize to allow adding more search parameters
 			items = append(items, cjd)
 		}
@@ -34,7 +35,9 @@ func (c *Client) ListCronJobs(context string, namespace string, options ListOpti
 // ListCronJobsOverContexts is like ListCronJobs but operates over multiple clusters
 func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.CronJobDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.GetAllContexts()
+		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+	} else {
+		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
 	}
 
 	var wait sync.WaitGroup

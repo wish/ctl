@@ -1,4 +1,8 @@
 # ctl
+
+[![Build Status](https://travis-ci.org/wish/ctl.svg?branch=master)](https://travis-ci.org/wish/ctl)
+[![Code Coverage](https://codecov.io/gh/wish/ctl/branch/master/graph/badge.svg)](https://codecov.io/gh/wish/ctl/)
+
 wrapper tool of kubectl for multi-clusters and easy pod/log discovering
 
 # prerequisites

@@ -19,6 +19,7 @@ func (c *Client) GetPod(context, namespace string, name string, options GetOptio
 	}
 
 	d := types.PodDiscovery{context, *pod}
+	c.extension.Transform(&d)
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
 	}
@@ -28,7 +29,9 @@ func (c *Client) GetPod(context, namespace string, name string, options GetOptio
 // FindPods simultaneously searches for multiple pods and returns all results
 func (c *Client) FindPods(contexts []string, namespace string, names []string, options ListOptions) ([]types.PodDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.GetAllContexts()
+		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+	} else {
+		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
 	}
 	// Creating set of names
 	positive := make(map[string]struct{})

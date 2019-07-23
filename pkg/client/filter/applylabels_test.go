@@ -3,7 +3,7 @@ package filter
 import "testing"
 
 type testMatchLabelStruct struct {
-	match  *LabelMatchMultiple
+	match  LabelMatch
 	labels map[string]string
 	ans    bool
 }
@@ -32,6 +32,21 @@ func TestMatchLabel(t *testing.T) {
 		{
 			&LabelMatchMultiple{nil},
 			map[string]string{"a": "b", "b": "b"},
+			true,
+		},
+		{
+			nil,
+			map[string]string{"a": "b", "b": "b"},
+			true,
+		},
+		{
+			nil,
+			nil,
+			true,
+		},
+		{
+			&LabelMatchNeq{"c", "k"},
+			nil,
 			true,
 		},
 	}

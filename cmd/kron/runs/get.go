@@ -7,7 +7,7 @@ import (
 )
 
 func getCmd(c *client.Client) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get cronjob [flags]",
 		Short: "Get a list of runs of a cron job",
 		Long: `Get a list of runs of a cron job.
@@ -32,8 +32,13 @@ If multiple cron jobs matches the parameters, only the first is used.`,
 				return err
 			}
 
-			printRunList(list)
+			labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
+			printRunList(list, labelColumns)
 			return nil
 		},
 	}
+
+	cmd.Flags().StringSlice("label-columns", nil, "Prints with columns that contain the value of the specified label")
+
+	return cmd
 }

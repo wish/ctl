@@ -20,6 +20,7 @@ func (c *Client) GetCronJob(context, namespace string, name string, options GetO
 	}
 
 	d := types.CronJobDiscovery{context, *cronjob}
+	c.extension.Transform(&d)
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
 	}
@@ -29,7 +30,9 @@ func (c *Client) GetCronJob(context, namespace string, name string, options GetO
 // FindCronJobs simultaneously searches for multiple cron jobs and returns all results
 func (c *Client) FindCronJobs(contexts []string, namespace string, names []string, options ListOptions) ([]types.CronJobDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.GetAllContexts()
+		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+	} else {
+		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
 	}
 	// Creating set of names
 	positive := make(map[string]struct{})
@@ -44,9 +47,9 @@ func (c *Client) FindCronJobs(contexts []string, namespace string, names []strin
 
 	var ret []types.CronJobDiscovery
 
-	for _, p := range all {
-		if _, ok := positive[p.Name]; ok {
-			ret = append(ret, p)
+	for _, j := range all {
+		if _, ok := positive[j.Name]; ok {
+			ret = append(ret, j)
 		}
 	}
 

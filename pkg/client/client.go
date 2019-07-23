@@ -1,6 +1,7 @@
 package client
 
 import (
+	"github.com/wish/ctl/pkg/client/clusterext"
 	"github.com/wish/ctl/pkg/client/helper"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -14,6 +15,17 @@ type Client struct {
 	// Add more functionality here...?
 	clientsetGetter
 	contextsGetter
+	extension clusterext.Extension
+}
+
+// GetPlaceholderClient returns an empty client
+func GetPlaceholderClient() *Client {
+	return &Client{}
+}
+
+// AttachLabelForger creates and adds an Extension to the client
+func (c *Client) AttachLabelForger(m map[string]map[string]string) {
+	c.extension = clusterext.Extension{m}
 }
 
 func clientsetHelper(getConfig func() (*restclient.Config, error)) (kubernetes.Interface, error) {
@@ -30,14 +42,21 @@ func clientsetHelper(getConfig func() (*restclient.Config, error)) (kubernetes.I
 
 // GetDefaultConfigClient returns a functioning client from the default kubeconfig path
 func GetDefaultConfigClient() *Client {
+	return GetConfigClient(helper.GetKubeConfigPath())
+}
+
+// GetConfigClient returns a client with a specific kubeconfig path
+func GetConfigClient(path string) *Client {
+	contexts := helper.GetContexts(path)
 	return &Client{
-		&configClientsetGetter{
+		clientsetGetter: &configClientsetGetter{
 			clientsets: make(map[string]kubernetes.Interface),
-			config:     helper.GetKubeConfigPath(),
+			config:     path,
 		},
-		StaticContextsGetter{
-			contexts: helper.GetContexts(helper.GetKubeConfigPath()),
+		contextsGetter: StaticContextsGetter{
+			contexts: contexts,
 		},
+		extension: clusterext.EmptyExtension(contexts),
 	}
 }
 
@@ -50,9 +69,10 @@ func GetFakeConfigClient(clusters map[string][]runtime.Object) *Client {
 		contexts = append(contexts, context)
 	}
 	return &Client{
-		&fakeClientsetGetter{
+		clientsetGetter: &fakeClientsetGetter{
 			clientsets: clientsets,
 		},
-		StaticContextsGetter{contexts: contexts},
+		contextsGetter: StaticContextsGetter{contexts: contexts},
+		extension:      clusterext.EmptyExtension(contexts),
 	}
 }
