@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/robfig/cron"
 	"github.com/wish/ctl/pkg/client/types"
+	"gopkg.in/yaml.v2"
 	"os"
 	"strings"
 	"text/tabwriter"
@@ -60,18 +61,7 @@ func printCronJobList(lst []types.CronJobDiscovery, labelColumns []string) {
 }
 
 func describeCronJob(c types.CronJobDiscovery) {
-	fmt.Printf("Context: %s\n", c.Context)
-	fmt.Printf("\tName: %s\n", c.Name)
-	fmt.Printf("\tNamespace: %s\n", c.Namespace)
-	fmt.Printf("\tSchedule: %s\n", c.Spec.Schedule)
-	fmt.Printf("\tActive: %d\n", len(c.Status.Active))
-	fmt.Printf("\tLast schedule: %v\n", time.Since(c.Status.LastScheduleTime.Time).Round(time.Second))
-	s, _ := cron.ParseStandard(c.Spec.Schedule)
-	fmt.Printf("\tNext run: %v\n", time.Until(s.Next(time.Now())).Round(time.Second))
-	fmt.Printf("\tCreated on: %v\n", c.CreationTimestamp)
-
-	fmt.Printf("\tLabels: \n")
-	for k, v := range c.Labels {
-		fmt.Printf("\t\t%s: %s\n", k, v)
-	}
+	fmt.Printf("context: %s\n", c.Context)
+	b, _ := yaml.Marshal(c.CronJob)
+	fmt.Println(string(b))
 }
