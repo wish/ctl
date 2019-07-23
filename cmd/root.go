@@ -33,7 +33,11 @@ func cmd() *cobra.Command {
 			viper.SetConfigName("config")
 			conf, _ := cmd.Flags().GetString("config")
 			if len(conf) == 0 {
-				conf = os.Getenv("HOME") + "/.ctl/config.yml"
+				if v, ok := os.LookupEnv("XDG_CONFIG_DIR"); ok {
+					conf = v + "/ctl/config.yml"
+				} else {
+					conf = os.Getenv("HOME") + "/.config/ctl/config.yml"
+				}
 			}
 			viper.SetConfigFile(conf)
 			if err := viper.ReadInConfig(); err != nil {
