@@ -48,19 +48,12 @@ func (e Extension) Transform(i interface{}) {
 	case *types.RunDiscovery:
 		transformObjectMeta(e.ClusterExt[v.Context], &(v.Labels))
 	default:
-		log.Printf("Unsupported type %T\n", v)
+		log.Printf("unsupported type %T\n", v)
 	}
 }
 
 // GetFilteredContexts returns all the contexts that may match the label
 func (e Extension) GetFilteredContexts(l filter.LabelMatch) []string {
-	if l == nil { // return all
-		var ret []string
-		for c := range e.ClusterExt {
-			ret = append(ret, c)
-		}
-		return ret
-	}
 	contexts := make([]string, 0)
 	for c, m := range e.ClusterExt {
 		if v, ok := m["hidden"]; (!ok || v != "true") && filter.EmptyOrMatchLabel(filter.GetLabeled(m), l) {
@@ -72,9 +65,6 @@ func (e Extension) GetFilteredContexts(l filter.LabelMatch) []string {
 
 // FilterContexts further filters contexts
 func (e Extension) FilterContexts(contexts []string, l filter.LabelMatch) []string {
-	if l == nil {
-		return contexts
-	}
 	ret := make([]string, 0)
 	for _, ctx := range contexts {
 		if m, ok := e.ClusterExt[ctx]; ok {
