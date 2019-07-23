@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/wish/ctl/pkg/client"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,7 +27,6 @@ func TestDescribeSingle(t *testing.T) {
 
 	_, err := cmd.ExecuteC()
 
-	fmt.Println(err)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -53,7 +51,6 @@ func TestDescribeBadContext(t *testing.T) {
 
 	_, err := cmd.ExecuteC()
 
-	fmt.Println(err)
 	if err == nil {
 		t.Error("Was expecting cmd execution to error")
 	} else {
@@ -80,7 +77,6 @@ func TestDescribeUnfound(t *testing.T) {
 
 	_, err := cmd.ExecuteC()
 
-	fmt.Println(err)
 	if err == nil {
 		t.Error("Was expecting cmd execution to error")
 	} else {
