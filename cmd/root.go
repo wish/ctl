@@ -9,8 +9,6 @@ import (
 	"github.com/wish/ctl/cmd/kron"
 	"github.com/wish/ctl/cmd/util/config"
 	"github.com/wish/ctl/pkg/client"
-	"os"
-	// "path/filepath"
 )
 
 func cmd() *cobra.Command {
