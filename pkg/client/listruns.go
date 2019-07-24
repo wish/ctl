@@ -25,7 +25,7 @@ func (c *Client) ListRuns(context string, namespace string, options ListOptions)
 	for _, run := range runs.Items {
 		r := types.RunDiscovery{context, run}
 		c.extension.Transform(&r)
-		if filter.MatchLabel(r, options.LabelMatch) {
+		if filter.MatchLabel(r, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(r.Name)) {
 			items = append(items, r)
 		}
 	}

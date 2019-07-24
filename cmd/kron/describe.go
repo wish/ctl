@@ -11,14 +11,14 @@ import (
 // Requires job name
 func describeCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "describe [jobs] [flags]",
+		Use:   "describe [NAME...] [flags]",
 		Short: "Show details about specified cron jobs",
 		Long:  `Show details about specific cron jobs, or the selected job if none is specified.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 			onlyFavorites, _ := cmd.Flags().GetBool("favorites")
-			options, err := parsing.ListOptions(cmd)
+			options, err := parsing.ListOptions(cmd, nil)
 			if err != nil {
 				return err
 			}

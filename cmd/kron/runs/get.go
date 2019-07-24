@@ -21,7 +21,7 @@ If multiple cron jobs matches the parameters, only the first is used.`,
 				return err
 			}
 			namespace, _ := cmd.Flags().GetString("namespace")
-			options, err := parsing.ListOptions(cmd)
+			options, err := parsing.ListOptions(cmd, nil)
 			if err != nil {
 				return err
 			}

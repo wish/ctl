@@ -1,12 +1,14 @@
 package client
 
-import "github.com/wish/ctl/pkg/client/filter"
-
-// Currently, all three options are the same and only support filtering.
+import (
+	"github.com/wish/ctl/pkg/client/filter"
+	"regexp"
+)
 
 // ListOptions is used to specific filtering on list operations
 type ListOptions struct {
 	filter.LabelMatch
+	Search *regexp.Regexp
 }
 
 // GetOptions is used to specific filtering on get operations

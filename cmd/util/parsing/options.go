@@ -4,6 +4,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/client/filter"
+	"regexp"
+	"strings"
 )
 
 // LabelMatchFromCmd automatically parses the "label" flag from a command
@@ -14,9 +16,25 @@ func LabelMatchFromCmd(cmd *cobra.Command) (filter.LabelMatch, error) {
 }
 
 // ListOptions parses a client.ListOptions from a command
-func ListOptions(cmd *cobra.Command) (client.ListOptions, error) {
+func ListOptions(cmd *cobra.Command, searches []string) (client.ListOptions, error) {
 	l, err := LabelMatchFromCmd(cmd)
-	return client.ListOptions{l}, err
+	if err != nil {
+		return client.ListOptions{}, err
+	}
+	var re *regexp.Regexp
+	if len(searches) > 0 {
+		// Check that each individual search is a valid regex
+		for _, s := range searches {
+			if _, err := regexp.Compile(s); err != nil {
+				return client.ListOptions{}, err
+			}
+		}
+		re, err = regexp.Compile("(" + strings.Join(searches, ")|(") + ")")
+	}
+	if err != nil {
+		return client.ListOptions{}, err
+	}
+	return client.ListOptions{LabelMatch: l, Search: re}, nil
 }
 
 // GetOptions parses a client.GetOptions from a command

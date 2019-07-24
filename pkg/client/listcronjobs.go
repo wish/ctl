@@ -25,7 +25,7 @@ func (c *Client) ListCronJobs(context string, namespace string, options ListOpti
 	for _, cj := range cronjobs.Items {
 		cjd := types.CronJobDiscovery{context, cj}
 		c.extension.Transform(&cjd)
-		if filter.MatchLabel(cjd, options.LabelMatch) { // TODO: Modularize to allow adding more search parameters
+		if filter.MatchLabel(cjd, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(cjd.Name)) { // TODO: Modularize to allow adding more search parameters
 			items = append(items, cjd)
 		}
 	}

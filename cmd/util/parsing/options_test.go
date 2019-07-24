@@ -27,13 +27,17 @@ func TestAllOptions(t *testing.T) {
 		{[]string{`--label=c in(a,z)`, `--label=a=b`}, false},
 		{[]string{`--label=c in (a)`}, false},
 		{[]string{`--label=a/c in (a)`}, false},
+		{[]string{`hello`}, false},
+		{[]string{`abc|def`}, false},
+		{[]string{`test.*`}, false},
+		{[]string{`cef)`}, true},
+		{[]string{`(cef`, `abc)`}, true},
 	}
 
 	for _, test := range tests {
 		cmd := &cobra.Command{
-			Args: cobra.ExactArgs(0),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				_, err1 := ListOptions(cmd)
+				_, err1 := ListOptions(cmd, args)
 				_, err2 := GetOptions(cmd)
 				_, err3 := LogOptions(cmd)
 
@@ -56,10 +60,10 @@ func TestAllOptions(t *testing.T) {
 
 		if err != nil {
 			if !test.err {
-				t.Error("Encountered unexpected error on", test.flags, ":", err)
+				t.Error("encountered unexpected error on", test.flags, ":", err)
 			}
 		} else if test.err {
-			t.Error("Expected an error but did not encounter one.", test.flags)
+			t.Error("expected an error but did not encounter one.", test.flags)
 		}
 	}
 }

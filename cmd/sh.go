@@ -9,10 +9,10 @@ import (
 
 func shCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sh pod [flags]",
+		Use:   "sh POD [flags]",
 		Short: "Exec $SHELL into the container of a specific pod",
 		Long: `Exec shell into the container of a specific pod.
-Note that this command only operates on one pod, if multiple pods match,
+Note that this command only operates on one pod, if multiple pods have the exact name,
 the command will only work on the first one found.
 If the pod has only one container, the container name is optional.
 If the pod has multiple containers, user have to choose one from them.`,
@@ -22,7 +22,7 @@ If the pod has multiple containers, user have to choose one from them.`,
 			namespace, _ := cmd.Flags().GetString("namespace")
 			container, _ := cmd.Flags().GetString("container")
 			shell, _ := cmd.Flags().GetString("shell")
-			options, err := parsing.ListOptions(cmd)
+			options, err := parsing.ListOptions(cmd, nil)
 			if err != nil {
 				return err
 			}

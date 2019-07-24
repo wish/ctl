@@ -17,7 +17,7 @@ If multiple cron job are found, only the first one will be executed.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
-			options, err := parsing.ListOptions(cmd)
+			options, err := parsing.ListOptions(cmd, nil)
 			if err != nil {
 				return err
 			}

@@ -26,20 +26,22 @@ func getResourceStr() string {
 
 func getCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get RESOURCE [flags]",
-		Short: "Get a list of resources",
-		Long:  "Get a list of resources\n\n" + getResourceStr(),
+		Use:   "get RESOURCE [NAME...] [flags]",
+		Short: "Prints a table of resources of a type",
+		Long: `Prints out a table of resource type matching the query.
+Optionally, it filters through names match any of the regular expressions set.` + "\n\n" + getResourceStr(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
-			options, err := parsing.ListOptions(cmd)
-			if err != nil {
-				return err
-			}
 
 			if len(args) == 0 {
 				defer cmd.Help()
 				return errors.New("no resource type provided")
+			}
+
+			options, err := parsing.ListOptions(cmd, args[1:])
+			if err != nil {
+				return err
 			}
 
 			switch args[0] {
@@ -56,7 +58,7 @@ func getCmd(c *client.Client) *cobra.Command {
 				}
 			default:
 				defer cmd.Help()
-				return errors.New(`The resource type "` + args[0] + `" was not found`)
+				return errors.New(`the resource type "` + args[0] + `" was not found`)
 			}
 			return nil
 		},

@@ -18,7 +18,7 @@ func describeCmd(c *client.Client) *cobra.Command {
 				return err
 			}
 			namespace, _ := cmd.Flags().GetString("namespace")
-			options, err := parsing.ListOptions(cmd)
+			options, err := parsing.ListOptions(cmd, nil)
 			if err != nil {
 				return err
 			}

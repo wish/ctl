@@ -7,7 +7,7 @@ import (
 
 // LogPodOverContexts retrieves logs of a single pod (uses first found if multiple)
 func (c *Client) LogPodOverContexts(contexts []string, namespace, name, container string, options LogOptions) (*rest.Result, error) {
-	pod, container, err := c.findPodWithContainer(contexts, namespace, name, container, ListOptions{options.LabelMatch})
+	pod, container, err := c.findPodWithContainer(contexts, namespace, name, container, ListOptions{options.LabelMatch, nil})
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (c *Client) LogPod(context, namespace, name, container string, options LogO
 
 	// Find first container
 	if container == "" || namespace == "" {
-		pod, err := c.findPod([]string{context}, namespace, name, ListOptions{options.LabelMatch})
+		pod, err := c.findPod([]string{context}, namespace, name, ListOptions{options.LabelMatch, nil})
 		if err != nil {
 			return nil, err
 		}

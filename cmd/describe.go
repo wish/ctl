@@ -27,27 +27,29 @@ func describeResourceStr() string {
 
 func describeCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "describe pods [flags]",
+		Use:   "describe pods [NAME...] [flags]",
 		Short: "Show details of a specific pod(s)",
-		Long:  "Print a detailed description of the pods specified by name.\n\n" + describeResourceStr(),
+		Long: `Print a detailed description of the pods specified by name.
+The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
-			options, err := parsing.ListOptions(cmd)
-			if err != nil {
-				return err
-			}
 
 			if len(args) == 0 {
 				defer cmd.Help()
 				return errors.New("no resource type provided")
 			}
 
+			options, err := parsing.ListOptions(cmd, nil)
+			if err != nil {
+				return err
+			}
+
 			switch args[0] {
 			case "pods", "pod", "po":
 				var pods []types.PodDiscovery
 				var err error
-				if len(args) == 1 {
+				if len(args) == 1 { // describe all
 					pods, err = c.ListPodsOverContexts(ctxs, namespace, options)
 				} else {
 					pods, err = c.FindPods(ctxs, namespace, args[1:], options)
@@ -61,8 +63,7 @@ func describeCmd(c *client.Client) *cobra.Command {
 				describePodList(pods)
 			default:
 				defer cmd.Help()
-				return errors.New(`The resource type "` + args[0] + `" was not found.
-See 'ctl describe'`)
+				return errors.New("the resource type \"" + args[0] + "\" was not found.\nSee 'ctl describe'")
 			}
 			return nil
 		},

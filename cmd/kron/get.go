@@ -18,7 +18,7 @@ func getCmd(c *client.Client) *cobra.Command {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 			onlyFavorites, _ := cmd.Flags().GetBool("favorites")
-			options, err := parsing.ListOptions(cmd)
+			options, err := parsing.ListOptions(cmd, nil)
 			if err != nil {
 				return err
 			}
