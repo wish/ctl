@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 
+	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	configcmd "github.com/wish/ctl/cmd/config"
@@ -13,57 +14,61 @@ import (
 
 func cmd() *cobra.Command {
 	// Placeholder client
-	c := client.GetPlaceholderClient()
+	var c *client.Client
+
+	viper.SetConfigName("config")
+	var conf string
+	if len(conf) == 0 {
+		if v, ok := os.LookupEnv("XDG_CONFIG_DIR"); ok {
+			conf = v + "/ctl/config.yml"
+		} else {
+			conf = os.Getenv("HOME") + "/.config/ctl/config.yml"
+		}
+	}
+
+	if k := viper.GetString("kubeconfig"); len(k) > 0 {
+		c = client.GetConfigClient(k)
+		// konf = true
+	} else {
+		c = client.GetDefaultConfigClient()
+	}
+
+	viper.SetConfigFile(conf)
+	if err := viper.ReadInConfig(); err != nil {
+		err = config.Create(conf)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+		if err = viper.ReadInConfig(); err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+	}
+
+	m, err := config.GetCtlExt()
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	if m == nil { // Read map from contexts
+		m = c.GetCtlExt()
+		config.WriteCtlExt(m)
+	}
+
+	c.AttachLabelForger(m)
 
 	cmd := &cobra.Command{
 		Use:          "ctl",
 		Short:        "A CLI tool for discovering k8s pods/logs across multiple clusters",
 		Long:         "ctl is a CLI tool for easily getting/exec pods/logs across multiple clusters/namespaces.",
 		SilenceUsage: true,
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// REVIEW: this is quite sketchy. Should use another method
-			// konf := false
-			if k, _ := cmd.Flags().GetString("kubeconfig"); len(k) > 0 {
-				*c = *client.GetConfigClient(k)
-				// konf = true
-			} else {
-				*c = *client.GetDefaultConfigClient()
-			}
-
-			viper.SetConfigName("config")
-			conf, _ := cmd.Flags().GetString("config")
-			if len(conf) == 0 {
-				if v, ok := os.LookupEnv("XDG_CONFIG_DIR"); ok {
-					conf = v + "/ctl/config.yml"
-				} else {
-					conf = os.Getenv("HOME") + "/.config/ctl/config.yml"
-				}
-			}
-			viper.SetConfigFile(conf)
-			if err := viper.ReadInConfig(); err != nil {
-				err = config.Create(conf)
-				if err != nil {
-					return err
-				}
-				if err = viper.ReadInConfig(); err != nil {
-					return err
-				}
-			}
-
-			m, err := config.GetCtlExt()
-			if err != nil {
-				return err
-			}
-			if m == nil { // Read map from contexts
-				m = c.GetCtlExt()
-				viper.Set("cluster-ext", m)
-				viper.WriteConfig()
-			}
-
-			c.AttachLabelForger(m)
-
-			return nil
-		},
+		// PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		// 	// REVIEW: this is quite sketchy. Should use another method
+		// 	// konf := fals
+		// 	return nil
+		// },
 	}
 
 	cmd.AddCommand(describeCmd(c))

@@ -35,7 +35,7 @@ Optionally, it filters through names match any of the regular expressions set.` 
 			namespace, _ := cmd.Flags().GetString("namespace")
 
 			if len(args) == 0 {
-				defer cmd.Help()
+				cmd.Help()
 				return errors.New("no resource type provided")
 			}
 
@@ -57,7 +57,7 @@ Optionally, it filters through names match any of the regular expressions set.` 
 					return err
 				}
 			default:
-				defer cmd.Help()
+				cmd.Help()
 				return errors.New(`the resource type "` + args[0] + `" was not found`)
 			}
 			return nil

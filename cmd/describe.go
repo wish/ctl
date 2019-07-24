@@ -36,7 +36,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 			namespace, _ := cmd.Flags().GetString("namespace")
 
 			if len(args) == 0 {
-				defer cmd.Help()
+				cmd.Help()
 				return errors.New("no resource type provided")
 			}
 
@@ -62,7 +62,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 				}
 				describePodList(pods)
 			default:
-				defer cmd.Help()
+				cmd.Help()
 				return errors.New("the resource type \"" + args[0] + "\" was not found.\nSee 'ctl describe'")
 			}
 			return nil
