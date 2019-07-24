@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 )
 
 func logsCmd(c *client.Client) *cobra.Command {
-	ret := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "logs pod [flags]",
 		Aliases: []string{"log"},
 		Short:   "Get log of a container in a pod",
@@ -33,13 +32,13 @@ func logsCmd(c *client.Client) *cobra.Command {
 				return err
 			}
 			// REVIEW: Format??
-			fmt.Println(string(raw))
+			cmd.Println(string(raw))
 
 			return nil
 		},
 	}
 
-	ret.Flags().StringP("container", "c", "", "Specify the container")
+	cmd.Flags().StringP("container", "c", "", "Specify the container")
 
-	return ret
+	return cmd
 }

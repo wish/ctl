@@ -64,11 +64,6 @@ func cmd() *cobra.Command {
 		Short:        "A CLI tool for discovering k8s pods/logs across multiple clusters",
 		Long:         "ctl is a CLI tool for easily getting/exec pods/logs across multiple clusters/namespaces.",
 		SilenceUsage: true,
-		// PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		// 	// REVIEW: this is quite sketchy. Should use another method
-		// 	// konf := fals
-		// 	return nil
-		// },
 	}
 
 	cmd.AddCommand(describeCmd(c))
@@ -82,8 +77,9 @@ func cmd() *cobra.Command {
 	cmd.PersistentFlags().StringSliceP("context", "x", nil, "Specify the context(s) to operate in. Defaults to all contexts.")
 	cmd.PersistentFlags().StringP("namespace", "n", "", "Specify the namespace within all the contexts specified. Defaults to all namespaces.")
 	cmd.PersistentFlags().StringArrayP("label", "l", nil, "Filter objects by label")
-	cmd.PersistentFlags().String("kubeconfig", "", "Custom kubeconfig file")
-	cmd.PersistentFlags().String("config", "", "Choose a different directory for ctl config")
+	for _, label := range viper.GetStringSlice("default_columns") {
+		cmd.PersistentFlags().String(label, "", "Default column label \""+label+"\"")
+	}
 
 	return cmd
 }
