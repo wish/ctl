@@ -3,6 +3,7 @@ package kron
 import (
 	"fmt"
 	"github.com/robfig/cron"
+	"github.com/spf13/viper"
 	"github.com/wish/ctl/pkg/client/types"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -22,10 +23,25 @@ func printCronJobList(lst []types.CronJobDiscovery, labelColumns []string) {
 		fmt.Println("No cron jobs found!")
 		return
 	}
+	// Insert default columns
+	defaultColumns := viper.GetStringSlice("default_columns")
+	var newLabelColumns []string
+	if len(defaultColumns) == 0 {
+		newLabelColumns = labelColumns
+	} else if len(labelColumns) == 0 {
+		newLabelColumns = defaultColumns
+	} else {
+		for _, s := range defaultColumns {
+			newLabelColumns = append(newLabelColumns, s)
+		}
+		for _, s := range labelColumns {
+			newLabelColumns = append(newLabelColumns, s)
+		}
+	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
 	fmt.Fprint(w, "CONTEXT\tNAME\tSCHEDULE\tSUSPEND\tACTIVE\tLAST SCHEDULE\tNEXT RUN\tAGE")
-	for _, l := range labelColumns {
+	for _, l := range newLabelColumns {
 		fmt.Fprint(w, "\t", strings.ToUpper(l))
 	}
 	fmt.Fprintln(w)
@@ -49,7 +65,7 @@ func printCronJobList(lst []types.CronJobDiscovery, labelColumns []string) {
 		// Age
 		fmt.Fprintf(w, "\t%v", time.Since(v.CreationTimestamp.Time).Round(time.Second))
 		// Labels
-		for _, l := range labelColumns {
+		for _, l := range newLabelColumns {
 			fmt.Fprint(w, "\t")
 			if _, ok := v.Labels[l]; ok {
 				fmt.Fprint(w, v.Labels[l])

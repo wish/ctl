@@ -2,6 +2,7 @@ package runs
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"github.com/wish/ctl/pkg/client/types"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -15,10 +16,25 @@ func printRunList(lst []types.RunDiscovery, labelColumns []string) {
 		fmt.Println("No runs found!")
 		return
 	}
+	// Insert default columns
+	defaultColumns := viper.GetStringSlice("default_columns")
+	var newLabelColumns []string
+	if len(defaultColumns) == 0 {
+		newLabelColumns = labelColumns
+	} else if len(labelColumns) == 0 {
+		newLabelColumns = defaultColumns
+	} else {
+		for _, s := range defaultColumns {
+			newLabelColumns = append(newLabelColumns, s)
+		}
+		for _, s := range labelColumns {
+			newLabelColumns = append(newLabelColumns, s)
+		}
+	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
 	fmt.Fprint(w, "NAME\tSTATE\tSTART\tEND")
-	for _, l := range labelColumns {
+	for _, l := range newLabelColumns {
 		fmt.Fprint(w, "\t", strings.ToUpper(l))
 	}
 	fmt.Fprintln(w)
@@ -41,7 +57,7 @@ func printRunList(lst []types.RunDiscovery, labelColumns []string) {
 			fmt.Fprint(w, "\t<none>")
 		}
 		// Labels
-		for _, l := range labelColumns {
+		for _, l := range newLabelColumns {
 			fmt.Fprint(w, "\t")
 			if _, ok := v.Labels[l]; ok {
 				fmt.Fprint(w, v.Labels[l])
