@@ -231,15 +231,15 @@ func getRunHandleFunc(cl *client.Client, templates *template.Template) func(http
 			http.Error(w, "Error finding pods of run", http.StatusInternalServerError)
 		}
 
-		logs := make(map[string]*rest.Result)
+		logs := make(map[string]rest.Result)
 
 		for _, pod := range pods {
-			res, err := cl.LogPod(pod.Context, pod.Namespace, pod.Name, "", client.LogOptions{})
+			req, err := cl.LogPod(pod.Context, pod.Namespace, pod.Name, "", client.LogOptions{})
 			if err != nil {
 				fmt.Println(err.Error())
 				continue // hmm
 			}
-			logs[pod.Name] = res
+			logs[pod.Name] = req.Do()
 		}
 
 		data := struct {

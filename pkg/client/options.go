@@ -19,4 +19,5 @@ type GetOptions struct {
 // LogOptions is used to specific filtering on log operations
 type LogOptions struct {
 	filter.LabelMatch
+	Follow bool
 }

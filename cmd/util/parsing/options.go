@@ -46,11 +46,11 @@ func ListOptions(cmd *cobra.Command, searches []string) (client.ListOptions, err
 // GetOptions parses a client.GetOptions from a command
 func GetOptions(cmd *cobra.Command) (client.GetOptions, error) {
 	l, err := LabelMatchFromCmd(cmd)
-	return client.GetOptions{l}, err
+	return client.GetOptions{LabelMatch: l}, err
 }
 
 // LogOptions parses a client.LogOptions from a command
 func LogOptions(cmd *cobra.Command) (client.LogOptions, error) {
 	l, err := LabelMatchFromCmd(cmd)
-	return client.LogOptions{l}, err
+	return client.LogOptions{LabelMatch: l}, err
 }

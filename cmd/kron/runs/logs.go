@@ -8,7 +8,7 @@ import (
 
 func logsCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "logs pod [flags]",
+		Use:     "logs run [flags]",
 		Aliases: []string{"log"},
 		Short:   "Get log of a container in a pod",
 		Long:    `Print logs from the pods belonging to a cron job run.`,
@@ -28,16 +28,18 @@ func logsCmd(c *client.Client) *cobra.Command {
 			}
 
 			for _, pod := range pods {
-				res, err := c.LogPod(pod.Context, pod.Namespace, pod.Name, container, client.LogOptions{lm})
+				req, err := c.LogPod(pod.Context, pod.Namespace, pod.Name, container, client.LogOptions{LabelMatch: lm})
+				if err != nil {
+					return err
+				}
 
+				res := req.Do()
 				raw, err := res.Raw()
 				if err != nil {
 					return err
 				}
-				// REVIEW: Format??
 				cmd.Printf("Logs from %s:\n", pod.Name)
 				cmd.Print(string(raw))
-				cmd.Println("------")
 			}
 			return nil
 		},

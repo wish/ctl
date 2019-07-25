@@ -175,7 +175,7 @@ type runPodDetails struct {
 	Logs string
 }
 
-func toFullRunDetails(path []string, run dtypes.RunDiscovery, logs map[string]*rest.Result) fullRunDetails {
+func toFullRunDetails(path []string, run dtypes.RunDiscovery, logs map[string]rest.Result) fullRunDetails {
 	pods := make([]runPodDetails, 0, len(logs))
 
 	for p, r := range logs {

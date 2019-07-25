@@ -6,7 +6,7 @@ import (
 )
 
 // LogPodOverContexts retrieves logs of a single pod (uses first found if multiple)
-func (c *Client) LogPodOverContexts(contexts []string, namespace, name, container string, options LogOptions) (*rest.Result, error) {
+func (c *Client) LogPodOverContexts(contexts []string, namespace, name, container string, options LogOptions) (*rest.Request, error) {
 	pod, container, err := c.findPodWithContainer(contexts, namespace, name, container, ListOptions{options.LabelMatch, nil})
 	if err != nil {
 		return nil, err
@@ -17,15 +17,14 @@ func (c *Client) LogPodOverContexts(contexts []string, namespace, name, containe
 		panic(err.Error())
 	}
 
-	req := cl.CoreV1().Pods(pod.Namespace).GetLogs(name, &v1.PodLogOptions{Container: container})
-	res := req.Do()
-	return &res, nil
+	req := cl.CoreV1().Pods(pod.Namespace).GetLogs(name, &v1.PodLogOptions{Container: container, Follow: options.Follow})
+	return req, nil
 }
 
 // LogPod retrieves logs from a container of a pod.
 // Operates on the first container if none specified.
 // TODO: The usage of this function is odd (support all containers???)
-func (c *Client) LogPod(context, namespace, name, container string, options LogOptions) (*rest.Result, error) {
+func (c *Client) LogPod(context, namespace, name, container string, options LogOptions) (*rest.Request, error) {
 	cl, err := c.getContextInterface(context)
 	if err != nil {
 		panic(err.Error())
@@ -43,7 +42,6 @@ func (c *Client) LogPod(context, namespace, name, container string, options LogO
 		namespace = pod.Namespace
 	}
 
-	req := cl.CoreV1().Pods(namespace).GetLogs(name, &v1.PodLogOptions{Container: container})
-	res := req.Do()
-	return &res, nil
+	req := cl.CoreV1().Pods(namespace).GetLogs(name, &v1.PodLogOptions{Container: container, Follow: options.Follow})
+	return req, nil
 }
