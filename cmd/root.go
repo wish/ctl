@@ -13,9 +13,6 @@ import (
 )
 
 func cmd() *cobra.Command {
-	// Placeholder client
-	var c *client.Client
-
 	viper.SetConfigName("config")
 	var conf string
 	if len(conf) == 0 {
@@ -24,13 +21,6 @@ func cmd() *cobra.Command {
 		} else {
 			conf = os.Getenv("HOME") + "/.config/ctl/config.yml"
 		}
-	}
-
-	if k := viper.GetString("kubeconfig"); len(k) > 0 {
-		c = client.GetConfigClient(k)
-		// konf = true
-	} else {
-		c = client.GetDefaultConfigClient()
 	}
 
 	viper.SetConfigFile(conf)
@@ -44,6 +34,14 @@ func cmd() *cobra.Command {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
+	}
+
+	var c *client.Client
+	if k := viper.GetString("kubeconfig"); len(k) > 0 {
+		c = client.GetConfigClient(k)
+		// konf = true
+	} else {
+		c = client.GetDefaultConfigClient()
 	}
 
 	m, err := config.GetCtlExt()

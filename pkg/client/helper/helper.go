@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"flag"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,23 +10,16 @@ import (
 
 // GetKubeConfigPath returns the default location of a kubeconfig file
 func GetKubeConfigPath() string {
-	// For multiple calls
-	if fl := flag.Lookup("kubeconfig"); fl != nil {
-		return fl.Value.String()
+	// TODO: handle multiple paths in KUBECONFIG
+	if fl := os.Getenv("KUBECONFIG"); fl != "" {
+		return fl
 	}
-	// Set kubeconfig value
-	var kubeconfig *string
-	var home string
-	if home = os.Getenv("HOME"); home == "" {
-		home = os.Getenv("USERPROFILE")
+	home, err := os.UserHomeDir()
+	if err != nil { // Can't find home dir
+		panic(err.Error())
 	}
-	if home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	flag.Parse()
-	return *kubeconfig
+
+	return filepath.Join(home, ".kube", "config")
 }
 
 // GetContexts returns a list of clusters from a config file
