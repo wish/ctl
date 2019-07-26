@@ -8,16 +8,16 @@ import (
 
 func webCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
-		Use:   "web [port]",
+		Use:   "web ADDR",
 		Short: "Serves a web ui of kron features",
-		Long: `Runs a web server on the specified localhost port.
-If no port is specified, runs on port 5766.`,
+		Long: `Runs a web server on the address.
+If no address is specified, runs on localhost:5766.`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
 				web.Serve(c, ":5766")
 			} else {
-				web.Serve(c, ":"+args[0])
+				web.Serve(c, args[0])
 			}
 		},
 	}

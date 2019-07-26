@@ -19,10 +19,6 @@ func Serve(cl *client.Client, endpoint string) {
 		"Title": strings.Title,
 	}).ParseGlob("pkg/web/template/*"))
 
-	// templates = templates.Funcs(template.FuncMap{
-	// 	"Title": strings.Title,
-	// })
-
 	// Main page
 	http.HandleFunc("/", getDashHandleFunc(cl, templates))
 
