@@ -35,7 +35,7 @@ func ListOptions(cmd *cobra.Command, searches []string) (client.ListOptions, err
 				return client.ListOptions{}, err
 			}
 		}
-		re, err = regexp.Compile("(" + strings.Join(searches, ")|(") + ")")
+		re, err = regexp.Compile("^(" + strings.Join(searches, ")|^(") + ")")
 	}
 	if err != nil {
 		return client.ListOptions{}, err
