@@ -2,6 +2,8 @@ package web
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
+	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/client/types"
 	"html/template"
@@ -12,13 +14,17 @@ import (
 )
 
 // Serve runs a webserver for kron at the specified url
-func Serve(endpoint string) {
-	cl := client.GetDefaultConfigClient()
+func Serve(cl *client.Client, endpoint string) {
+	templates := template.Must(template.New("all").Funcs(template.FuncMap{
+		"Title": strings.Title,
+	}).ParseGlob("pkg/web/template/*"))
 
-	templates := template.Must(template.ParseGlob("pkg/web/template/*"))
+	// templates = templates.Funcs(template.FuncMap{
+	// 	"Title": strings.Title,
+	// })
 
 	// Main page
-	http.HandleFunc("/", getAdvDashHandleFunc(cl, templates))
+	http.HandleFunc("/", getDashHandleFunc(cl, templates))
 
 	// Advanced dashboard
 	http.HandleFunc("/advanced", getAdvDashHandleFunc(cl, templates))
@@ -42,17 +48,19 @@ func Serve(endpoint string) {
 	fmt.Println(http.ListenAndServe(endpoint, nil))
 }
 
-func getAdvDashHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
+func getDashHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := struct {
-			Page      page
-			Contexts  map[string]bool
-			Namespace string
-			Search    string
-			Cronjobs  []cardDetails
+			Page           page
+			Contexts       map[string]bool
+			Namespace      string
+			Search         string
+			Cronjobs       []cardDetails
+			DefaultColumns map[string]string
 		}{
-			Page:     page{Title: "Advanced Dashboard - Kron", Active: "advanced"},
-			Contexts: make(map[string]bool),
+			Page:           page{Title: "Dashboard - Kron", Active: "dashboard"},
+			Contexts:       make(map[string]bool),
+			DefaultColumns: make(map[string]string),
 		}
 
 		// Contexts
@@ -68,13 +76,29 @@ func getAdvDashHandleFunc(cl *client.Client, templates *template.Template) func(
 			}
 		}
 
+		// Default columns
+		var dcLabelsRaw []string
+
+		for _, col := range viper.GetStringSlice("default_columns") {
+			v := r.URL.Query().Get(col)
+			data.DefaultColumns[col] = v
+			if len(v) > 0 {
+				dcLabelsRaw = append(dcLabelsRaw, col+"="+v)
+			}
+		}
+
+		labelMatch, err := parsing.LabelMatchSlice(dcLabelsRaw)
+		if err != nil {
+			fmt.Println("error encountered when parsing default columns: ", err.Error())
+		}
+
 		namespace := r.URL.Query().Get("namespace")
 		data.Namespace = namespace
 
 		search := r.URL.Query().Get("search")
 		data.Search = search
 
-		cronjobs, err := cl.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{})
+		cronjobs, err := cl.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{LabelMatch: labelMatch})
 		if err != nil {
 			panic(err.Error())
 		}
@@ -91,7 +115,87 @@ func getAdvDashHandleFunc(cl *client.Client, templates *template.Template) func(
 			}
 		}
 
-		runs, err := cl.ListRunsOverContexts(ctxs, namespace, client.ListOptions{})
+		runs, err := cl.ListRunsOverContexts(ctxs, namespace, client.ListOptions{LabelMatch: labelMatch})
+		if err != nil {
+			panic(err.Error())
+		}
+
+		data.Cronjobs = toCardDetailsList(filtered, runs)
+
+		if err := templates.ExecuteTemplate(w, "dash.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
+func getAdvDashHandleFunc(cl *client.Client, templates *template.Template) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := struct {
+			Page           page
+			Contexts       map[string]bool
+			Namespace      string
+			Search         string
+			Cronjobs       []cardDetails
+			DefaultColumns map[string]string
+		}{
+			Page:           page{Title: "Advanced Dashboard - Kron", Active: "advanced"},
+			Contexts:       make(map[string]bool),
+			DefaultColumns: make(map[string]string),
+		}
+
+		// Contexts
+		for _, x := range cl.GetAllContexts() {
+			data.Contexts[x] = false
+		}
+
+		// Check valid
+		ctxs := r.URL.Query()["context"]
+		for _, c := range ctxs {
+			if _, ok := data.Contexts[c]; ok {
+				data.Contexts[c] = true
+			}
+		}
+
+		// Default columns
+		var dcLabelsRaw []string
+
+		for _, col := range viper.GetStringSlice("default_columns") {
+			v := r.URL.Query().Get(col)
+			data.DefaultColumns[col] = v
+			if len(v) > 0 {
+				dcLabelsRaw = append(dcLabelsRaw, col+"="+v)
+			}
+		}
+
+		labelMatch, err := parsing.LabelMatchSlice(dcLabelsRaw)
+		if err != nil {
+			fmt.Println("error encountered when parsing default columns: ", err.Error())
+		}
+
+		namespace := r.URL.Query().Get("namespace")
+		data.Namespace = namespace
+
+		search := r.URL.Query().Get("search")
+		data.Search = search
+
+		cronjobs, err := cl.ListCronJobsOverContexts(ctxs, namespace, client.ListOptions{LabelMatch: labelMatch})
+		if err != nil {
+			panic(err.Error())
+		}
+
+		// Filter searches
+		var filtered []types.CronJobDiscovery
+		if search == "" {
+			filtered = cronjobs
+		} else {
+			for _, c := range cronjobs {
+				if strings.Contains(c.Name, search) {
+					filtered = append(filtered, c)
+				}
+			}
+		}
+
+		runs, err := cl.ListRunsOverContexts(ctxs, namespace, client.ListOptions{LabelMatch: labelMatch})
 		if err != nil {
 			panic(err.Error())
 		}

@@ -15,9 +15,9 @@ If no port is specified, runs on port 5766.`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				web.Serve(":5766")
+				web.Serve(c, ":5766")
 			} else {
-				web.Serve(":" + args[0])
+				web.Serve(c, ":"+args[0])
 			}
 		},
 	}

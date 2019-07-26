@@ -24,6 +24,7 @@ type cardDetails struct {
 	Active    int
 	Suspend   bool
 	LastRun   runStatus
+	Labels    map[string]string
 }
 
 //
@@ -55,6 +56,7 @@ func toCardDetails(c *dtypes.CronJobDiscovery, r *dtypes.RunDiscovery) cardDetai
 		Active:    len(c.Status.Active),
 		Suspend:   *(c.Spec.Suspend),
 		LastRun:   runStatus,
+		Labels:    c.GetLabels(),
 	}
 }
 

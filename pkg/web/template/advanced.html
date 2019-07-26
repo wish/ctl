@@ -60,6 +60,9 @@
           <th scope="col">Suspend</th>
           <th scope="col">Active</th>
           <th scope="col">Last Run</th>
+          {{range $label, $_ := .DefaultColumns}}
+          <th scope="col">{{$label | Title}}</th>
+          {{end}}
         </tr>
       </thead>
       <tbody>
@@ -71,6 +74,11 @@
           <td>{{.Suspend}}</td>
           <td>{{.Active}}</td>
           <td>{{.LastRun}}</td>
+          {{with $labels := .Labels}}
+            {{range $label, $_ := $.DefaultColumns}}
+              <td>{{index $labels $label}}</td>
+            {{end}}
+          {{end}}
         </tr>
       {{end}}
       </tbody>
