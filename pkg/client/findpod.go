@@ -2,6 +2,7 @@ package client
 
 import (
 	"errors"
+	"fmt"
 	"github.com/wish/ctl/pkg/client/types"
 	"strings"
 )
@@ -28,24 +29,27 @@ func (c *Client) findPod(contexts []string, namespace, name string, options List
 	return &pod, nil
 }
 
-func (c *Client) findPodWithContainer(contexts []string, namespace, name, container string, options ListOptions) (*types.PodDiscovery, string, error) {
-	pod, err := c.findPod(contexts, namespace, name, options)
+func (c *Client) findPodWithContainer(contexts []string, namespace, name, optionalContainer string, options ListOptions) (pod *types.PodDiscovery, container string, err error) {
+	pod, err = c.findPod(contexts, namespace, name, options)
 	if err != nil {
-		return pod, "", err
+		return
 	}
 
-	// Check for container
-	if container == "" { // No container specified
-		if len(pod.Spec.Containers) == 1 { // Only container
+	if optionalContainer == "" {
+		if len(pod.Spec.Containers) > 0 {
 			container = pod.Spec.Containers[0].Name
-		} else {
-			conts := make([]string, len(pod.Spec.Containers))
-			for i, c := range pod.Spec.Containers {
-				conts[i] = c.Name
+			var s []string
+			for _, c := range pod.Spec.Containers {
+				s = append(s, c.Name)
 			}
-			return nil, "", errors.New("No container was specified! Choose one of the containers: " + strings.Join(conts, ", "))
+			fmt.Println("Available containers are:", strings.Join(s, ", "))
+			fmt.Println("No container specified, defaulting to the first container:", container)
+		} else {
+			err = errors.New("there are no containers on this pod")
 		}
+	} else {
+		container = optionalContainer
 	}
 
-	return pod, container, nil
+	return
 }
