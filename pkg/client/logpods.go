@@ -6,6 +6,7 @@ import (
 	"io"
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/rest"
+	"strings"
 )
 
 // LogPodOverContexts retrieves logs of a single pod (uses first found if multiple)
@@ -35,6 +36,18 @@ func (c *Client) LogPodsOverContexts(contexts []string, namespace, container str
 
 	readers := make([]io.Reader, len(pods))
 
+	// Processing of log string
+	var processor func(string) string
+	if options.Timestamps {
+		processor = func(s string) string {
+			return s + "\n"
+		}
+	} else {
+		processor = func(s string) string {
+			return s[strings.Index(s, " ")+1:] + "\n"
+		}
+	}
+
 	// Choose container
 	for i, pod := range pods {
 		var req *rest.Request
@@ -56,7 +69,7 @@ func (c *Client) LogPodsOverContexts(contexts []string, namespace, container str
 	}
 
 	fmt.Printf("Opened %d connections to pods\n", len(readers))
-	return logsync.Sync(readers), nil
+	return logsync.Sync(readers, processor), nil
 }
 
 // LogPod retrieves logs from a container of a pod.

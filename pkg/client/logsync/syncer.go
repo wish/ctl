@@ -8,24 +8,28 @@ import (
 	"time"
 )
 
+// Helper struct to contain one log stream/buffer
 type queued struct {
-	buffer  []string
-	scanner *bufio.Scanner
-	mutex   sync.Mutex
+	buffer  []string       // All logs read from this stream (in order)
+	scanner *bufio.Scanner // Stream
+	mutex   sync.Mutex     // Buffer access mutex
 }
 
+// Returns whether more lines are available from this stream
 func (q *queued) ready() bool {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
 	return len(q.buffer) > 0
 }
 
+// Get the frontmost line
 func (q *queued) peek() string {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
 	return q.buffer[0]
 }
 
+// Remove the frontmost line
 func (q *queued) pop() {
 	q.mutex.Lock()
 	q.buffer = q.buffer[1:]
@@ -33,7 +37,7 @@ func (q *queued) pop() {
 }
 
 // Sync returns an io.Reader that synchronizes all the readers chronologically
-func Sync(readers []io.Reader) io.Reader {
+func Sync(readers []io.Reader, processor func(string) string) io.Reader {
 	qs := make([]*queued, len(readers))
 
 	// Return
@@ -77,25 +81,23 @@ func Sync(readers []io.Reader) io.Reader {
 		}
 		if ind != -1 {
 			s := qs[ind].peek()
-			writer.Write([]byte(s[strings.Index(s, " ")+1:] + "\n"))
+			writer.Write([]byte(processor(s)))
 			qs[ind].pop()
 			logs--
 		}
 	}
 
-	for i, reader := range readers {
+	for i, r := range readers {
 		q := &queued{
-			scanner: bufio.NewScanner(reader),
+			scanner: bufio.NewScanner(r),
 		}
 
 		go func() {
 			for q.scanner.Scan() {
-				mutex.Lock()
 				q.mutex.Lock()
 				q.buffer = append(q.buffer, q.scanner.Text())
 				logs++
 				q.mutex.Unlock()
-				mutex.Unlock()
 				action()
 			}
 			activeLock.Lock()

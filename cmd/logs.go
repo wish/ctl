@@ -19,9 +19,11 @@ func logsCmd(c *client.Client) *cobra.Command {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
 			container, _ := cmd.Flags().GetString("container")
-			follow, _ := cmd.Flags().GetBool("follow")
+
 			options, err := parsing.LogOptions(cmd, args)
-			options.Follow = follow
+			// TODO: move these options to parsing (add to kron)
+			options.Follow, _ = cmd.Flags().GetBool("follow")
+			options.Timestamps, _ = cmd.Flags().GetBool("timestamps")
 
 			if err != nil {
 				return err
@@ -46,6 +48,7 @@ func logsCmd(c *client.Client) *cobra.Command {
 
 	cmd.Flags().StringP("container", "c", "", "Specify the container")
 	cmd.Flags().BoolP("follow", "f", false, "Specify if the logs should be streamed")
+	cmd.Flags().Bool("timestamps", false, "Add a RFC3339Nano format timestamp to the beginning of each line")
 
 	return cmd
 }
