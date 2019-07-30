@@ -39,7 +39,7 @@ func TestAllOptions(t *testing.T) {
 			RunE: func(cmd *cobra.Command, args []string) error {
 				_, err1 := ListOptions(cmd, args)
 				_, err2 := GetOptions(cmd)
-				_, err3 := LogOptions(cmd)
+				_, err3 := LogOptions(cmd, args)
 
 				if err1 != nil {
 					return err1

@@ -20,4 +20,5 @@ type GetOptions struct {
 type LogOptions struct {
 	filter.LabelMatch
 	Follow bool
+	Search *regexp.Regexp
 }

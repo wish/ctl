@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"github.com/wish/ctl/pkg/client/types"
 	"strings"
 )
 
@@ -40,20 +39,14 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 				return errors.New("no resource type provided")
 			}
 
-			options, err := parsing.ListOptions(cmd, nil)
+			options, err := parsing.ListOptions(cmd, args[1:])
 			if err != nil {
 				return err
 			}
 
 			switch args[0] {
 			case "pods", "pod", "po":
-				var pods []types.PodDiscovery
-				var err error
-				if len(args) == 1 { // describe all
-					pods, err = c.ListPodsOverContexts(ctxs, namespace, options)
-				} else {
-					pods, err = c.FindPods(ctxs, namespace, args[1:], options)
-				}
+				pods, err := c.ListPodsOverContexts(ctxs, namespace, options)
 				if err != nil {
 					return err
 				}

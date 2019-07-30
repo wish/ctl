@@ -5,6 +5,7 @@ import (
 	"io"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
 )
@@ -28,8 +29,8 @@ func (c *Client) ExecInPod(contexts []string, namespace, name, container string,
 		Namespace(pod.Namespace).
 		SubResource("exec")
 
-	scheme := runtime.NewScheme()
-	if err := corev1.AddToScheme(scheme); err != nil {
+	myscheme := runtime.NewScheme()
+	if err := corev1.AddToScheme(myscheme); err != nil {
 		return err
 	}
 
@@ -39,8 +40,8 @@ func (c *Client) ExecInPod(contexts []string, namespace, name, container string,
 		Stdin:     stdin != nil,
 		Stdout:    true,
 		Stderr:    true,
-		TTY:       false,
-	}, runtime.NewParameterCodec(scheme))
+		TTY:       true,
+	}, scheme.ParameterCodec)
 
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		&clientcmd.ClientConfigLoadingRules{ExplicitPath: helper.GetKubeConfigPath()},
@@ -55,7 +56,7 @@ func (c *Client) ExecInPod(contexts []string, namespace, name, container string,
 		Stdin:  stdin,
 		Stdout: stdout,
 		Stderr: stderr,
-		Tty:    false,
+		Tty:    true,
 	})
 	if err != nil {
 		return err

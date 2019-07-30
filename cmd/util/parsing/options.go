@@ -50,7 +50,20 @@ func GetOptions(cmd *cobra.Command) (client.GetOptions, error) {
 }
 
 // LogOptions parses a client.LogOptions from a command
-func LogOptions(cmd *cobra.Command) (client.LogOptions, error) {
+func LogOptions(cmd *cobra.Command, searches []string) (client.LogOptions, error) {
 	l, err := LabelMatchFromCmd(cmd)
-	return client.LogOptions{LabelMatch: l}, err
+	var re *regexp.Regexp
+	if len(searches) > 0 {
+		// Check that each individual search is a valid regex
+		for _, s := range searches {
+			if _, err := regexp.Compile(s); err != nil {
+				return client.LogOptions{}, err
+			}
+		}
+		re, err = regexp.Compile("^(" + strings.Join(searches, ")|^(") + ")")
+	}
+	if err != nil {
+		return client.LogOptions{}, err
+	}
+	return client.LogOptions{LabelMatch: l, Follow: false, Search: re}, nil
 }
