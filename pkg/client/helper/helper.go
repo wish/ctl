@@ -3,7 +3,6 @@ package helper
 import (
 	"os"
 	"path/filepath"
-	"strings"
 
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -33,11 +32,8 @@ func GetContexts(configpath string) []string {
 	}
 
 	ctxs := make([]string, 0, len(config.Contexts))
-	for k := range config.Contexts { // Currently ignoring mappings
-		// Hardcode ignore test clusters
-		if !strings.Contains(k, "test") { // REVIEW: Remove this when possible
-			ctxs = append(ctxs, k)
-		}
+	for k := range config.Contexts {
+		ctxs = append(ctxs, k)
 	}
 
 	return ctxs
