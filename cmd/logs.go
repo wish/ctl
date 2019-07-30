@@ -26,30 +26,19 @@ func logsCmd(c *client.Client) *cobra.Command {
 				return err
 			}
 
-			if follow {
-				reader, err := c.LogPodsOverContexts(ctxs, namespace, container, options)
-				if err != nil {
-					return err
-				}
-				scanner := bufio.NewScanner(reader)
+			reader, err := c.LogPodsOverContexts(ctxs, namespace, container, options)
+			if err != nil {
+				return err
+			}
+			scanner := bufio.NewScanner(reader)
 
-				for scanner.Scan() {
-					cmd.Println(scanner.Text())
-				}
-
-				if err = scanner.Err(); err != nil {
-					return err
-				}
-			} else {
-				req, err := c.LogPodOverContexts(ctxs, namespace, args[0], container, options)
-				res := req.Do()
-				raw, err := res.Raw()
-				if err != nil {
-					return err
-				}
-				cmd.Print(string(raw))
+			for scanner.Scan() {
+				cmd.Println(scanner.Text())
 			}
 
+			if err = scanner.Err(); err != nil {
+				return err
+			}
 			return nil
 		},
 	}

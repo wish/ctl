@@ -60,16 +60,22 @@ func Sync(readers []io.Reader) io.Reader {
 	// Return
 	reader, writer := io.Pipe()
 
+	// number of active logs
+	active := len(readers)
+	var activeLock sync.RWMutex
+
 	// Action mutex
 	var mutex sync.Mutex
 	mutex.Lock()
-	active := 0 // number of active
+	logs := 0 // number of logs lines in all pods
 
 	action := func() {
-		active++
 		mutex.Lock()
 		defer mutex.Unlock()
-		if active == 0 {
+		if logs == 0 {
+			if active == 0 {
+				writer.Close()
+			}
 			return
 		}
 		recent := time.Time{}
@@ -92,11 +98,36 @@ func Sync(readers []io.Reader) io.Reader {
 			s := qs[ind].peek()
 			writer.Write([]byte(s[strings.Index(s, " ")+1:] + "\n"))
 			qs[ind].pop()
+			logs--
 		}
 	}
 
 	for i, reader := range readers {
-		qs[i] = getQueued(reader, action)
+		q := queued{
+			scanner: bufio.NewScanner(reader),
+		}
+
+		go func() {
+			for {
+				if q.scanner.Scan() {
+					mutex.Lock()
+					q.mutex.Lock()
+					q.buffer = append(q.buffer, q.scanner.Text())
+					logs++
+					q.mutex.Unlock()
+					mutex.Unlock()
+				} else { // what to do when errors
+					activeLock.Lock()
+					active--
+					activeLock.Unlock()
+					break
+				}
+				action()
+			}
+			action()
+		}()
+
+		qs[i] = &q
 	}
 
 	mutex.Unlock()
