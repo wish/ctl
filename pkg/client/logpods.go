@@ -42,9 +42,9 @@ func (c *Client) LogPodsOverContexts(contexts []string, namespace, container str
 		cl, _ := c.getContextInterface(pod.Context)
 		// detect container
 		if container == "" {
-			req = cl.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &v1.PodLogOptions{Container: pod.Spec.Containers[0].Name, Timestamps: true})
+			req = cl.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &v1.PodLogOptions{Container: pod.Spec.Containers[0].Name, Follow: options.Follow, Timestamps: true})
 		} else {
-			req = cl.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &v1.PodLogOptions{Container: container, Timestamps: true})
+			req = cl.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &v1.PodLogOptions{Container: container, Follow: options.Follow, Timestamps: true})
 		}
 
 		readCloser, err := req.Stream()

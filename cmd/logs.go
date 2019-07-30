@@ -22,6 +22,7 @@ func logsCmd(c *client.Client) *cobra.Command {
 			follow, _ := cmd.Flags().GetBool("follow")
 			options, err := parsing.LogOptions(cmd, args)
 			options.Follow = follow
+
 			if err != nil {
 				return err
 			}

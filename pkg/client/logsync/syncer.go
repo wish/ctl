@@ -32,27 +32,6 @@ func (q *queued) pop() {
 	q.mutex.Unlock()
 }
 
-func getQueued(reader io.Reader, action func()) *queued {
-	q := queued{
-		scanner: bufio.NewScanner(reader),
-	}
-
-	go func() {
-		for {
-			if q.scanner.Scan() {
-				q.mutex.Lock()
-				q.buffer = append(q.buffer, q.scanner.Text())
-				q.mutex.Unlock()
-			} else { // what to do when errors
-				break
-			}
-			action()
-		}
-	}()
-
-	return &q
-}
-
 // Sync returns an io.Reader that synchronizes all the readers chronologically
 func Sync(readers []io.Reader) io.Reader {
 	qs := make([]*queued, len(readers))
@@ -73,9 +52,11 @@ func Sync(readers []io.Reader) io.Reader {
 		mutex.Lock()
 		defer mutex.Unlock()
 		if logs == 0 {
+			activeLock.RLock()
 			if active == 0 {
 				writer.Close()
 			}
+			activeLock.RUnlock()
 			return
 		}
 		recent := time.Time{}
@@ -103,31 +84,27 @@ func Sync(readers []io.Reader) io.Reader {
 	}
 
 	for i, reader := range readers {
-		q := queued{
+		q := &queued{
 			scanner: bufio.NewScanner(reader),
 		}
 
 		go func() {
-			for {
-				if q.scanner.Scan() {
-					mutex.Lock()
-					q.mutex.Lock()
-					q.buffer = append(q.buffer, q.scanner.Text())
-					logs++
-					q.mutex.Unlock()
-					mutex.Unlock()
-				} else { // what to do when errors
-					activeLock.Lock()
-					active--
-					activeLock.Unlock()
-					break
-				}
+			for q.scanner.Scan() {
+				mutex.Lock()
+				q.mutex.Lock()
+				q.buffer = append(q.buffer, q.scanner.Text())
+				logs++
+				q.mutex.Unlock()
+				mutex.Unlock()
 				action()
 			}
+			activeLock.Lock()
+			active--
+			activeLock.Unlock()
 			action()
 		}()
 
-		qs[i] = &q
+		qs[i] = q
 	}
 
 	mutex.Unlock()
