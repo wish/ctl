@@ -11,19 +11,19 @@ import (
 	"sync"
 )
 
-// ListRuns returns a list of all jobs that match the query
-func (c *Client) ListRuns(context string, namespace string, options ListOptions) ([]types.RunDiscovery, error) {
+// ListJobs returns a list of all jobs that match the query
+func (c *Client) ListJobs(context string, namespace string, options ListOptions) ([]types.JobDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
 	}
-	runs, err := cs.BatchV1().Jobs(namespace).List(metav1.ListOptions{})
+	jobs, err := cs.BatchV1().Jobs(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
-	var items []types.RunDiscovery
-	for _, run := range runs.Items {
-		r := types.RunDiscovery{context, run}
+	var items []types.JobDiscovery
+	for _, job := range jobs.Items {
+		r := types.JobDiscovery{context, job}
 		c.extension.Transform(&r)
 		if filter.MatchLabel(r, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(r.Name)) {
 			items = append(items, r)
@@ -32,8 +32,8 @@ func (c *Client) ListRuns(context string, namespace string, options ListOptions)
 	return items, nil
 }
 
-// ListRunsOverContexts is like ListRuns but operates over multiple clusters
-func (c *Client) ListRunsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.RunDiscovery, error) {
+// ListJobsOverContexts is like ListJobs but operates over multiple clusters
+func (c *Client) ListJobsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.JobDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
 	} else {
@@ -44,14 +44,14 @@ func (c *Client) ListRunsOverContexts(contexts []string, namespace string, optio
 	wait.Add(len(contexts))
 
 	var mutex sync.Mutex
-	var ret []types.RunDiscovery
+	var ret []types.JobDiscovery
 	var failed []string
 
 	for _, ctx := range contexts {
 		go func(ctx string) {
 			defer wait.Done()
 
-			runs, err := c.ListRuns(ctx, namespace, options)
+			jobs, err := c.ListJobs(ctx, namespace, options)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Could not connect to cluster \"%s\": %v\n", ctx, err)
 				failed = append(failed, ctx)
@@ -59,8 +59,8 @@ func (c *Client) ListRunsOverContexts(contexts []string, namespace string, optio
 			}
 
 			mutex.Lock()
-			for _, run := range runs {
-				ret = append(ret, run)
+			for _, job := range jobs {
+				ret = append(ret, job)
 			}
 			mutex.Unlock()
 		}(ctx)
@@ -73,25 +73,25 @@ func (c *Client) ListRunsOverContexts(contexts []string, namespace string, optio
 	return ret, nil
 }
 
-// ListRunsOfCronJob returns a list of all jobs belonging to a cron job
-func (c *Client) ListRunsOfCronJob(contexts []string, namespace, cronjobName string, options ListOptions) ([]types.RunDiscovery, error) {
+// ListJobsOfCronJob returns a list of all jobs belonging to a cron job
+func (c *Client) ListJobsOfCronJob(contexts []string, namespace, cronjobName string, options ListOptions) ([]types.JobDiscovery, error) {
 	cronjob, err := c.findCronJob(contexts, namespace, cronjobName, options)
 	if err != nil {
 		return nil, err
 	}
 
 	// Assuming that jobs started are in the same location
-	list, err := c.ListRuns(cronjob.Context, cronjob.Namespace, options)
+	list, err := c.ListJobs(cronjob.Context, cronjob.Namespace, options)
 	if err != nil {
 		return nil, err
 	}
 
-	var ret []types.RunDiscovery
-	for _, r := range list {
+	var ret []types.JobDiscovery
+	for _, j := range list {
 		// Check if has owner reference
-		for _, o := range r.OwnerReferences {
+		for _, o := range j.OwnerReferences {
 			if o.UID == cronjob.UID { // matches
-				ret = append(ret, r)
+				ret = append(ret, j)
 				break
 			}
 		}

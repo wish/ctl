@@ -75,14 +75,14 @@ func (c *Client) ListPodsOverContexts(contexts []string, namespace string, optio
 	return ret, nil
 }
 
-// ListPodsOfRun returns a list of all pods belonging to a job
-func (c *Client) ListPodsOfRun(contexts []string, namespace, runName string, options ListOptions) ([]types.PodDiscovery, error) {
+// ListPodsOfJob returns a list of all pods belonging to a job
+func (c *Client) ListPodsOfJob(contexts []string, namespace, jobName string, options ListOptions) ([]types.PodDiscovery, error) {
 	pods, err := c.ListPodsOverContexts(contexts, namespace, options)
 	if err != nil {
 		return nil, err
 	}
 
-	run, err := c.findRun(contexts, namespace, runName, options)
+	job, err := c.findJob(contexts, namespace, jobName, options)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (c *Client) ListPodsOfRun(contexts []string, namespace, runName string, opt
 	for _, p := range pods {
 		// Check if has owner reference
 		for _, o := range p.OwnerReferences {
-			if o.UID == run.UID { // matches
+			if o.UID == job.UID { // matches
 				ret = append(ret, p)
 				break
 			}

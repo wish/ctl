@@ -37,7 +37,7 @@ const (
 	runRunning runStatus = "running"
 )
 
-func toCardDetails(c *dtypes.CronJobDiscovery, r *dtypes.RunDiscovery) cardDetails {
+func toCardDetails(c *dtypes.CronJobDiscovery, r *dtypes.JobDiscovery) cardDetails {
 	var runStatus runStatus
 	if r == nil {
 		runStatus = runNA
@@ -60,14 +60,14 @@ func toCardDetails(c *dtypes.CronJobDiscovery, r *dtypes.RunDiscovery) cardDetai
 	}
 }
 
-func toCardDetailsList(lst []dtypes.CronJobDiscovery, runs []dtypes.RunDiscovery) []cardDetails {
+func toCardDetailsList(lst []dtypes.CronJobDiscovery, jobs []dtypes.JobDiscovery) []cardDetails {
 	ret := make([]cardDetails, len(lst))
-	recent := make(map[types.UID]*dtypes.RunDiscovery)
+	recent := make(map[types.UID]*dtypes.JobDiscovery)
 
-	for i := range runs {
-		if len(runs[i].OwnerReferences) == 1 {
-			if x, ok := recent[runs[i].OwnerReferences[0].UID]; !ok || runs[i].Status.StartTime.After(x.Status.StartTime.Time) {
-				recent[runs[i].OwnerReferences[0].UID] = &runs[i]
+	for i := range jobs {
+		if len(jobs[i].OwnerReferences) == 1 {
+			if x, ok := recent[jobs[i].OwnerReferences[0].UID]; !ok || jobs[i].Status.StartTime.After(x.Status.StartTime.Time) {
+				recent[jobs[i].OwnerReferences[0].UID] = &jobs[i]
 			}
 		}
 	}
@@ -96,7 +96,7 @@ type runDetails struct {
 	End    string
 }
 
-type byStartTime []dtypes.RunDiscovery
+type byStartTime []dtypes.JobDiscovery
 
 func (l byStartTime) Len() int      { return len(l) }
 func (l byStartTime) Swap(i, j int) { l[i], l[j] = l[j], l[i] }
@@ -104,8 +104,8 @@ func (l byStartTime) Less(i, j int) bool {
 	return l[i].Status.StartTime.After(l[j].Status.StartTime.Time)
 }
 
-func toFullDetails(cronjob *dtypes.CronJobDiscovery, runs []dtypes.RunDiscovery) fullDetails {
-	sort.Sort(byStartTime(runs))
+func toFullDetails(cronjob *dtypes.CronJobDiscovery, jobs []dtypes.JobDiscovery) fullDetails {
+	sort.Sort(byStartTime(jobs))
 
 	// Last schedule
 	lastSchedule := "N/A"
@@ -125,33 +125,33 @@ func toFullDetails(cronjob *dtypes.CronJobDiscovery, runs []dtypes.RunDiscovery)
 		Schedule:     cronjob.Spec.Schedule,
 		Template:     string(template), // Change
 		LastSchedule: lastSchedule,
-		Runs:         toRunDetailsList(runs),
+		Runs:         toRunDetailsList(jobs),
 	}
 }
 
-func toRunDetails(run dtypes.RunDiscovery) runDetails {
+func toRunDetails(job dtypes.JobDiscovery) runDetails {
 	// Get condition:
 	condition := "Running"
-	for _, x := range run.Status.Conditions {
+	for _, x := range job.Status.Conditions {
 		if x.Status == corev1.ConditionTrue {
 			condition = string(x.Type)
 		}
 	}
 
 	end := "N/A"
-	if run.Status.CompletionTime != nil {
-		end = run.Status.CompletionTime.Format("Mon Jan _2 3:04pm 2006")
+	if job.Status.CompletionTime != nil {
+		end = job.Status.CompletionTime.Format("Mon Jan _2 3:04pm 2006")
 	}
 
 	return runDetails{
-		Name:   run.Name,
-		Start:  run.Status.StartTime.Format("Mon Jan _2 3:04pm 2006"),
+		Name:   job.Name,
+		Start:  job.Status.StartTime.Format("Mon Jan _2 3:04pm 2006"),
 		Status: condition,
 		End:    end,
 	}
 }
 
-func toRunDetailsList(lst []dtypes.RunDiscovery) []runDetails {
+func toRunDetailsList(lst []dtypes.JobDiscovery) []runDetails {
 	ret := make([]runDetails, len(lst))
 
 	for i := range lst {
@@ -169,16 +169,16 @@ type fullRunDetails struct {
 	Start     string
 	Status    string
 	End       string
-	Pods      []runPodDetails
+	Pods      []podDetails
 }
 
-type runPodDetails struct {
+type podDetails struct {
 	Name string
 	Logs string
 }
 
-func toFullRunDetails(path []string, run dtypes.RunDiscovery, logs map[string]rest.Result) fullRunDetails {
-	pods := make([]runPodDetails, 0, len(logs))
+func toFullRunDetails(path []string, job dtypes.JobDiscovery, logs map[string]rest.Result) fullRunDetails {
+	pods := make([]podDetails, 0, len(logs))
 
 	for p, r := range logs {
 		raw, err := r.Raw()
@@ -186,13 +186,13 @@ func toFullRunDetails(path []string, run dtypes.RunDiscovery, logs map[string]re
 			fmt.Println(err.Error())
 			continue
 		}
-		pods = append(pods, runPodDetails{p, string(raw)})
+		pods = append(pods, podDetails{p, string(raw)})
 	}
 
-	details := toRunDetails(run)
+	details := toRunDetails(job)
 
 	return fullRunDetails{
-		Name:      run.Name,
+		Name:      job.Name,
 		Cronjob:   path[3],
 		Context:   path[1],
 		Namespace: path[2],

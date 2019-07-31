@@ -7,8 +7,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GetRun returns a single job
-func (c *Client) GetRun(context, namespace string, name string, options GetOptions) (*types.RunDiscovery, error) {
+// GetJob returns a single job
+func (c *Client) GetJob(context, namespace string, name string, options GetOptions) (*types.JobDiscovery, error) {
 	cs, err := c.getContextInterface(context)
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func (c *Client) GetRun(context, namespace string, name string, options GetOptio
 		return nil, err
 	}
 
-	d := types.RunDiscovery{context, *job}
+	d := types.JobDiscovery{context, *job}
 	c.extension.Transform(&d)
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
@@ -26,8 +26,8 @@ func (c *Client) GetRun(context, namespace string, name string, options GetOptio
 	return &d, nil
 }
 
-// FindRuns simultaneously searches for multiple jobs and returns all results
-func (c *Client) FindRuns(contexts []string, namespace string, names []string, options ListOptions) ([]types.RunDiscovery, error) {
+// FindJobs simultaneously searches for multiple jobs and returns all results
+func (c *Client) FindJobs(contexts []string, namespace string, names []string, options ListOptions) ([]types.JobDiscovery, error) {
 	if len(contexts) == 0 {
 		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
 	} else {
@@ -39,16 +39,16 @@ func (c *Client) FindRuns(contexts []string, namespace string, names []string, o
 		positive[name] = struct{}{}
 	}
 
-	all, err := c.ListRunsOverContexts(contexts, namespace, options)
+	all, err := c.ListJobsOverContexts(contexts, namespace, options)
 	if err != nil {
 		return nil, err
 	}
 
-	var ret []types.RunDiscovery
+	var ret []types.JobDiscovery
 
-	for _, r := range all {
-		if _, ok := positive[r.Name]; ok {
-			ret = append(ret, r)
+	for _, j := range all {
+		if _, ok := positive[j.Name]; ok {
+			ret = append(ret, j)
 		}
 	}
 

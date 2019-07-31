@@ -11,6 +11,7 @@ import (
 
 var supportedDescribeTypes = [][]string{
 	{"pods", "pod", "po"},
+	{"jobs", "job"},
 	{"configmaps", "configmap", "cm"},
 	{"deployments", "deployment", "deploy"},
 	{"replicasets", "replicaset", "rs"},
@@ -57,6 +58,15 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 					return errors.New("could not find any matching pods")
 				}
 				describePodList(pods)
+			case "jobs", "job":
+				jobs, err := c.ListJobsOverContexts(ctxs, namespace, options)
+				if err != nil {
+					return err
+				}
+				if len(jobs) == 0 {
+					return errors.New("could not find any matching jobs")
+				}
+				describeJobList(jobs)
 			case "configmaps", "configmap", "cm":
 				configmaps, err := c.ListConfigMapsOverContexts(ctxs, namespace, options)
 				if err != nil {

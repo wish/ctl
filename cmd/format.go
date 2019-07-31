@@ -272,3 +272,75 @@ func describeReplicaSetList(lst []types.ReplicaSetDiscovery) {
 		describeReplicaSet(d)
 	}
 }
+
+func printJobList(lst []types.JobDiscovery, labelColumns []string) {
+	if len(lst) == 0 {
+		fmt.Println("No replicasets found")
+		return
+	}
+	// Insert default columns
+	defaultColumns := viper.GetStringSlice("default_columns")
+	var newLabelColumns []string
+	if len(defaultColumns) == 0 {
+		newLabelColumns = labelColumns
+	} else if len(labelColumns) == 0 {
+		newLabelColumns = defaultColumns
+	} else {
+		for _, s := range defaultColumns {
+			newLabelColumns = append(newLabelColumns, s)
+		}
+		for _, s := range labelColumns {
+			newLabelColumns = append(newLabelColumns, s)
+		}
+	}
+
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
+	fmt.Fprint(w, "CONTEXT\tNAMESPACE\tNAME\tSTATE\tSTART\tEND")
+	for _, l := range newLabelColumns {
+		fmt.Fprint(w, "\t", strings.ToUpper(l))
+	}
+	fmt.Fprintln(w)
+
+	for _, v := range lst {
+		fmt.Fprintf(w, "%s", v.Context)
+		fmt.Fprintf(w, "\t%s", v.Namespace)
+		fmt.Fprintf(w, "\t%s", v.Name)
+		// State
+		if v.Status.Failed > 0 {
+			fmt.Fprint(w, "\tFAILED")
+		} else if v.Status.CompletionTime != nil {
+			fmt.Fprint(w, "\tSUCCESSFUL")
+		} else {
+			fmt.Fprint(w, "\tIN PROGRESS")
+		}
+		// Start
+		fmt.Fprintf(w, "\t%v", v.Status.StartTime)
+		// END
+		if v.Status.CompletionTime != nil {
+			fmt.Fprintf(w, "\t%v", v.Status.CompletionTime)
+		} else {
+			fmt.Fprint(w, "\t<none>")
+		}
+
+		for _, l := range newLabelColumns {
+			fmt.Fprint(w, "\t")
+			if _, ok := v.Labels[l]; ok {
+				fmt.Fprint(w, v.Labels[l])
+			}
+		}
+		fmt.Fprintln(w)
+	}
+	w.Flush()
+}
+
+func describeJob(d types.JobDiscovery) {
+	fmt.Printf("context: %s\n", d.Context)
+	b, _ := yaml.Marshal(d.Job)
+	fmt.Println(string(b))
+}
+
+func describeJobList(lst []types.JobDiscovery) {
+	for _, d := range lst {
+		describeJob(d)
+	}
+}

@@ -8,9 +8,9 @@ import (
 
 func describeCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
-		Use:   "describe run",
-		Short: "Get info about a run",
-		Long:  "Get information about a specific run of a cron job.",
+		Use:   "describe job",
+		Short: "Get info about a job",
+		Long:  "Get information about a specific job belonging to a cron job.",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, err := cmd.Flags().GetStringSlice("command")
@@ -23,7 +23,7 @@ func describeCmd(c *client.Client) *cobra.Command {
 				return err
 			}
 
-			list, err := c.FindRuns(ctxs, namespace, args, options)
+			list, err := c.FindJobs(ctxs, namespace, args, options)
 			if err != nil {
 				return err
 			}
@@ -32,7 +32,7 @@ func describeCmd(c *client.Client) *cobra.Command {
 				return err
 			}
 			for _, r := range list {
-				describeRun(r)
+				describeJob(r)
 			}
 
 			return nil

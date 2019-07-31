@@ -11,7 +11,7 @@ import (
 )
 
 // TODO: Add better formatting and more fields
-func printRunList(lst []types.RunDiscovery, labelColumns []string) {
+func printJobList(lst []types.JobDiscovery, labelColumns []string) {
 	if len(lst) == 0 {
 		fmt.Println("No runs found!")
 		return
@@ -68,7 +68,7 @@ func printRunList(lst []types.RunDiscovery, labelColumns []string) {
 	w.Flush()
 }
 
-func describeRun(run types.RunDiscovery) {
+func describeJob(run types.JobDiscovery) {
 	b, _ := yaml.Marshal(run)
 	fmt.Println(string(b))
 }
