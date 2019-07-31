@@ -61,3 +61,14 @@ type DeploymentDiscovery struct {
 func (c DeploymentDiscovery) GetLabels() map[string]string {
 	return c.Labels
 }
+
+// ReplicaSetDiscovery represents a deployment with the context information
+type ReplicaSetDiscovery struct {
+	Context string
+	extensionsv1beta1.ReplicaSet
+}
+
+// GetLabels allows ReplicaSetDiscovery to implement the Labeled interface
+func (c ReplicaSetDiscovery) GetLabels() map[string]string {
+	return c.Labels
+}

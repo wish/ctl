@@ -13,6 +13,7 @@ var supportedGetTypes = [][]string{
 	{"pods", "pod", "po"},
 	{"configmaps", "configmap", "cm"},
 	{"deployments", "deployment", "deploy"},
+	{"replicasets", "replicaset", "rs"},
 }
 
 func getResourceStr() string {
@@ -71,6 +72,14 @@ Optionally, it filters through names match any of the regular expressions set.` 
 				list, err := c.ListDeploymentsOverContexts(ctxs, namespace, options)
 				if list != nil {
 					printDeploymentList(list, labelColumns)
+				}
+				if err != nil {
+					return err
+				}
+			case "replicasets", "replicaset", "rs":
+				list, err := c.ListReplicaSetsOverContexts(ctxs, namespace, options)
+				if list != nil {
+					printReplicaSetList(list, labelColumns)
 				}
 				if err != nil {
 					return err
