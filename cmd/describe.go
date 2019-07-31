@@ -54,6 +54,15 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 					return errors.New("could not find any matching pods")
 				}
 				describePodList(pods)
+			case "configmaps", "configmap", "cm":
+				configmaps, err := c.ListConfigMapsOverContexts(ctxs, namespace, options)
+				if err != nil {
+					return err
+				}
+				if len(configmaps) == 0 {
+					return errors.New("could not find any matching configmaps")
+				}
+				describeConfigMapList(configmaps)
 			default:
 				cmd.Help()
 				return errors.New("the resource type \"" + args[0] + "\" was not found.\nSee 'ctl describe'")
