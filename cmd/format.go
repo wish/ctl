@@ -142,3 +142,69 @@ func describeConfigMapList(lst []types.ConfigMapDiscovery) {
 		describeConfigMap(cm)
 	}
 }
+
+func printDeploymentList(lst []types.DeploymentDiscovery, labelColumns []string) {
+	if len(lst) == 0 {
+		fmt.Println("No pods found")
+		return
+	}
+	// Insert default columns
+	defaultColumns := viper.GetStringSlice("default_columns")
+	var newLabelColumns []string
+	if len(defaultColumns) == 0 {
+		newLabelColumns = labelColumns
+	} else if len(labelColumns) == 0 {
+		newLabelColumns = defaultColumns
+	} else {
+		for _, s := range defaultColumns {
+			newLabelColumns = append(newLabelColumns, s)
+		}
+		for _, s := range labelColumns {
+			newLabelColumns = append(newLabelColumns, s)
+		}
+	}
+
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
+	fmt.Fprint(w, "CONTEXT\tNAMESPACE\tNAME\tDESIRED\tCURRENT\tUP-TO-DATE\tAVAILABLE\tAGE")
+	for _, l := range newLabelColumns {
+		fmt.Fprint(w, "\t", strings.ToUpper(l))
+	}
+	fmt.Fprintln(w)
+
+	for _, v := range lst {
+		fmt.Fprintf(w, "%s", v.Context)
+		fmt.Fprintf(w, "\t%s", v.Namespace)
+		fmt.Fprintf(w, "\t%s", v.Name)
+		// Desired
+		fmt.Fprintf(w, "\t%d", *v.Spec.Replicas)
+		// Current
+		fmt.Fprintf(w, "\t%d", v.Status.Replicas)
+		// Up-to-date
+		fmt.Fprintf(w, "\t%d", v.Status.UpdatedReplicas)
+		// Available
+		fmt.Fprintf(w, "\t%d", v.Status.AvailableReplicas)
+		// Age
+		fmt.Fprintf(w, "\t%v", time.Since(v.CreationTimestamp.Time).Round(time.Second))
+
+		for _, l := range newLabelColumns {
+			fmt.Fprint(w, "\t")
+			if _, ok := v.Labels[l]; ok {
+				fmt.Fprint(w, v.Labels[l])
+			}
+		}
+		fmt.Fprintln(w)
+	}
+	w.Flush()
+}
+
+func describeDeployment(d types.DeploymentDiscovery) {
+	fmt.Printf("context: %s\n", d.Context)
+	b, _ := yaml.Marshal(d.Deployment)
+	fmt.Println(string(b))
+}
+
+func describeDeploymentList(lst []types.DeploymentDiscovery) {
+	for _, d := range lst {
+		describeDeployment(d)
+	}
+}
