@@ -52,6 +52,7 @@ func Sync(readers []io.Reader, processor func(string) string) io.Reader {
 	mutex.Lock()
 	logs := 0 // number of logs lines in all pods
 
+	// There should be one of these called for each log
 	action := func() {
 		mutex.Lock()
 		defer mutex.Unlock()
@@ -69,7 +70,11 @@ func Sync(readers []io.Reader, processor func(string) string) io.Reader {
 			if qs[q].ready() {
 				s := qs[q].peek()
 				if i := strings.Index(s, " "); i != -1 {
-					t, _ := time.Parse(time.RFC3339Nano, s[:i-1])
+					t, err := time.Parse(time.RFC3339Nano, s[:i])
+					if err != nil { // Try non-nano
+						t, _ = time.Parse(time.RFC3339, s[:i])
+						// If also error... just continue downwards
+					}
 					if recent.IsZero() || t.Before(recent) {
 						ind = q
 						recent = t
@@ -98,12 +103,12 @@ func Sync(readers []io.Reader, processor func(string) string) io.Reader {
 				q.buffer = append(q.buffer, q.scanner.Text())
 				logs++
 				q.mutex.Unlock()
-				action()
+				go action()
 			}
 			activeLock.Lock()
 			active--
 			activeLock.Unlock()
-			action()
+			go action()
 		}()
 
 		qs[i] = q

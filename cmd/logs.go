@@ -48,7 +48,7 @@ func logsCmd(c *client.Client) *cobra.Command {
 
 	cmd.Flags().StringP("container", "c", "", "Specify the container")
 	cmd.Flags().BoolP("follow", "f", false, "Specify if the logs should be streamed")
-	cmd.Flags().Bool("timestamps", false, "Add a RFC3339Nano format timestamp to the beginning of each line")
+	cmd.Flags().Bool("timestamps", false, "Add an RFC3339 or RFC3339Nano timestamp to the beginning of each line")
 
 	return cmd
 }
