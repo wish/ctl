@@ -34,8 +34,8 @@ func createObj(context, name, namespace, res string, labels map[string]string) i
 				ObjectMeta: objectmeta,
 			},
 		}
-	case "run":
-		return &types.RunDiscovery{
+	case "job":
+		return &types.JobDiscovery{
 			Context: context,
 			Job: batchv1.Job{
 				ObjectMeta: objectmeta,
@@ -78,7 +78,7 @@ func TestTransform(t *testing.T) {
 				ans map[string]string
 			}{
 				{createObj("c2", "name", "default", "cronjob", nil), map[string]string{"pft": "tfp"}},
-				{createObj("c1", "name", "default", "run", map[string]string{"a": "b"}), map[string]string{"a": "b", "foo": "bar", "hello": "world"}},
+				{createObj("c1", "name", "default", "job", map[string]string{"a": "b"}), map[string]string{"a": "b", "foo": "bar", "hello": "world"}},
 				{createObj("c3", "wow", "bad", "pod", nil), nil},
 			},
 		},

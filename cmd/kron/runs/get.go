@@ -9,8 +9,8 @@ import (
 func getCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get cronjob [flags]",
-		Short: "Get a list of runs of a cron job",
-		Long: `Get a list of runs of a cron job.
+		Short: "Get a list of jobs belonging to a cron job",
+		Long: `Get a list of jobs belonging to a cron job.
 Only operates on a single cron job.
 If multiple cron jobs matches the parameters, only the first is used.`,
 		Args: cobra.ExactArgs(1),
@@ -26,14 +26,14 @@ If multiple cron jobs matches the parameters, only the first is used.`,
 				return err
 			}
 
-			list, err := c.ListRunsOfCronJob(ctxs, namespace, args[0], options)
+			list, err := c.ListJobsOfCronJob(ctxs, namespace, args[0], options)
 
 			if err != nil {
 				return err
 			}
 
 			labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
-			printRunList(list, labelColumns)
+			printJobList(list, labelColumns)
 			return nil
 		},
 	}

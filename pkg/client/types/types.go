@@ -18,14 +18,14 @@ func (c CronJobDiscovery) GetLabels() map[string]string {
 	return c.Labels
 }
 
-// RunDiscovery represents a job with the context information
-type RunDiscovery struct {
+// JobDiscovery represents a job with the context information
+type JobDiscovery struct {
 	Context string
 	batchv1.Job
 }
 
-// GetLabels allows RunDiscovery to implement the Labeled interface
-func (c RunDiscovery) GetLabels() map[string]string {
+// GetLabels allows JobDiscovery to implement the Labeled interface
+func (c JobDiscovery) GetLabels() map[string]string {
 	return c.Labels
 }
 

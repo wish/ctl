@@ -111,12 +111,12 @@ func getDashHandleFunc(cl *client.Client, templates *template.Template) func(htt
 			}
 		}
 
-		runs, err := cl.ListRunsOverContexts(ctxs, namespace, client.ListOptions{LabelMatch: labelMatch})
+		jobs, err := cl.ListJobsOverContexts(ctxs, namespace, client.ListOptions{LabelMatch: labelMatch})
 		if err != nil {
 			panic(err.Error())
 		}
 
-		data.Cronjobs = toCardDetailsList(filtered, runs)
+		data.Cronjobs = toCardDetailsList(filtered, jobs)
 
 		if err := templates.ExecuteTemplate(w, "dash.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -191,12 +191,12 @@ func getAdvDashHandleFunc(cl *client.Client, templates *template.Template) func(
 			}
 		}
 
-		runs, err := cl.ListRunsOverContexts(ctxs, namespace, client.ListOptions{LabelMatch: labelMatch})
+		jobs, err := cl.ListJobsOverContexts(ctxs, namespace, client.ListOptions{LabelMatch: labelMatch})
 		if err != nil {
 			panic(err.Error())
 		}
 
-		data.Cronjobs = toCardDetailsList(filtered, runs)
+		data.Cronjobs = toCardDetailsList(filtered, jobs)
 
 		if err := templates.ExecuteTemplate(w, "advanced.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -218,7 +218,7 @@ func getDetailsHandleFunc(cl *client.Client, templates *template.Template) func(
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		runs, err := cl.ListRunsOfCronJob([]string{path[1]}, path[2], path[3], client.ListOptions{})
+		jobs, err := cl.ListJobsOfCronJob([]string{path[1]}, path[2], path[3], client.ListOptions{})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -230,7 +230,7 @@ func getDetailsHandleFunc(cl *client.Client, templates *template.Template) func(
 			Page: page{
 				Title: fmt.Sprintf("%s - Cron Jobs - Kron", cronjob.Name),
 			},
-			Details: toFullDetails(cronjob, runs),
+			Details: toFullDetails(cronjob, jobs),
 		}
 
 		if err := templates.ExecuteTemplate(w, "details.html", data); err != nil {
@@ -309,26 +309,26 @@ func getRunHandleFunc(cl *client.Client, templates *template.Template) func(http
 			http.Error(w, "Invalid cron job path", http.StatusNotFound)
 		}
 
-		runs, err := cl.ListRunsOfCronJob([]string{path[1]}, path[2], path[3], client.ListOptions{})
+		jobs, err := cl.ListJobsOfCronJob([]string{path[1]}, path[2], path[3], client.ListOptions{})
 		if err != nil {
 			http.Error(w, "Error finding runs", http.StatusInternalServerError)
 		}
 
-		var run *types.RunDiscovery
-		for _, x := range runs {
+		var job *types.JobDiscovery
+		for _, x := range jobs {
 			if x.Name == path[4] {
-				run = &x
+				job = &x
 				break
 			}
 		}
 
-		if run == nil {
-			http.Error(w, "Specified run could not be found!", http.StatusNotFound)
+		if job == nil {
+			http.Error(w, "Specified job could not be found!", http.StatusNotFound)
 		}
 
-		pods, err := cl.ListPodsOfRun([]string{path[1]}, path[2], path[4], client.ListOptions{})
+		pods, err := cl.ListPodsOfJob([]string{path[1]}, path[2], path[4], client.ListOptions{})
 		if err != nil {
-			http.Error(w, "Error finding pods of run", http.StatusInternalServerError)
+			http.Error(w, "Error finding pods of job", http.StatusInternalServerError)
 		}
 
 		logs := make(map[string]rest.Result)
@@ -347,9 +347,9 @@ func getRunHandleFunc(cl *client.Client, templates *template.Template) func(http
 			Details fullRunDetails
 		}{
 			Page: page{
-				Title: fmt.Sprintf("%s - %s Runs - Kron", run.Name, path[3]),
+				Title: fmt.Sprintf("%s - %s Runs - Kron", job.Name, path[3]),
 			},
-			Details: toFullRunDetails(path, *run, logs),
+			Details: toFullRunDetails(path, *job, logs),
 		}
 
 		if err := templates.ExecuteTemplate(w, "run.html", data); err != nil {

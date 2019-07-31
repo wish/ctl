@@ -45,7 +45,7 @@ func (e Extension) Transform(i interface{}) {
 		transformObjectMeta(e.ClusterExt[v.Context], &(v.Labels))
 	case *types.PodDiscovery:
 		transformObjectMeta(e.ClusterExt[v.Context], &(v.Labels))
-	case *types.RunDiscovery:
+	case *types.JobDiscovery:
 		transformObjectMeta(e.ClusterExt[v.Context], &(v.Labels))
 	case *types.ConfigMapDiscovery:
 		transformObjectMeta(e.ClusterExt[v.Context], &(v.Labels))

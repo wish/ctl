@@ -11,6 +11,7 @@ import (
 
 var supportedGetTypes = [][]string{
 	{"pods", "pod", "po"},
+	{"jobs", "job"},
 	{"configmaps", "configmap", "cm"},
 	{"deployments", "deployment", "deploy"},
 	{"replicasets", "replicaset", "rs"},
@@ -56,6 +57,14 @@ Optionally, it filters through names match any of the regular expressions set.` 
 				// Output
 				if list != nil {
 					printPodList(list, labelColumns)
+				}
+				if err != nil {
+					return err
+				}
+			case "jobs", "job":
+				list, err := c.ListJobsOverContexts(ctxs, namespace, options)
+				if list != nil {
+					printJobList(list, labelColumns)
 				}
 				if err != nil {
 					return err

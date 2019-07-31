@@ -22,7 +22,7 @@ func logsCmd(c *client.Client) *cobra.Command {
 			container, _ := cmd.Flags().GetString("container")
 			lm, err := parsing.LabelMatchFromCmd(cmd)
 
-			pods, err := c.ListPodsOfRun(ctxs, namespace, args[0], client.ListOptions{lm, nil})
+			pods, err := c.ListPodsOfJob(ctxs, namespace, args[0], client.ListOptions{lm, nil})
 			if err != nil {
 				return err
 			}
