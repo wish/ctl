@@ -11,6 +11,7 @@ import (
 
 var supportedGetTypes = [][]string{
 	{"pods", "pod", "po"},
+	{"configmaps", "configmap", "cm"},
 }
 
 func getResourceStr() string {
@@ -52,6 +53,15 @@ Optionally, it filters through names match any of the regular expressions set.` 
 				if list != nil {
 					labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
 					printPodList(list, labelColumns)
+				}
+				if err != nil {
+					return err
+				}
+			case "configmaps", "configmap", "cm":
+				list, err := c.ListConfigMapsOverContexts(ctxs, namespace, options)
+				if list != nil {
+					labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
+					printConfigMapList(list, labelColumns)
 				}
 				if err != nil {
 					return err

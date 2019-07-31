@@ -38,3 +38,14 @@ type PodDiscovery struct {
 func (c PodDiscovery) GetLabels() map[string]string {
 	return c.Labels
 }
+
+// ConfigMapDiscovery represents a configmap with the context information
+type ConfigMapDiscovery struct {
+	Context string
+	corev1.ConfigMap
+}
+
+// GetLabels allows ConfigMapDiscovery to implement the Labeled interface
+func (c ConfigMapDiscovery) GetLabels() map[string]string {
+	return c.Labels
+}
