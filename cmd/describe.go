@@ -13,6 +13,7 @@ var supportedDescribeTypes = [][]string{
 	{"pods", "pod", "po"},
 	{"configmaps", "configmap", "cm"},
 	{"deployments", "deployment", "deploy"},
+	{"replicasets", "replicaset", "rs"},
 }
 
 func describeResourceStr() string {
@@ -74,6 +75,15 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 					return errors.New("could not find any matching deployments")
 				}
 				describeDeploymentList(deployments)
+			case "replicasets", "replicaset", "rs":
+				replicasets, err := c.ListReplicaSetsOverContexts(ctxs, namespace, options)
+				if err != nil {
+					return err
+				}
+				if len(replicasets) == 0 {
+					return errors.New("could not find any matching replicasets")
+				}
+				describeReplicaSetList(replicasets)
 			default:
 				cmd.Help()
 				return errors.New("the resource type \"" + args[0] + "\" was not found.\nSee 'ctl describe'")
