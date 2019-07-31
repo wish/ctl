@@ -13,9 +13,9 @@ func (c *Client) findConfigMap(contexts []string, namespace, name string, option
 	}
 
 	var cm types.ConfigMapDiscovery
-	for _, cj := range list {
-		if cj.Name == name {
-			cm = cj
+	for _, i := range list {
+		if i.Name == name {
+			cm = i
 			break
 		}
 	}

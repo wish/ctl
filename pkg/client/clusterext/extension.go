@@ -49,6 +49,8 @@ func (e Extension) Transform(i interface{}) {
 		transformObjectMeta(e.ClusterExt[v.Context], &(v.Labels))
 	case *types.ConfigMapDiscovery:
 		transformObjectMeta(e.ClusterExt[v.Context], &(v.Labels))
+	case *types.DeploymentDiscovery:
+		transformObjectMeta(e.ClusterExt[v.Context], &(v.Labels))
 	default:
 		log.Printf("unsupported type %T\n", v)
 	}

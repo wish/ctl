@@ -12,6 +12,7 @@ import (
 var supportedGetTypes = [][]string{
 	{"pods", "pod", "po"},
 	{"configmaps", "configmap", "cm"},
+	{"deployments", "deployment", "deploy"},
 }
 
 func getResourceStr() string {
@@ -45,13 +46,14 @@ Optionally, it filters through names match any of the regular expressions set.` 
 				return err
 			}
 
+			labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
+
 			switch args[0] {
 			case "pods", "pod", "po":
 				list, err := c.ListPodsOverContexts(ctxs, namespace, options)
 				// NOTE: List is unsorted and could be in an inconsistent order
 				// Output
 				if list != nil {
-					labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
 					printPodList(list, labelColumns)
 				}
 				if err != nil {
@@ -60,8 +62,15 @@ Optionally, it filters through names match any of the regular expressions set.` 
 			case "configmaps", "configmap", "cm":
 				list, err := c.ListConfigMapsOverContexts(ctxs, namespace, options)
 				if list != nil {
-					labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
 					printConfigMapList(list, labelColumns)
+				}
+				if err != nil {
+					return err
+				}
+			case "deployments", "deployment", "deploy":
+				list, err := c.ListDeploymentsOverContexts(ctxs, namespace, options)
+				if list != nil {
+					printDeploymentList(list, labelColumns)
 				}
 				if err != nil {
 					return err
