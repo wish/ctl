@@ -15,6 +15,7 @@ var supportedGetTypes = [][]string{
 	{"configmaps", "configmap", "cm"},
 	{"deployments", "deployment", "deploy"},
 	{"replicasets", "replicaset", "rs"},
+	{"cronjobs", "cronjob"},
 }
 
 func getResourceStr() string {
@@ -89,6 +90,14 @@ Optionally, it filters through names match any of the regular expressions set.` 
 				list, err := c.ListReplicaSetsOverContexts(ctxs, namespace, options)
 				if list != nil {
 					printReplicaSetList(list, labelColumns)
+				}
+				if err != nil {
+					return err
+				}
+			case "cronjobs", "cronjob":
+				list, err := c.ListCronJobsOverContexts(ctxs, namespace, options)
+				if list != nil {
+					printCronJobList(list, labelColumns)
 				}
 				if err != nil {
 					return err
