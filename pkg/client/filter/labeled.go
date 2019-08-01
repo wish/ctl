@@ -16,5 +16,12 @@ func (s staticlabeled) GetLabels() map[string]string {
 
 // GetLabeled returns a Labeled object that returns the passed map
 func GetLabeled(m map[string]string) Labeled {
-	return staticlabeled{labels: m}
+	if m == nil {
+		return staticlabeled{}
+	}
+	copy := make(map[string]string)
+	for k, v := range m {
+		copy[k] = v
+	}
+	return staticlabeled{labels: copy}
 }
