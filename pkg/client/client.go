@@ -50,7 +50,7 @@ func GetConfigClient(path string) *Client {
 	contexts := helper.GetContexts(path)
 	return &Client{
 		clientsetGetter: &configClientsetGetter{
-			clientsets: make(map[string]kubernetes.Interface),
+			clientsets: make(map[string]clusterFunctionality),
 			config:     path,
 		},
 		contextsGetter: StaticContextsGetter{
