@@ -16,13 +16,27 @@ func GetCtlExt() (map[string]map[string]string, error) {
 
 // WriteCtlExt processes the ctl extension and writes it to the config file
 func WriteCtlExt(m map[string]map[string]string) {
+	// Get all labels
+	allM := make(map[string]struct{})
+	var all []string
+	// Most common default_columns
 	defaultColumnsOcc := make(map[string]int)
 	for _, n := range m {
-		if defaultColumns, ok := n["default_columns"]; ok {
+		if defaultColumns, ok := n["_default_columns"]; ok {
 			defaultColumnsOcc[defaultColumns]++
-			delete(n, "default_columns")
+			delete(n, "_default_columns")
+		}
+		for k := range n {
+			if _, ok := allM[k]; !strings.HasPrefix(k, "_") && !ok {
+				allM[k] = struct{}{}
+				all = append(all, k)
+			}
 		}
 	}
+
+	viper.Set("label_flags", all)
+
+	// Default columns
 	max := 0
 	for col, occ := range defaultColumnsOcc {
 		if occ > max {
@@ -30,6 +44,7 @@ func WriteCtlExt(m map[string]map[string]string) {
 			viper.Set("default_columns", strings.Split(col, ","))
 		}
 	}
+
 	viper.Set("cluster-ext", m)
 	viper.WriteConfig()
 }

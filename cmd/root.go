@@ -75,8 +75,8 @@ func cmd() *cobra.Command {
 	cmd.PersistentFlags().StringSliceP("context", "x", nil, "Specify the context(s) to operate in. Defaults to all contexts.")
 	cmd.PersistentFlags().StringP("namespace", "n", "", "Specify the namespace within all the contexts specified. Defaults to all namespaces.")
 	cmd.PersistentFlags().StringArrayP("label", "l", nil, "Filter objects by label")
-	for _, label := range viper.GetStringSlice("default_columns") {
-		cmd.PersistentFlags().String(label, "", "Default column label \""+label+"\"")
+	for _, label := range viper.GetStringSlice("label_flags") {
+		cmd.PersistentFlags().String(label, "", "Cluster level label flag \""+label+"\"")
 	}
 
 	return cmd

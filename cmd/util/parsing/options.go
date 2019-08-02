@@ -13,7 +13,7 @@ import (
 // and returns the filtering.LabelMatch specified.
 func LabelMatchFromCmd(cmd *cobra.Command) (filter.LabelMatch, error) {
 	s, _ := cmd.Flags().GetStringArray("label")
-	for _, label := range viper.GetStringSlice("default_columns") {
+	for _, label := range viper.GetStringSlice("label_flags") {
 		if v, err := cmd.Flags().GetString(label); err == nil && len(v) > 0 {
 			s = append(s, label+"="+v)
 		}

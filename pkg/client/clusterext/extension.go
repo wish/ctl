@@ -62,7 +62,7 @@ func (e Extension) Transform(i interface{}) {
 func (e Extension) GetFilteredContexts(l filter.LabelMatch) []string {
 	contexts := make([]string, 0)
 	for c, m := range e.ClusterExt {
-		if v, ok := m["hidden"]; (!ok || v != "true") && filter.EmptyOrMatchLabel(filter.GetLabeled(m), l) {
+		if v, ok := m["_hidden"]; (!ok || v != "true") && filter.EmptyOrMatchLabel(filter.GetLabeled(m), l) {
 			contexts = append(contexts, c)
 		}
 	}
@@ -74,7 +74,7 @@ func (e Extension) FilterContexts(contexts []string, l filter.LabelMatch) []stri
 	ret := make([]string, 0)
 	for _, ctx := range contexts {
 		if m, ok := e.ClusterExt[ctx]; ok {
-			if v, ok := m["hidden"]; (!ok || v != "true") && filter.EmptyOrMatchLabel(filter.GetLabeled(m), l) {
+			if v, ok := m["_hidden"]; (!ok || v != "true") && filter.EmptyOrMatchLabel(filter.GetLabeled(m), l) {
 				ret = append(ret, ctx)
 			}
 		} else { // Can't find, add to list anyways

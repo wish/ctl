@@ -25,7 +25,7 @@ func generateCtlExt(data map[string]string) runtime.Object {
 
 func TestGetCtlExt(t *testing.T) {
 	c := GetFakeConfigClient(map[string][]runtime.Object{
-		"cluster1": []runtime.Object{generateCtlExt(map[string]string{"hidden": "true"})},
+		"cluster1": []runtime.Object{generateCtlExt(map[string]string{"_hidden": "true"})},
 		"cluster2": []runtime.Object{},
 		"c4":       []runtime.Object{generateCtlExt(make(map[string]string))},
 	})
@@ -33,7 +33,7 @@ func TestGetCtlExt(t *testing.T) {
 	c.contextsGetter = StaticContextsGetter{contexts: []string{"cluster1", "cluster2", "cluster3", "c4"}}
 
 	ans := map[string]map[string]string{
-		"cluster1": map[string]string{"hidden": "true"},
+		"cluster1": map[string]string{"_hidden": "true"},
 		"cluster2": nil,
 		"c4":       make(map[string]string),
 	}
