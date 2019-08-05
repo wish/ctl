@@ -11,6 +11,7 @@ import (
 	"github.com/wish/ctl/pkg/client/filter"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 type runDetails struct {
@@ -23,7 +24,7 @@ type runDetails struct {
 func runCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "run TAG [flags]",
-		Short: "Shortcut tool to run preset kubectl commands",
+		Short: "Shortcut tool to using kubectl run",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			labelMatch, _ := parsing.LabelMatchFromCmd(cmd)
@@ -45,11 +46,7 @@ func runCmd(c *client.Client) *cobra.Command {
 					}
 					// Parse run command specified
 					if run, ok := runs[args[0]]; ok {
-						cmd.Println(run)
 						combinedargs := []string{"run", "--context", ctx}
-						if len(run.Flags) > 0 {
-							combinedargs = append(combinedargs, run.Flags...)
-						}
 						// Find run image
 						lm := &filter.LabelMatchEq{"app", run.App}
 						l, err := c.ListDeployments(ctx, "", client.ListOptions{LabelMatch: lm})
@@ -57,9 +54,9 @@ func runCmd(c *client.Client) *cobra.Command {
 							return err
 						}
 						for _, d := range l {
-							if len(d.Spec.Template.Spec.Containers) > 0 {
-								cmd.Println(d.Spec.Template.Spec.Containers[0].Image)
+							if len(d.Spec.Template.Spec.Containers) > 0 { // Use first image
 								combinedargs = append(combinedargs, "--image", d.Spec.Template.Spec.Containers[0].Image)
+								break
 							}
 						}
 
@@ -67,7 +64,7 @@ func runCmd(c *client.Client) *cobra.Command {
 							combinedargs = append(combinedargs, run.Flags...)
 						}
 
-						combinedargs = append(combinedargs, run.Name)
+						combinedargs = append(combinedargs, os.ExpandEnv(run.Name))
 
 						if len(run.AfterArgs) > 0 {
 							combinedargs = append(combinedargs, "--")
@@ -79,10 +76,9 @@ func runCmd(c *client.Client) *cobra.Command {
 						command.Stderr = os.Stderr
 						command.Stdin = os.Stdin
 
-						// command.Run()
-						cmd.Println(command)
+						cmd.Println("kubectl " + strings.Join(combinedargs, " "))
+
 						return command.Run()
-						// return nil
 					}
 				}
 			}
