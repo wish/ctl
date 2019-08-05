@@ -17,6 +17,7 @@ import (
 type runDetails struct {
 	App       string   `json:"app"`
 	Name      string   `json:"name"`
+	ImageTag  string   `json:"image_tag"`
 	Flags     []string `json:"flags"`
 	AfterArgs []string `json:"afterargs"`
 }
@@ -28,6 +29,7 @@ func runCmd(c *client.Client) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			labelMatch, _ := parsing.LabelMatchFromCmd(cmd)
+			overrideTag, _ := cmd.Flags().GetString("tag")
 
 			m, err := config.GetCtlExt()
 			if err != nil {
@@ -55,7 +57,16 @@ func runCmd(c *client.Client) *cobra.Command {
 						}
 						for _, d := range l {
 							if len(d.Spec.Template.Spec.Containers) > 0 { // Use first image
-								combinedargs = append(combinedargs, "--image", d.Spec.Template.Spec.Containers[0].Image)
+								image := d.Spec.Template.Spec.Containers[0].Image
+								// Change tag on image
+								i := strings.LastIndex(image, ":")
+								if len(overrideTag) == 0 {
+									overrideTag = run.ImageTag
+								}
+								if i != -1 && len(overrideTag) > 0 {
+									image = image[:i+1] + overrideTag
+								}
+								combinedargs = append(combinedargs, "--image", image)
 								break
 							}
 						}
@@ -85,6 +96,8 @@ func runCmd(c *client.Client) *cobra.Command {
 			return errors.New("no command found to run")
 		},
 	}
+
+	cmd.Flags().String("tag", "", "Change the image tag.")
 
 	return cmd
 }
