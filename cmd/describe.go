@@ -38,6 +38,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
+			showEvents, _ := cmd.Flags().GetBool("show-events")
 
 			if len(args) == 0 {
 				cmd.Help()
@@ -49,6 +50,8 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 				return err
 			}
 
+			describeOptions := client.DescribeOptions{ShowEvents: showEvents}
+
 			switch args[0] {
 			case "pods", "pod", "po":
 				pods, err := c.ListPodsOverContexts(ctxs, namespace, options)
@@ -59,7 +62,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 					return errors.New("could not find any matching pods")
 				}
 				for _, pod := range pods {
-					s, err := c.DescribePod(pod)
+					s, err := c.DescribePod(pod, describeOptions)
 					if err != nil {
 						cmd.Println(err.Error())
 					} else {
@@ -75,7 +78,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 					return errors.New("could not find any matching jobs")
 				}
 				for _, job := range jobs {
-					s, err := c.DescribeJob(job)
+					s, err := c.DescribeJob(job, describeOptions)
 					if err != nil {
 						cmd.Println(err.Error())
 					} else {
@@ -91,7 +94,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 					return errors.New("could not find any matching configmaps")
 				}
 				for _, configmap := range configmaps {
-					s, err := c.DescribeConfigMap(configmap)
+					s, err := c.DescribeConfigMap(configmap, describeOptions)
 					if err != nil {
 						cmd.Println(err.Error())
 					} else {
@@ -107,7 +110,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 					return errors.New("could not find any matching deployments")
 				}
 				for _, deployment := range deployments {
-					s, err := c.DescribeDeployment(deployment)
+					s, err := c.DescribeDeployment(deployment, describeOptions)
 					if err != nil {
 						cmd.Println(err.Error())
 					} else {
@@ -123,7 +126,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 					return errors.New("could not find any matching replicasets")
 				}
 				for _, replicaset := range replicasets {
-					s, err := c.DescribeReplicaSet(replicaset)
+					s, err := c.DescribeReplicaSet(replicaset, describeOptions)
 					if err != nil {
 						cmd.Println(err.Error())
 					} else {
@@ -139,7 +142,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 					return errors.New("could not find any matching cronjobs")
 				}
 				for _, cronjob := range cronjobs {
-					s, err := c.DescribeCronJob(cronjob)
+					s, err := c.DescribeCronJob(cronjob, describeOptions)
 					if err != nil {
 						cmd.Println(err.Error())
 					} else {
@@ -153,6 +156,8 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 			return nil
 		},
 	}
+
+	cmd.Flags().Bool("show-events", true, "If true, display events related to the described object.")
 
 	return cmd
 }

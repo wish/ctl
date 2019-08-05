@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-// ListOptions is used to specific filtering on list operations
+// ListOptions is used to specify filtering on list operations
 type ListOptions struct {
 	// Filtering by labels
 	filter.LabelMatch
@@ -13,13 +13,13 @@ type ListOptions struct {
 	Search *regexp.Regexp
 }
 
-// GetOptions is used to specific filtering on get operations
+// GetOptions is used to specify filtering on get operations
 type GetOptions struct {
 	// Filtering by labels
 	filter.LabelMatch
 }
 
-// LogOptions is used to specific filtering on log operations
+// LogOptions is used to specify filtering on log operations
 type LogOptions struct {
 	// Filtering by labels
 	filter.LabelMatch
@@ -29,4 +29,9 @@ type LogOptions struct {
 	Search *regexp.Regexp
 	// When set, adds a RFC3339Nano timestamp to the beginning of each line
 	Timestamps bool
+}
+
+// DescribeOptions is used to specify how to describe a resource
+type DescribeOptions struct {
+	ShowEvents bool
 }

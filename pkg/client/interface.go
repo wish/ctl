@@ -2,13 +2,13 @@ package client
 
 import (
 	"errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"sync"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	describeversioned "k8s.io/kubectl/pkg/describe/versioned"
 	"k8s.io/kubectl/pkg/describe"
+	describeversioned "k8s.io/kubectl/pkg/describe/versioned"
+	"sync"
 )
 
 type clientsetGetter interface {
