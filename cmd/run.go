@@ -12,6 +12,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"math/rand"
+	"time"
 )
 
 type runDetails struct {
@@ -37,6 +39,10 @@ func runCmd(c *client.Client) *cobra.Command {
 			}
 			e := clusterext.Extension{m}
 			ctxs := e.GetFilteredContexts(labelMatch)
+
+			// Random shuffle contexts
+			rand.Seed(time.Now().UnixNano())
+			rand.Shuffle(len(ctxs), func(i, j int) { ctxs[i], ctxs[j] = ctxs[j], ctxs[i]})
 
 			for _, ctx := range ctxs {
 				// Find matching command through all runs
