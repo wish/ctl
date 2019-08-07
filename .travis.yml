@@ -3,8 +3,20 @@ language: go
 go:
   - "1.12.x"
 
+addons:
+  apt:
+    packages:
+      - rpm
+      - snapd
+
+env:
+  - PATH=/snap/bin:$PATH
+
 before_install:
   - go get -u golang.org/x/lint/golint
+
+install:
+  - sudo snap install snapcraft --classic
 
 git:
   depth: 1
@@ -20,3 +32,12 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - test -n "$TRAVIS_TAG" && snapcraft login --with snap.login
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: curl -sL https://git.io/goreleaser | bash
+    on:
+      tags: true
+      condition: $TRAVIS_OS_NAME = linux
