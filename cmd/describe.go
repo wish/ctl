@@ -52,7 +52,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 
 			describeOptions := client.DescribeOptions{ShowEvents: showEvents}
 
-			switch args[0] {
+			switch strings.ToLower(args[0]) {
 			case "pods", "pod", "po":
 				pods, err := c.ListPodsOverContexts(ctxs, namespace, options)
 				if err != nil {

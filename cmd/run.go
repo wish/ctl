@@ -9,10 +9,10 @@ import (
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/client/clusterext"
 	"github.com/wish/ctl/pkg/client/filter"
+	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
-	"math/rand"
 	"time"
 )
 
@@ -42,7 +42,7 @@ func runCmd(c *client.Client) *cobra.Command {
 
 			// Random shuffle contexts
 			rand.Seed(time.Now().UnixNano())
-			rand.Shuffle(len(ctxs), func(i, j int) { ctxs[i], ctxs[j] = ctxs[j], ctxs[i]})
+			rand.Shuffle(len(ctxs), func(i, j int) { ctxs[i], ctxs[j] = ctxs[j], ctxs[i] })
 
 			for _, ctx := range ctxs {
 				// Find matching command through all runs

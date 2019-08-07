@@ -51,7 +51,7 @@ Optionally, it filters through names match any of the regular expressions set.` 
 
 			labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
 
-			switch args[0] {
+			switch strings.ToLower(args[0]) {
 			case "pods", "pod", "po":
 				list, err := c.ListPodsOverContexts(ctxs, namespace, options)
 				// NOTE: List is unsorted and could be in an inconsistent order
