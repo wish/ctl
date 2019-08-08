@@ -17,7 +17,6 @@ before_install:
 
 install:
   - sudo snap install snapcraft --classic
-  - env GO111MODULE=on go get ./...
 
 git:
   depth: 1
@@ -38,7 +37,7 @@ after_success:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: curl -sL https://git.io/goreleaser | bash
+    script: env GO111MODULE=on go get ./...; curl -sL https://git.io/goreleaser | bash
     on:
       tags: true
       condition: $TRAVIS_OS_NAME = linux
