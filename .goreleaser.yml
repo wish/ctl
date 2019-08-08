@@ -4,9 +4,10 @@ project_name: ctl
 # .goreleaser.yml
 env:
   - GO111MODULE=on
-  before:
-    hooks:
-      - go mod download
+
+before:
+  hooks:
+    - go mod download
 
 archives:
   - files:
