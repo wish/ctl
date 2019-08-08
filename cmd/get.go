@@ -56,52 +56,40 @@ Optionally, it filters through names match any of the regular expressions set.` 
 				list, err := c.ListPodsOverContexts(ctxs, namespace, options)
 				// NOTE: List is unsorted and could be in an inconsistent order
 				// Output
-				if list != nil {
-					printPodList(list, labelColumns)
-				}
 				if err != nil {
 					return err
 				}
+				printPodList(cmd.OutOrStdout(), list, labelColumns)
 			case "jobs", "job":
 				list, err := c.ListJobsOverContexts(ctxs, namespace, options)
-				if list != nil {
-					printJobList(list, labelColumns)
-				}
 				if err != nil {
 					return err
 				}
+				printJobList(cmd.OutOrStdout(), list, labelColumns)
 			case "configmaps", "configmap", "cm":
 				list, err := c.ListConfigMapsOverContexts(ctxs, namespace, options)
-				if list != nil {
-					printConfigMapList(list, labelColumns)
-				}
 				if err != nil {
 					return err
 				}
+				printConfigMapList(cmd.OutOrStdout(), list, labelColumns)
 			case "deployments", "deployment", "deploy":
 				list, err := c.ListDeploymentsOverContexts(ctxs, namespace, options)
-				if list != nil {
-					printDeploymentList(list, labelColumns)
-				}
 				if err != nil {
 					return err
 				}
+				printDeploymentList(cmd.OutOrStdout(), list, labelColumns)
 			case "replicasets", "replicaset", "rs":
 				list, err := c.ListReplicaSetsOverContexts(ctxs, namespace, options)
-				if list != nil {
-					printReplicaSetList(list, labelColumns)
-				}
 				if err != nil {
 					return err
 				}
+				printReplicaSetList(cmd.OutOrStdout(), list, labelColumns)
 			case "cronjobs", "cronjob":
 				list, err := c.ListCronJobsOverContexts(ctxs, namespace, options)
-				if list != nil {
-					printCronJobList(list, labelColumns)
-				}
 				if err != nil {
 					return err
 				}
+				printCronJobList(cmd.OutOrStdout(), list, labelColumns)
 			default:
 				cmd.Help()
 				return errors.New(`the resource type "` + args[0] + `" was not found`)
