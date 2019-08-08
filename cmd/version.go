@@ -6,14 +6,16 @@ import (
 )
 
 // Version set default value
-var Version = "unset"
+var Version string = "v12.0.0"
+var Commit string
 
 func versionCmd(*client.Client) *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
 		Short: "Show ctl version",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Println(cmd.Use + " version: " + Version)
+			cmd.Println(cmd.Root().Use, "version", Version)
+			cmd.Println("commit sha", Commit)
 		},
 	}
 }
