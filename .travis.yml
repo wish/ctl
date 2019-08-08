@@ -17,6 +17,7 @@ before_install:
 
 install:
   - sudo snap install snapcraft --classic
+  - env GO111MODULE=on go get ./...
 
 git:
   depth: 1
