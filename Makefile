@@ -11,15 +11,11 @@ help: ## Show this help
 
 bin/linux/ctl: $(GOFILES_BUILD)
 	@echo "$@"
-	@GOOS=linux CGO_ENABLED=0 go build -ldflags \
-	       "-X github.com/wish/ctl/cmd.commit=${SHA}" \
-	       -o bin/linux/ctl github.com/wish/ctl
+	@GOOS=linux CGO_ENABLED=0 go build -o bin/linux/ctl github.com/wish/ctl
 
 bin/darwin/ctl: $(GOFILES_BUILD)
 	@echo "$@"
-	@GOOS=darwin CGO_ENABLED=0 go build -ldflags \
-		"-X github.com/wish/ctl/cmd.commit=${SHA}" \
-	     -o bin/darwin/ctl github.com/wish/ctl
+	@GOOS=darwin CGO_ENABLED=0 go build -o bin/darwin/ctl github.com/wish/ctl
 
 .PHONY: all
 all: bin/linux/ctl bin/darwin/ctl ## Builds ctl binaries for linux and osx
