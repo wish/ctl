@@ -37,7 +37,7 @@ after_success:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: env GO111MODULE=on go get ./...; curl -sL https://git.io/goreleaser | bash
+    script: curl -sL https://git.io/goreleaser | bash
     on:
       tags: true
       condition: $TRAVIS_OS_NAME = linux
