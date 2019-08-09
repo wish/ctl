@@ -14,6 +14,8 @@ func Cmd(c *client.Client) *cobra.Command {
 	}
 
 	config.AddCommand(fetchCmd(c))
+	config.AddCommand(deleteCmd(c))
+	config.AddCommand(viewCmd(c))
 
 	return config
 }
