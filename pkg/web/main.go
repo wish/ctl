@@ -2,7 +2,7 @@ package web
 
 import (
 	"fmt"
-	"github.com/gobuffalo/packr"
+	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/viper"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
@@ -21,7 +21,7 @@ func Serve(cl *client.Client, endpoint string) {
 		"Title": strings.Title,
 	})
 
-	box := packr.NewBox("./template")
+	box := packr.New("all", "./template")
 
 	box.Walk(func(path string, f packr.File) error {
 		temp := templates.New(f.Name())
