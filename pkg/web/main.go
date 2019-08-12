@@ -2,11 +2,13 @@ package web
 
 import (
 	"fmt"
+	"github.com/gobuffalo/packr"
 	"github.com/spf13/viper"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/client/types"
 	"html/template"
+	"io/ioutil"
 	"k8s.io/client-go/rest"
 	"net/http"
 	"regexp"
@@ -15,9 +17,21 @@ import (
 
 // Serve runs a webserver for kron at the specified url
 func Serve(cl *client.Client, endpoint string) {
-	templates := template.Must(template.New("all").Funcs(template.FuncMap{
+	templates := template.New("all").Funcs(template.FuncMap{
 		"Title": strings.Title,
-	}).ParseGlob("pkg/web/template/*"))
+	})
+
+	box := packr.NewBox("./template")
+
+	box.Walk(func(path string, f packr.File) error {
+		temp := templates.New(f.Name())
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			return err
+		}
+		_, err = temp.Parse(string(b))
+		return err
+	})
 
 	// Main page
 	http.HandleFunc("/", getDashHandleFunc(cl, templates))
