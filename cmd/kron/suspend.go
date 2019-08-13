@@ -1,6 +1,7 @@
 package kron
 
 import (
+	"errors"
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
@@ -16,12 +17,22 @@ If the cron job is already suspended, does nothing.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
-			options, err := parsing.ListOptions(cmd, nil)
+			options, err := parsing.ListOptions(cmd, args)
 			if err != nil {
 				return err
 			}
 
-			success, err := c.SetCronJobSuspend(ctxs, namespace, args[0], true, options)
+			all, err := c.ListCronJobsOverContexts(ctxs, namespace, options)
+			if err != nil {
+				return err
+			}
+			if len(all) == 0 {
+				return errors.New("no cronjobs found")
+			} else if len(all) > 1 {
+				return errors.New("too many cronjobs match the criteria")
+			}
+
+			success, err := c.SetCronJobSuspend(all[0].Context, all[0].Namespace, all[0].Name, true)
 			if err != nil {
 				return err
 			}
