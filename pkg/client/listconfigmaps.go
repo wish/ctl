@@ -72,5 +72,6 @@ func (c *Client) ListConfigMapsOverContexts(contexts []string, namespace string,
 	if failed != nil {
 		return ret, errors.New("failed connecting to the following contexts: " + strings.Join(failed, ", "))
 	}
+	sortObjs(ret)
 	return ret, nil
 }

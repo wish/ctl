@@ -70,5 +70,7 @@ func (c *Client) ListCronJobsOverContexts(contexts []string, namespace string, o
 	if failed != nil {
 		return ret, errors.New("failed connecting to the following contexts: " + strings.Join(failed, ", "))
 	}
+
+	sortObjs(ret)
 	return ret, nil
 }
