@@ -15,7 +15,7 @@ type Client struct {
 	// Add more functionality here...?
 	clientsetGetter
 	contextsGetter
-	extension clusterext.Extension
+	clusterext.Extension
 }
 
 // GetPlaceholderClient returns an empty client
@@ -25,7 +25,7 @@ func GetPlaceholderClient() *Client {
 
 // AttachLabelForger creates and adds an Extension to the client
 func (c *Client) AttachLabelForger(m map[string]map[string]string) {
-	c.extension = clusterext.Extension{m}
+	c.Extension = clusterext.Extension{m}
 }
 
 func clientsetHelper(getConfig func() (*restclient.Config, error)) (kubernetes.Interface, error) {
@@ -56,7 +56,7 @@ func GetConfigClient(path string) *Client {
 		contextsGetter: StaticContextsGetter{
 			contexts: contexts,
 		},
-		extension: clusterext.EmptyExtension(contexts),
+		Extension: clusterext.EmptyExtension(contexts),
 	}
 }
 
@@ -73,6 +73,6 @@ func GetFakeConfigClient(clusters map[string][]runtime.Object) *Client {
 			clientsets: clientsets,
 		},
 		contextsGetter: StaticContextsGetter{contexts: contexts},
-		extension:      clusterext.EmptyExtension(contexts),
+		Extension:      clusterext.EmptyExtension(contexts),
 	}
 }

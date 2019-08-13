@@ -24,7 +24,7 @@ func (c *Client) ListDeployments(context string, namespace string, options ListO
 	var items []types.DeploymentDiscovery
 	for _, deployment := range deployments.Items {
 		cm := types.DeploymentDiscovery{context, deployment}
-		c.extension.Transform(&cm)
+		c.Transform(&cm)
 		if filter.MatchLabel(cm, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(cm.Name)) {
 			items = append(items, cm)
 		}
@@ -35,9 +35,9 @@ func (c *Client) ListDeployments(context string, namespace string, options ListO
 // ListDeploymentsOverContexts is like ListDeployments but operates over multiple clusters
 func (c *Client) ListDeploymentsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.DeploymentDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+		contexts = c.GetFilteredContexts(options.LabelMatch)
 	} else {
-		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
+		contexts = c.FilterContexts(contexts, options.LabelMatch)
 	}
 
 	var wait sync.WaitGroup

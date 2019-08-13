@@ -15,16 +15,17 @@
             <input class="form-control form-control-sm mr-sm-2 bg-light" type="search" placeholder="Namespace" aria-label="Namespace" name="namespace" value="{{.Namespace}}">
             <!-- </form> -->
             <!-- Default columns -->
-            {{range $label, $val := .DefaultColumns}}
-            <div class="form-group">
-              <label for="defaultcol-{{$label}}">{{$label | Title}}: </label>
-              <input class="form-control form-control-sm mr-sm-2 bg-light" type="search" aria-label="{{$label | Title}}" name="{{$label}}" value="{{$val}}" id="defaultcol-{{$label}}">
-            <div>
+            {{range .LabelFlags}}
+            <select name="{{.LabelName}}" class="form-control form-control-sm" id="select-{{.LabelName}}">
+              <option value="">SELECT {{.LabelName | ToUpper}}</option>
+              {{range .Values}}
+              <option {{if .Set}}selected {{end}}value="{{.Name}}">{{.Name}}</option>
+              {{end}}
+            </select>
             {{end}}
             <button type="submit" class="btn btn-sm btn-primary">Apply</button>
           </div>
         </form>
-
       </ul>
     </div>
   </nav>
@@ -43,8 +44,8 @@
           <th scope="col">Suspend</th>
           <th scope="col">Active</th>
           <th scope="col">Last Run</th>
-          {{range $label, $_ := .DefaultColumns}}
-          <th scope="col">{{$label | Title}}</th>
+          {{range .DefaultColumns}}
+          <th scope="col">{{. | Title}}</th>
           {{end}}
         </tr>
       </thead>
@@ -58,8 +59,8 @@
           <td>{{.Active}}</td>
           <td>{{.LastRun}}</td>
           {{with $labels := .Labels}}
-            {{range $label, $_ := $.DefaultColumns}}
-              <td>{{index $labels $label}}</td>
+            {{range $.DefaultColumns}}
+              <td>{{index $labels .}}</td>
             {{end}}
           {{end}}
         </tr>

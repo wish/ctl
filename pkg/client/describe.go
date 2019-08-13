@@ -14,18 +14,18 @@ import (
 
 // Helper to print contextual info
 func (c *Client) describeContextInfo(context string) string {
-	if c.extension.ClusterExt == nil {
+	if c.ClusterExt == nil {
 		return ""
 	}
-	if _, ok := c.extension.ClusterExt[context]; !ok {
+	if _, ok := c.ClusterExt[context]; !ok {
 		return ""
 	}
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "Context: \t%s\n", context)
-	if _, ok := c.extension.ClusterExt[context]; ok {
+	if _, ok := c.ClusterExt[context]; ok {
 		fmt.Fprintf(&sb, "Labels:  \t")
 		first := true
-		for k, v := range c.extension.ClusterExt[context] {
+		for k, v := range c.ClusterExt[context] {
 			if strings.HasPrefix(k, "_") {
 				continue
 			}

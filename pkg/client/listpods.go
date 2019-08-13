@@ -24,7 +24,7 @@ func (c *Client) ListPods(context string, namespace string, options ListOptions)
 	var items []types.PodDiscovery
 	for _, pod := range pods.Items {
 		p := types.PodDiscovery{context, pod}
-		c.extension.Transform(&p)
+		c.Transform(&p)
 		if filter.MatchLabel(p, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(p.Name)) {
 			items = append(items, p)
 		}
@@ -35,9 +35,9 @@ func (c *Client) ListPods(context string, namespace string, options ListOptions)
 // ListPodsOverContexts is like ListPods but operates over multiple clusters
 func (c *Client) ListPodsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.PodDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+		contexts = c.GetFilteredContexts(options.LabelMatch)
 	} else {
-		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
+		contexts = c.FilterContexts(contexts, options.LabelMatch)
 	}
 
 	var wait sync.WaitGroup

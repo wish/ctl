@@ -20,7 +20,7 @@ func (c *Client) GetDeployment(context, namespace string, name string, options G
 	}
 
 	d := types.DeploymentDiscovery{context, *configmap}
-	c.extension.Transform(&d)
+	c.Transform(&d)
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
 	}
@@ -30,9 +30,9 @@ func (c *Client) GetDeployment(context, namespace string, name string, options G
 // FindDeployments simultaneously searches for multiple deployments and returns all results
 func (c *Client) FindDeployments(contexts []string, namespace string, names []string, options ListOptions) ([]types.DeploymentDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+		contexts = c.GetFilteredContexts(options.LabelMatch)
 	} else {
-		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
+		contexts = c.FilterContexts(contexts, options.LabelMatch)
 	}
 	// Creating set of names
 	positive := make(map[string]struct{})

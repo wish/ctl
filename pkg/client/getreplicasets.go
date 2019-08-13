@@ -20,7 +20,7 @@ func (c *Client) GetReplicaSet(context, namespace string, name string, options G
 	}
 
 	r := types.ReplicaSetDiscovery{context, *replicaset}
-	c.extension.Transform(&r)
+	c.Transform(&r)
 	if !filter.MatchLabel(r, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
 	}
@@ -30,9 +30,9 @@ func (c *Client) GetReplicaSet(context, namespace string, name string, options G
 // FindReplicaSets simultaneously searches for multiple configmaps and returns all results
 func (c *Client) FindReplicaSets(contexts []string, namespace string, names []string, options ListOptions) ([]types.ReplicaSetDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+		contexts = c.GetFilteredContexts(options.LabelMatch)
 	} else {
-		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
+		contexts = c.FilterContexts(contexts, options.LabelMatch)
 	}
 	// Creating set of names
 	positive := make(map[string]struct{})

@@ -12,13 +12,15 @@ import (
 	"k8s.io/client-go/rest"
 	"net/http"
 	"regexp"
+	"sort"
 	"strings"
 )
 
 // Serve runs a webserver for kron at the specified url
 func Serve(cl *client.Client, endpoint string) {
 	templates := template.New("all").Funcs(template.FuncMap{
-		"Title": strings.Title,
+		"Title":   strings.Title,
+		"ToUpper": strings.ToUpper,
 	})
 
 	box := packr.New("all", "./template")
@@ -62,38 +64,74 @@ func getDashHandleFunc(cl *client.Client, templates *template.Template) func(htt
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := struct {
 			Page           page
-			Contexts       map[string]bool
 			Namespace      string
 			Search         string
 			Cronjobs       []cardDetails
-			DefaultColumns map[string]string
+			DefaultColumns []string
+			LabelFlags     []struct {
+				LabelName string
+				Values    []struct {
+					Name string
+					Set  bool
+				}
+			}
 		}{
 			Page:           page{Title: "Dashboard - Kron", Active: "dashboard"},
-			Contexts:       make(map[string]bool),
-			DefaultColumns: make(map[string]string),
+			DefaultColumns: viper.GetStringSlice("default_columns"),
 		}
 
-		// Contexts
+		// To keep track of which values got added
+		labelValues := make(map[string]struct {
+			ind  int
+			vals map[string]struct{}
+		})
 		for _, x := range cl.GetAllContexts() {
-			data.Contexts[x] = false
+			for k, v := range cl.Extension.ClusterExt[x] {
+				if !strings.HasPrefix(k, "_") {
+					// Add label to set
+					if _, ok := labelValues[k]; !ok {
+						labelValues[k] = struct {
+							ind  int
+							vals map[string]struct{}
+						}{len(data.LabelFlags), make(map[string]struct{})}
+						data.LabelFlags = append(data.LabelFlags, struct {
+							LabelName string
+							Values    []struct {
+								Name string
+								Set  bool
+							}
+						}{LabelName: k})
+					}
+					// Add label value to list of values
+					if _, ok := labelValues[k].vals[v]; !ok {
+						data.LabelFlags[labelValues[k].ind].Values = append(data.LabelFlags[labelValues[k].ind].Values, struct {
+							Name string
+							Set  bool
+						}{v, r.URL.Query().Get(k) == v})
+						labelValues[k].vals[v] = struct{}{}
+					}
+				}
+			}
 		}
 
-		// Check valid
-		ctxs := r.URL.Query()["context"]
-		for _, c := range ctxs {
-			if _, ok := data.Contexts[c]; ok {
-				data.Contexts[c] = true
-			}
+		// Keep options in alphabetical order
+		sort.Slice(data.LabelFlags, func(i, j int) bool {
+			return strings.Compare(data.LabelFlags[i].LabelName, data.LabelFlags[j].LabelName) < 0
+		})
+
+		for _, x := range data.LabelFlags {
+			sort.Slice(x.Values, func(i, j int) bool {
+				return strings.Compare(x.Values[i].Name, x.Values[j].Name) < 0
+			})
 		}
 
 		// Default columns
 		var dcLabelsRaw []string
 
-		for _, col := range viper.GetStringSlice("default_columns") {
-			v := r.URL.Query().Get(col)
-			data.DefaultColumns[col] = v
+		for k := range labelValues {
+			v := r.URL.Query().Get(k)
 			if len(v) > 0 {
-				dcLabelsRaw = append(dcLabelsRaw, col+"="+v)
+				dcLabelsRaw = append(dcLabelsRaw, k+"="+v)
 			}
 		}
 
@@ -102,6 +140,7 @@ func getDashHandleFunc(cl *client.Client, templates *template.Template) func(htt
 			fmt.Println("error encountered when parsing default columns: ", err.Error())
 		}
 
+		ctxs := cl.GetFilteredContexts(labelMatch)
 		namespace := r.URL.Query().Get("namespace")
 		data.Namespace = namespace
 

@@ -24,7 +24,7 @@ func (c *Client) ListJobs(context string, namespace string, options ListOptions)
 	var items []types.JobDiscovery
 	for _, job := range jobs.Items {
 		r := types.JobDiscovery{context, job}
-		c.extension.Transform(&r)
+		c.Transform(&r)
 		if filter.MatchLabel(r, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(r.Name)) {
 			items = append(items, r)
 		}
@@ -35,9 +35,9 @@ func (c *Client) ListJobs(context string, namespace string, options ListOptions)
 // ListJobsOverContexts is like ListJobs but operates over multiple clusters
 func (c *Client) ListJobsOverContexts(contexts []string, namespace string, options ListOptions) ([]types.JobDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+		contexts = c.GetFilteredContexts(options.LabelMatch)
 	} else {
-		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
+		contexts = c.FilterContexts(contexts, options.LabelMatch)
 	}
 
 	var wait sync.WaitGroup

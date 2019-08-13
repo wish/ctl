@@ -19,7 +19,7 @@ func (c *Client) GetJob(context, namespace string, name string, options GetOptio
 	}
 
 	d := types.JobDiscovery{context, *job}
-	c.extension.Transform(&d)
+	c.Transform(&d)
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
 	}
@@ -29,9 +29,9 @@ func (c *Client) GetJob(context, namespace string, name string, options GetOptio
 // FindJobs simultaneously searches for multiple jobs and returns all results
 func (c *Client) FindJobs(contexts []string, namespace string, names []string, options ListOptions) ([]types.JobDiscovery, error) {
 	if len(contexts) == 0 {
-		contexts = c.extension.GetFilteredContexts(options.LabelMatch)
+		contexts = c.GetFilteredContexts(options.LabelMatch)
 	} else {
-		contexts = c.extension.FilterContexts(contexts, options.LabelMatch)
+		contexts = c.FilterContexts(contexts, options.LabelMatch)
 	}
 	// Creating set of names
 	positive := make(map[string]struct{})
