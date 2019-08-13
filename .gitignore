@@ -3,3 +3,5 @@ vendor
 bin
 ctl
 coverage.txt
+packrd
+*-packr.go
