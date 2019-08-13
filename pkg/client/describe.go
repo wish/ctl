@@ -74,7 +74,7 @@ func (c *Client) DescribeJob(job types.JobDiscovery, options DescribeOptions) (s
 
 // DescribeConfigMap returns a human readable format to describe the configmap
 func (c *Client) DescribeConfigMap(configmap types.ConfigMapDiscovery, options DescribeOptions) (string, error) {
-	d, err := c.getDescriber(configmap.Context, schema.GroupKind{Group: batchv1.GroupName, Kind: "ConfigMap"})
+	d, err := c.getDescriber(configmap.Context, schema.GroupKind{Group: corev1.GroupName, Kind: "ConfigMap"})
 	if err != nil {
 		return "", err
 	}
