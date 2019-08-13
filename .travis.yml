@@ -14,7 +14,6 @@ env:
 
 before_install:
   - go get -u golang.org/x/lint/golint
-  - go get -u github.com/gobuffalo/packr/v2/packr2
 
 install:
   - sudo snap install snapcraft --classic
