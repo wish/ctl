@@ -14,6 +14,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 )
 
 // Serve runs a webserver for kron at the specified url
@@ -34,6 +35,19 @@ func Serve(cl *client.Client, endpoint string) {
 		_, err = temp.Parse(string(b))
 		return err
 	})
+
+	// Icons
+	static := packr.New("static", "./static")
+	if file, err := static.Open("icon.png"); err == nil {
+		http.HandleFunc("/icon.png", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeContent(w, r, "icon", time.Time{}, file)
+		})
+	}
+	if file, err := static.Open("icon-white-center.png"); err == nil {
+		http.HandleFunc("/icon-white-center.png", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeContent(w, r, "icon", time.Time{}, file)
+		})
+	}
 
 	// Main page
 	http.HandleFunc("/", getDashHandleFunc(cl, templates))
