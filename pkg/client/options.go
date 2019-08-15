@@ -35,3 +35,9 @@ type LogOptions struct {
 type DescribeOptions struct {
 	ShowEvents bool
 }
+
+// DeleteOptions is used to specify conditions on deleting a resource
+type DeleteOptions struct {
+	// When set, the resource is deleted immediately by setting GracePeriodSeconds to 0.
+	Now bool
+}
