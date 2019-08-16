@@ -12,5 +12,7 @@ before:
     - packr2
 
 archives:
-  - files:
+  -
+    files:
     - none*
+    format: binary
