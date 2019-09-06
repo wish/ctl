@@ -5,6 +5,7 @@ import (
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
+	apiextensionv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 )
 
 // CronJobDiscovery represents a cron job with the context information
@@ -70,5 +71,16 @@ type ReplicaSetDiscovery struct {
 
 // GetLabels allows ReplicaSetDiscovery to implement the Labeled interface
 func (c ReplicaSetDiscovery) GetLabels() map[string]string {
+	return c.Labels
+}
+
+// CrdDiscovery represents a CRD with the context information
+type CrdDiscovery struct {
+	Context string
+	apiextensionv1.CustomResourceDefinition
+}
+
+// GetLabels allows CrdDiscovery to implement the Labeled interface
+func (c CrdDiscovery) GetLabels() map[string]string {
 	return c.Labels
 }

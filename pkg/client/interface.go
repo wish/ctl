@@ -2,18 +2,21 @@ package client
 
 import (
 	"errors"
+	apiextension "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kubectl/pkg/describe"
 	describeversioned "k8s.io/kubectl/pkg/describe/versioned"
+
 	"sync"
 )
 
 type clientsetGetter interface {
 	getContextInterface(string) (kubernetes.Interface, error)
 	getDescriber(string, schema.GroupKind) (describe.Describer, error)
+	getCrdClientSet(context string) (*apiextension.Clientset, error)
 }
 
 type clusterFunctionality struct {
@@ -55,6 +58,17 @@ func (d *configClientsetGetter) getContextInterface(context string) (kubernetes.
 	return clientset, nil
 }
 
+func (d *configClientsetGetter) getCrdClientSet(context string) (*apiextension.Clientset, error) {
+	// Get config
+	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: d.config},
+		&clientcmd.ConfigOverrides{CurrentContext: context}).ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+	return apiextension.NewForConfig(config)
+}
+
 func (d *configClientsetGetter) getDescriber(context string, kind schema.GroupKind) (describe.Describer, error) {
 	_, err := d.getContextInterface(context)
 	if err != nil {
@@ -81,4 +95,8 @@ func (f *fakeClientsetGetter) getContextInterface(context string) (kubernetes.In
 
 func (*fakeClientsetGetter) getDescriber(string, schema.GroupKind) (describe.Describer, error) {
 	return nil, errors.New("fake client cannot describe")
+}
+
+func (d *fakeClientsetGetter) getCrdClientSet(context string) (*apiextension.Clientset, error) {
+	return nil, errors.New("fake client cannot list crd")
 }
