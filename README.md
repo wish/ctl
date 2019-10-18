@@ -37,11 +37,11 @@ You can compile the binary by running `make`. Move the binary created in `bin` t
 Example:
 
 ```shell
-$ ctl get pods bye --env=dev
-CONTEXT               NAMESPACE  NAME                  READY  STATUS     RESTARTS  AGE      ENV  AZ
-app-05-dev.k8s.local  default    bye-1565193600-trc9d  0/1    Succeeded  0         2h17m4s  dev  us-west-1a
-app-05-dev.k8s.local  default    bye-1565197200-hq2z6  0/1    Succeeded  0         1h17m5s  dev  us-west-1a
-app-05-dev.k8s.local  default    bye-1565200800-zg44s  0/1    Succeeded  0         17m6s    dev  us-west-1a
+$ ctl get pods bye --k8s_env=dev
+CONTEXT               NAMESPACE  NAME                  READY  STATUS     RESTARTS  AGE      K8S_ENV  AZ
+app-05-dev.k8s.local  default    bye-1565193600-trc9d  0/1    Succeeded  0         2h17m4s  dev      us-west-1a
+app-05-dev.k8s.local  default    bye-1565197200-hq2z6  0/1    Succeeded  0         1h17m5s  dev      us-west-1a
+app-05-dev.k8s.local  default    bye-1565200800-zg44s  0/1    Succeeded  0         17m6s    dev      us-west-1a
 ```
 
 ## Commands
@@ -74,10 +74,10 @@ Ctl operates across multiple cluster, but it may not be desired to work on all o
 
 Howevever, for most users, we have added functionality to make it easier to specify and narrow down clusters.
 
-When configured, new labels can be added to all clusters. For example, at Wish ctl now has three global flags: env, az and region. You may use any combination of these to narrow down which clusters to query on.
+When configured, new labels can be added to all clusters. For example, at Wish ctl now has three global flags: k8s_env, az and region. You may use any combination of these to narrow down which clusters to query on.
 
 ```shell
-$ ctl get pods --env=dev
+$ ctl get pods --k8s_env=dev
 ```
 
 Additional columns are added to get output from labels. These columns are set by the config. See [configuration](#setup-and-configuration) for more details.
@@ -87,7 +87,7 @@ Additional columns are added to get output from labels. These columns are set by
 Most objects can be scoped to a namespace. By default, ctl operates on all namespaces, but you may specify a single namespace with the `-n, --namespace` flag. For more expensive operations, specifying contexts and namespaces can improve the performance.
 
 ### Labels
-Objects can be filtered by labels. The cluster-level labels above are shorthands for these labels filters (`--env=dev` is equivalent to `-l env=dev`). Use flag `-l, --label`. You can set any number of labels together: `-l a=b,b=c -l c!=d` is valid.
+Objects can be filtered by labels. The cluster-level labels above are shorthands for these labels filters (`--k8s_env=dev` is equivalent to `-l k8s_env=dev`). Use flag `-l, --label`. You can set any number of labels together: `-l a=b,b=c -l c!=d` is valid.
 
 There are three types of label filters:
 
