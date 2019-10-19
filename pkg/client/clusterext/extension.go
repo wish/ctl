@@ -10,6 +10,7 @@ import (
 // it also supports filtering clusters by labels
 type Extension struct {
 	ClusterExt map[string]map[string]string
+	K8Envs []string
 }
 
 // EmptyExtension returns an Extension object that works as if no extensions are set
