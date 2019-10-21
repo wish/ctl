@@ -10,7 +10,7 @@ import (
 // it also supports filtering clusters by labels
 type Extension struct {
 	ClusterExt map[string]map[string]string
-	K8Envs []string
+	K8Envs     []string
 }
 
 // EmptyExtension returns an Extension object that works as if no extensions are set
@@ -83,4 +83,27 @@ func (e Extension) FilterContexts(contexts []string, l filter.LabelMatch) []stri
 		}
 	}
 	return ret
+}
+
+// GetK8sEnv retrieves all unique K8s environments from an Extension assuming that the ClusterExt is set
+func (e *Extension) GetK8sEnv() {
+	e.K8Envs = make([]string, 0)
+
+	for _, v := range e.ClusterExt {
+		if _, ok := v["k8s_env"]; ok {
+
+			// Check if the environment already exists in the K8Envs flag
+			exists := false
+			for _, env := range e.K8Envs {
+				if env == v["k8s_env"] {
+					exists = true
+					break
+				}
+			}
+
+			if !exists {
+				e.K8Envs = append(e.K8Envs, v["k8s_env"])
+			}
+		}
+	}
 }

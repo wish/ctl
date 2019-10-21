@@ -37,7 +37,7 @@ func runCmd(c *client.Client) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			e := clusterext.Extension{m}
+			e := clusterext.Extension{ClusterExt: m, K8Envs: nil}
 			ctxs := e.GetFilteredContexts(labelMatch)
 
 			// Random shuffle contexts

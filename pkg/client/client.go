@@ -25,7 +25,8 @@ func GetPlaceholderClient() *Client {
 
 // AttachLabelForger creates and adds an Extension to the client
 func (c *Client) AttachLabelForger(m map[string]map[string]string) {
-	c.Extension = clusterext.Extension{m}
+	c.Extension = clusterext.Extension{ClusterExt: m, K8Envs: nil}
+	c.GetK8sEnv()
 }
 
 func clientsetHelper(getConfig func() (*restclient.Config, error)) (kubernetes.Interface, error) {

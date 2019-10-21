@@ -343,3 +343,9 @@ func printCronJobList(w io.Writer, lst []types.CronJobDiscovery, labelColumns []
 	}
 	tw.Flush()
 }
+
+func printK8sEnvList(k8sEnv []string) {
+	for _, v := range k8sEnv {
+		fmt.Println(v)
+	}
+}

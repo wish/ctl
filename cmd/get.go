@@ -90,6 +90,8 @@ Optionally, it filters through names match any of the regular expressions set.` 
 					return err
 				}
 				printCronJobList(cmd.OutOrStdout(), list, labelColumns)
+			case "k8s_env":
+				printK8sEnvList(c.K8Envs)
 			default:
 				cmd.Help()
 				return errors.New(`the resource type "` + args[0] + `" was not found`)

@@ -85,7 +85,7 @@ func TestTransform(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		e := Extension{test.lf}
+		e := Extension{test.lf, nil}
 		for _, obj := range test.objs {
 			res := obj.obj.(filter.Labeled)
 			if e.Transform(obj.obj); !reflect.DeepEqual(res.GetLabels(), obj.ans) {
@@ -96,7 +96,7 @@ func TestTransform(t *testing.T) {
 }
 
 func TestBadTransform(t *testing.T) { // should not crash
-	Extension{map[string]map[string]string{"x": map[string]string{"x": "x"}}}.Transform(1)
+	Extension{map[string]map[string]string{"x": map[string]string{"x": "x"}}, nil}.Transform(1)
 }
 
 func TestEmptyExtension(t *testing.T) {
