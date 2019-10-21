@@ -57,6 +57,12 @@ func cmd() *cobra.Command {
 
 	c.AttachLabelForger(m)
 
+	if len(m) == 0 {
+		fmt.Printf("Config is empty and there are no clusters. " +
+			"Please check that the config file at %s is correctly loaded " +
+			"and that your kube config is up to date and valid.\n", conf)
+	}
+
 	cmd := &cobra.Command{
 		Use:          "ctl",
 		Short:        "A CLI tool for discovering k8s pods/logs across multiple clusters",
