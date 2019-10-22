@@ -1,0 +1,15 @@
+Source: ctl
+Section: net
+Priority: optional
+Maintainer: Wish Engineering <launchpad@contextlogic.com>
+Build-Depends: debhelper (>= 10), golang-1.12
+Standards-Version: 4.1.2
+Homepage: <insert the upstream URL, if relevant>
+#Vcs-Git: https://anonscm.debian.org/git/collab-maint/ctl.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/ctl.git
+
+Package: ctl
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
