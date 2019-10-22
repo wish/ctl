@@ -66,7 +66,7 @@ Currently, ctl supports the following resource types (with shorthand in parenthe
 - configmaps (cm)
 - k8s_env 
 
-* k8s_env list all possible k8s_env for the clusters
+*k8s_env list all possible k8s_env for the clusters
 
 ## Multi-cluster usage
 Ctl operates across multiple cluster, but it may not be desired to work on all of them. For the advanced user, you may directly specify which cluster(s) to use via the context flag:
