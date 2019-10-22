@@ -1,3 +1,9 @@
+ctl (12.0.1-1-1) bionic; urgency=medium
+
+  * Made revisions according to feedback from infra poc (warning messages, list all envs, change env to k8s_env). -zliu
+
+ -- Wish Engineering <launchpad@contextlogic.com>  Tue, 21 Oct 2019 11:40:00 +0000
+
 ctl (12.0.0-3-6) bionic; urgency=medium
 
   * Change to build from source, and actually install ctl binary. -lhuhn
