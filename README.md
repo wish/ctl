@@ -126,7 +126,7 @@ Ctl prints out the command before running.
 Cluster level configs are cached. To update this cached data, run `ctl config fetch`. Sometimes you may need to delete the ctl config folder. This is normally at `$XDG_CONFIG_DIR/ctl` or `~/.config/ctl`.
 
 ## Kron
-Kron features are outdated. Most cronjob features can be accessed through the base ctl commands. However, `ctl kron web` still remains useful. It creates a webserver to display all cronjobs. You may see `ctl help kron` for more details.
+Kron features are outdated. Most cronjob features can be accessed through the base ctl commands. However, `ctl kron web` still remains useful. It creates a webserver to display all cronjobs. You may see `ctl help kron` for more details. Locally, this should be run in the ctl repo to access the static files.
 
 # Setup and Configuration
 This section refers to the optional setup on the server-side of configuration ctl for all users. To use the optional features of ctl, a ConfigMap should be added to clusters.
