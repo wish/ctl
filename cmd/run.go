@@ -99,7 +99,7 @@ func runCmd(c *client.Client) *cobra.Command {
 					}
 				}
 			}
-			return errors.New("no command found to run")
+			return errors.New("no command found to run or not authorized to access cluster")
 		},
 	}
 
