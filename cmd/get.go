@@ -57,36 +57,42 @@ Optionally, it filters through names match any of the regular expressions set.` 
 				// NOTE: List is unsorted and could be in an inconsistent order
 				// Output
 				if err != nil {
+					printPodList(cmd.OutOrStdout(), list, labelColumns)
 					return err
 				}
 				printPodList(cmd.OutOrStdout(), list, labelColumns)
 			case "jobs", "job":
 				list, err := c.ListJobsOverContexts(ctxs, namespace, options)
 				if err != nil {
+					printJobList(cmd.OutOrStdout(), list, labelColumns)
 					return err
 				}
 				printJobList(cmd.OutOrStdout(), list, labelColumns)
 			case "configmaps", "configmap", "cm":
 				list, err := c.ListConfigMapsOverContexts(ctxs, namespace, options)
 				if err != nil {
+					printConfigMapList(cmd.OutOrStdout(), list, labelColumns)
 					return err
 				}
 				printConfigMapList(cmd.OutOrStdout(), list, labelColumns)
 			case "deployments", "deployment", "deploy":
 				list, err := c.ListDeploymentsOverContexts(ctxs, namespace, options)
 				if err != nil {
+					printDeploymentList(cmd.OutOrStdout(), list, labelColumns)
 					return err
 				}
 				printDeploymentList(cmd.OutOrStdout(), list, labelColumns)
 			case "replicasets", "replicaset", "rs":
 				list, err := c.ListReplicaSetsOverContexts(ctxs, namespace, options)
 				if err != nil {
+					printReplicaSetList(cmd.OutOrStdout(), list, labelColumns)
 					return err
 				}
 				printReplicaSetList(cmd.OutOrStdout(), list, labelColumns)
 			case "cronjobs", "cronjob":
 				list, err := c.ListCronJobsOverContexts(ctxs, namespace, options)
 				if err != nil {
+					printCronJobList(cmd.OutOrStdout(), list, labelColumns)
 					return err
 				}
 				printCronJobList(cmd.OutOrStdout(), list, labelColumns)
