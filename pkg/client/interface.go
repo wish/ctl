@@ -45,10 +45,7 @@ func (d *configClientsetGetter) getContextInterface(context string) (kubernetes.
 	if err != nil {
 		return nil, err
 	}
-
-	if err != nil {
-		return nil, err
-	}
+	
 	d.cslock.Lock()
 	d.clientsets[context] = clusterFunctionality{clientset, config}
 	d.cslock.Unlock()
