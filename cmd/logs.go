@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
+
 	// "io"
 	"bufio"
 )
@@ -21,7 +22,6 @@ func logsCmd(c *client.Client) *cobra.Command {
 			container, _ := cmd.Flags().GetString("container")
 
 			options, err := parsing.LogOptions(cmd, args)
-			// TODO: move these options to parsing (add to kron)
 			options.Follow, _ = cmd.Flags().GetBool("follow")
 			options.Timestamps, _ = cmd.Flags().GetBool("timestamps")
 

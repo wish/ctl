@@ -8,8 +8,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	configcmd "github.com/wish/ctl/cmd/config"
-
-	//"github.com/wish/ctl/cmd/kron"
 	"github.com/wish/ctl/cmd/util/config"
 	"github.com/wish/ctl/pkg/client"
 )
