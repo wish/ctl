@@ -55,7 +55,7 @@ func TestListDeploymentsSingle(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{deployment.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {deployment.DeepCopyObject()}})
 
 	p, err := cl.ListDeployments("hi", "", ListOptions{})
 	if err != nil {
@@ -80,7 +80,7 @@ func TestListDeploymentsBadContext(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{deployment.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {deployment.DeepCopyObject()}})
 
 	p, err := cl.ListDeployments("pew", "", ListOptions{})
 

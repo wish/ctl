@@ -55,7 +55,7 @@ func TestListConfigMapsSingle(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{configmap.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {configmap.DeepCopyObject()}})
 
 	p, err := cl.ListConfigMaps("hi", "", ListOptions{})
 	if err != nil {
@@ -80,7 +80,7 @@ func TestListConfigMapsBadContext(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{configmap.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {configmap.DeepCopyObject()}})
 
 	p, err := cl.ListConfigMaps("pew", "", ListOptions{})
 

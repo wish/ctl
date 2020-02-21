@@ -55,7 +55,7 @@ func TestListJobsSingle(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{job.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {job.DeepCopyObject()}})
 
 	l, err := cl.ListJobs("hi", "", ListOptions{})
 	if err != nil {
@@ -80,7 +80,7 @@ func TestListJobsBadContext(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{job.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {job.DeepCopyObject()}})
 
 	l, err := cl.ListJobs("pew", "", ListOptions{})
 

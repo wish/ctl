@@ -55,7 +55,7 @@ func TestListReplicaSetsSingle(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{replicaset.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {replicaset.DeepCopyObject()}})
 
 	l, err := cl.ListReplicaSets("hi", "", ListOptions{})
 	if err != nil {
@@ -80,7 +80,7 @@ func TestListReplicaSetsBadContext(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{replicaset.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {replicaset.DeepCopyObject()}})
 
 	l, err := cl.ListReplicaSets("pew", "", ListOptions{})
 

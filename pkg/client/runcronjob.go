@@ -26,7 +26,7 @@ func (c *Client) RunCronJob(contexts []string, namespace, cronjobName string, op
 				Name:      fmt.Sprintf("%s-%d", cronjobName, time.Now().Unix()), // REVIEW: What if name is not unique??
 				Namespace: cronjob.Namespace,
 				OwnerReferences: []metav1.OwnerReference{
-					metav1.OwnerReference{
+					{
 						APIVersion: "batch/v1beta1",
 						Kind:       "CronJob",
 						Name:       cronjob.Name,

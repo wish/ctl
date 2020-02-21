@@ -55,7 +55,7 @@ func TestListPodsSingle(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{pod.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {pod.DeepCopyObject()}})
 
 	p, err := cl.ListPods("hi", "", ListOptions{})
 	if err != nil {
@@ -80,7 +80,7 @@ func TestListPodsBadContext(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{pod.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {pod.DeepCopyObject()}})
 
 	p, err := cl.ListPods("pew", "", ListOptions{})
 

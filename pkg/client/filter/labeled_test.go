@@ -8,9 +8,9 @@ import (
 func TestLabeled(t *testing.T) {
 	tests := []map[string]string{
 		nil,
-		map[string]string{},
-		map[string]string{"a": "b"},
-		map[string]string{"a": "b", "c": "d"},
+		{},
+		{"a": "b"},
+		{"a": "b", "c": "d"},
 	}
 
 	for _, test := range tests {

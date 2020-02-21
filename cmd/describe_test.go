@@ -19,7 +19,7 @@ func TestDescribeSingle(t *testing.T) {
 		},
 	}
 
-	cl := client.GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{pod.DeepCopyObject()}})
+	cl := client.GetFakeConfigClient(map[string][]runtime.Object{"hi": {pod.DeepCopyObject()}})
 
 	cmd := describeCmd(cl)
 	cmd.Flags().StringSliceP("context", "x", nil, "Context")
@@ -43,7 +43,7 @@ func TestDescribeBadContext(t *testing.T) {
 		},
 	}
 
-	cl := client.GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{pod.DeepCopyObject()}})
+	cl := client.GetFakeConfigClient(map[string][]runtime.Object{"hi": {pod.DeepCopyObject()}})
 
 	cmd := describeCmd(cl)
 	cmd.Flags().StringSliceP("context", "x", nil, "Context")
@@ -69,7 +69,7 @@ func TestDescribeUnfound(t *testing.T) {
 		},
 	}
 
-	cl := client.GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{pod.DeepCopyObject()}})
+	cl := client.GetFakeConfigClient(map[string][]runtime.Object{"hi": {pod.DeepCopyObject()}})
 
 	cmd := describeCmd(cl)
 	cmd.Flags().StringSliceP("context", "x", nil, "Context")

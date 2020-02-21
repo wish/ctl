@@ -55,7 +55,7 @@ func TestListCronJobsSingle(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{cronjob.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {cronjob.DeepCopyObject()}})
 
 	p, err := cl.ListCronJobs("hi", "", ListOptions{})
 	if err != nil {
@@ -80,7 +80,7 @@ func TestListCronJobsBadContext(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{cronjob.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {cronjob.DeepCopyObject()}})
 
 	p, err := cl.ListCronJobs("pew", "", ListOptions{})
 
