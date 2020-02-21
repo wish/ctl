@@ -1,11 +1,12 @@
 package client
 
 import (
+	"strconv"
+	"testing"
+
 	batchv1b1 "k8s.io/api/batch/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"strconv"
-	"testing"
 )
 
 func getRandomCronJobs(N int) []*batchv1b1.CronJob {
@@ -157,9 +158,9 @@ func TestGetCronJob(t *testing.T) {
 		namespace string
 		name      string
 	}{
-		{"c1", "", "1"},
+		{"c1", "1", "1"},
 		{"c2", "0", "0"},
-		{"c1", "", "0"},
+		{"c1", "0", "0"},
 		{"c2", "5", "5"},
 	}
 

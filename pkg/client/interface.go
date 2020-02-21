@@ -2,13 +2,14 @@ package client
 
 import (
 	"errors"
+	"sync"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kubectl/pkg/describe"
 	describeversioned "k8s.io/kubectl/pkg/describe/versioned"
-	"sync"
 )
 
 type clientsetGetter interface {
@@ -45,7 +46,7 @@ func (d *configClientsetGetter) getContextInterface(context string) (kubernetes.
 	if err != nil {
 		return nil, err
 	}
-	
+
 	d.cslock.Lock()
 	d.clientsets[context] = clusterFunctionality{clientset, config}
 	d.cslock.Unlock()
