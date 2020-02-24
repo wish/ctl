@@ -14,6 +14,8 @@ import (
 )
 
 func cmd() *cobra.Command {
+	viper.SetDefault("deadline", 18000)
+
 	viper.SetConfigName("config")
 	var conf string
 	if len(conf) == 0 {

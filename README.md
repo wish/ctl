@@ -23,7 +23,6 @@ ___
   - [Labels](#labels)
   - [Hiding clusters](#hiding-clusters)
   - [Default columns](#default-columns)
-  - [Kubectl run](#kubectl-run)
 
 # Overview
 Ctl is a tool that helps with using multiple Kubernetes clusters simultaneously.
@@ -117,9 +116,9 @@ A big feature of ctl is the support for multiple logs at a time. As all of ctl u
 Additionally, this feature supports the `-f, --follow` option which constantly streams logs.
 
 ## Run
-The run command is a wrapper over `kubectl run`. It requires cluster config to set up.
+The run command is a wrapper over `kubectl apply`. It requires cluster config to set up.
 
-The syntax is `ctl run NAME [flags]`. The label flags can be used to narrow down which cluster to run on. If there are multiple clusters in which a run is specified on, ctl randomly picks one.
+The syntax is `ctl run APPNAME [flags]`. The label flags can be used to narrow down which cluster to run on. If there are multiple clusters in which a run is specified on, ctl randomly picks one.
 
 Ctl prints out the command before running.
 
@@ -145,19 +144,3 @@ A cluster can be hidden from users by setting `_hidden` to be true.
 ## Default columns
 You can set default label columns to be printed with get output via `_default_columns`. Set this to be a comma separated list in string format. E.g. `"_default_columns":"col1,able"`.
 
-## Kubectl run
-The run command is to be a serialized json string with the following format:
-
-```go
-map[string]struct{
-  App       string   `json:"app"`
-  ImageTag  string   `json:"image_tag"`
-  Name      string   `json:"name"`
-  Flags     []string `json:"flags"`
-  AfterArgs []string `json:"afterargs"`
-}
-```
-
-Ctl constructs a kubectl call using the above data. First, it searches for a deployment object with a "app" label value specified. Then it overwrites the tag on the image found from the deployment. Then it combines it with the name, flags and calls the program on the pod specified by afterargs.
-
-//TODO: clarify this
