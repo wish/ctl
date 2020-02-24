@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	configcmd "github.com/wish/ctl/cmd/config"
+	"github.com/wish/ctl/cmd/cron"
 	"github.com/wish/ctl/cmd/util/config"
 	"github.com/wish/ctl/pkg/client"
 )
@@ -77,6 +78,7 @@ func cmd() *cobra.Command {
 	cmd.AddCommand(versionCmd(c))
 	cmd.AddCommand(runCmd(c))
 	cmd.AddCommand(deleteCmd(c))
+	cmd.AddCommand(cron.Cmd(c))
 	cmd.AddCommand(configcmd.Cmd(c))
 
 	cmd.PersistentFlags().StringSliceP("context", "x", nil, "Specify the context(s) to operate in. Defaults to all contexts.")
