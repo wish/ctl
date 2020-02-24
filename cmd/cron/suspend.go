@@ -1,4 +1,4 @@
-package kron
+package cron
 
 import (
 	"errors"
@@ -7,12 +7,12 @@ import (
 	"github.com/wish/ctl/pkg/client"
 )
 
-func unsuspendCmd(c *client.Client) *cobra.Command {
+func suspendCmd(c *client.Client) *cobra.Command {
 	return &cobra.Command{
-		Use:   "unsuspend cronjob [flags]",
-		Short: "Unsuspend a cron job",
-		Long: `Unsuspends the specified cron job.
-	If the cron job is not suspended, does nothing.`,
+		Use:   "suspend cronjob [flags]",
+		Short: "Suspend a cron job",
+		Long: `Suspends the specified cron job.
+If the cron job is already suspended, does nothing.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
@@ -32,17 +32,18 @@ func unsuspendCmd(c *client.Client) *cobra.Command {
 				return errors.New("too many cronjobs match the criteria")
 			}
 
-			success, err := c.SetCronJobSuspend(all[0].Context, all[0].Namespace, all[0].Name, false)
+			success, err := c.SetCronJobSuspend(all[0].Context, all[0].Namespace, all[0].Name, true)
 			if err != nil {
 				return err
 			}
 
 			if success {
-				cmd.Println("Successfully unsuspended cron job", args[0])
+				cmd.Println("Successfully suspended cron job", args[0])
 			} else {
-				cmd.Printf("Cron job \"%s\" was already unsuspended\n", args[0])
+				cmd.Printf("Cron job \"%s\" was already suspended\n", args[0])
 			}
-			return err
+
+			return nil
 		},
 	}
 }

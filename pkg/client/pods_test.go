@@ -1,11 +1,12 @@
 package client
 
 import (
+	"strconv"
+	"testing"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"strconv"
-	"testing"
 )
 
 func getRandomPods(N int) []*corev1.Pod {
@@ -54,7 +55,7 @@ func TestListPodsSingle(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{pod.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {pod.DeepCopyObject()}})
 
 	p, err := cl.ListPods("hi", "", ListOptions{})
 	if err != nil {
@@ -79,7 +80,7 @@ func TestListPodsBadContext(t *testing.T) {
 		},
 	}
 
-	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": []runtime.Object{pod.DeepCopyObject()}})
+	cl := GetFakeConfigClient(map[string][]runtime.Object{"hi": {pod.DeepCopyObject()}})
 
 	p, err := cl.ListPods("pew", "", ListOptions{})
 
@@ -157,9 +158,9 @@ func TestGetPod(t *testing.T) {
 		namespace string
 		name      string
 	}{
-		{"c1", "", "1"},
+		{"c1", "1", "1"},
 		{"c2", "0", "0"},
-		{"c1", "", "0"},
+		{"c1", "0", "0"},
 		{"c2", "5", "5"},
 	}
 

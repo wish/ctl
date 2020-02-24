@@ -64,11 +64,11 @@ func TestTransform(t *testing.T) {
 		},
 		{
 			lf: map[string]map[string]string{
-				"c1": map[string]string{
+				"c1": {
 					"foo":   "bar",
 					"hello": "world",
 				},
-				"c2": map[string]string{
+				"c2": {
 					"pft": "tfp",
 				},
 				"c3": nil,
@@ -96,15 +96,15 @@ func TestTransform(t *testing.T) {
 }
 
 func TestBadTransform(t *testing.T) { // should not crash
-	Extension{map[string]map[string]string{"x": map[string]string{"x": "x"}}, nil}.Transform(1)
+	Extension{map[string]map[string]string{"x": {"x": "x"}}, nil}.Transform(1)
 }
 
 func TestEmptyExtension(t *testing.T) {
 	var lists = [][]string{
-		[]string{"abc", "def", "ghi", "jkl"},
-		[]string{""},
-		[]string{"wow"},
-		[]string{},
+		{"abc", "def", "ghi", "jkl"},
+		{""},
+		{"wow"},
+		{},
 	}
 
 	equal := func(a []string, b []string) bool {

@@ -1,4 +1,4 @@
-package kron
+package cron
 
 import (
 	"github.com/spf13/cobra"

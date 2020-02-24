@@ -3,17 +3,18 @@ package cmd
 import (
 	"encoding/json"
 	"errors"
+	"math/rand"
+	"os"
+	"os/exec"
+	"strings"
+	"time"
+
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/config"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/client/clusterext"
 	"github.com/wish/ctl/pkg/client/filter"
-	"math/rand"
-	"os"
-	"os/exec"
-	"strings"
-	"time"
 )
 
 type runDetails struct {
