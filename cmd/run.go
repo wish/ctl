@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -23,6 +24,13 @@ type runDetails struct {
 	Manifest string `json:"manifest"`
 }
 
+const (
+	// DefaultDeadline - default amount of time to keep the ad hoc pods running
+	DefaultDeadline string = "120"
+	// MaxDeadline sets the max deadline for a job (defaulted to 1 day)
+	MaxDeadline int = 60 * 60 * 24
+)
+
 func runCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "run APPNAME [flags]",
@@ -30,8 +38,17 @@ func runCmd(c *client.Client) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			labelMatch, _ := parsing.LabelMatchFromCmd(cmd)
-			activeDeadline, _ := cmd.Flags().GetInt("deadline")
+			deadline, _ := cmd.Flags().GetString("deadline")
 
+			// Check for valid input for deadline and set default if needed
+			if deadlineInt, err := strconv.Atoi(deadline); err != nil || deadlineInt < 1 || deadlineInt > MaxDeadline {
+				fmt.Printf("Setting default deadline of %v seconds \n", DefaultDeadline)
+				deadline = DefaultDeadline
+			}
+
+			appName := args[0]
+
+			// Get all kubernetes contexts from config file
 			m, err := config.GetCtlExt()
 			if err != nil {
 				return err
@@ -52,25 +69,45 @@ func runCmd(c *client.Client) *cobra.Command {
 						continue
 					}
 
-					// Parse run command specified
-					if run, ok := runs[args[0]]; ok {
+					// Get a list of available app names
+					availableAppNames := make([]string, len(runs))
+					i := 0
+					for k := range runs {
+						availableAppNames[i] = k
+						i++
+					}
+
+					// Check if the app name exists in the raw runs
+					if run, ok := runs[appName]; ok {
+						// Check if the app is active
 						if run.Active {
+							// Get hostname to use in job name
 							user, err := os.Hostname()
 							if err != nil {
-								errors.New("Unnable to get hostname of machine")
+								return errors.New("Unable to get hostname of machine")
 							}
-							manifest := regexp.MustCompile(`({USER}\)`).ReplaceAllString(run.Manifest, user)
-							manifest = regexp.MustCompile(`("{ACTIVE_DEADLINE_SECONDS}\")`).ReplaceAllString(manifest, strconv.Itoa(activeDeadline))
+							// Template out hostname into job name in manifest
+							manifest := regexp.MustCompile(`({USER})`).ReplaceAllString(run.Manifest, user)
+							// Template active deadline seconds into manifest
+							manifest = regexp.MustCompile(`("{ACTIVE_DEADLINE_SECONDS}")`).ReplaceAllString(manifest, deadline)
 
+							// Pass the manifest into a reader for stdin
 							r := strings.NewReader(manifest)
 							command := exec.Command("kubectl", "apply", "-f", "-")
 							command.Stdout = os.Stdout
 							command.Stderr = os.Stderr
 							command.Stdin = r
 
+							fmt.Printf("Running %v in %v with a deadline of %vs\n", appName, ctx, deadline)
+
 							return command.Run()
 						}
-						cmd.Printf("WARN: Command found in a cluster but is disabled with message: %s", run.Manifest)
+						// If the app name is not active, let's just print its manifest
+						cmd.Printf("WARN: App name not active in %v. Manifest file: %v\n", ctx, run.Manifest)
+					} else {
+						// App name not found, list out available app names to the user
+						fmt.Printf("Available app names: %v\n", availableAppNames)
+						return errors.New("App name not found")
 					}
 				}
 			}
