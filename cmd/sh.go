@@ -1,10 +1,11 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"os"
 )
 
 func shCmd(c *client.Client) *cobra.Command {

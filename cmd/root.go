@@ -80,6 +80,7 @@ func cmd() *cobra.Command {
 	cmd.AddCommand(versionCmd(c))
 	cmd.AddCommand(runCmd(c))
 	cmd.AddCommand(deleteCmd(c))
+	cmd.AddCommand(cpCmd(c))
 	cmd.AddCommand(cron.Cmd(c))
 	cmd.AddCommand(configcmd.Cmd(c))
 

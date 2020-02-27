@@ -3,8 +3,9 @@ package client
 import (
 	"errors"
 	"fmt"
-	"github.com/wish/ctl/pkg/client/types"
 	"strings"
+
+	"github.com/wish/ctl/pkg/client/types"
 )
 
 // Helpers for finding a specific pod
@@ -29,7 +30,7 @@ func (c *Client) findPod(contexts []string, namespace, name string, options List
 	return &pod, nil
 }
 
-func (c *Client) findPodWithContainer(contexts []string, namespace, name, optionalContainer string, options ListOptions) (pod *types.PodDiscovery, container string, err error) {
+func (c *Client) FindPodWithContainer(contexts []string, namespace, name, optionalContainer string, options ListOptions) (pod *types.PodDiscovery, container string, err error) {
 	pod, err = c.findPod(contexts, namespace, name, options)
 	if err != nil {
 		return

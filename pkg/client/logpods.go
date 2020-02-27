@@ -2,16 +2,17 @@ package client
 
 import (
 	"fmt"
-	"github.com/wish/ctl/pkg/client/logsync"
 	"io"
-	"k8s.io/api/core/v1"
-	"k8s.io/client-go/rest"
 	"strings"
+
+	"github.com/wish/ctl/pkg/client/logsync"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/rest"
 )
 
 // LogPodOverContexts retrieves logs of a single pod (uses first found if multiple)
 func (c *Client) LogPodOverContexts(contexts []string, namespace, name, container string, options LogOptions) (*rest.Request, error) {
-	pod, container, err := c.findPodWithContainer(contexts, namespace, name, container, ListOptions{options.LabelMatch, nil})
+	pod, container, err := c.FindPodWithContainer(contexts, namespace, name, container, ListOptions{options.LabelMatch, nil})
 	if err != nil {
 		return nil, err
 	}

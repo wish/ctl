@@ -1,8 +1,9 @@
 package client
 
 import (
-	"github.com/wish/ctl/pkg/client/helper"
 	"io"
+
+	"github.com/wish/ctl/pkg/client/helper"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -12,7 +13,7 @@ import (
 
 // ExecInPod executes a command on a pod interactively
 func (c *Client) ExecInPod(contexts []string, namespace, name, container string, options ListOptions, commands []string, stdin io.Reader, stdout, stderr io.Writer) error {
-	pod, container, err := c.findPodWithContainer(contexts, namespace, name, container, options)
+	pod, container, err := c.FindPodWithContainer(contexts, namespace, name, container, options)
 	if err != nil {
 		return err
 	}
