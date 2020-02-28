@@ -11,10 +11,14 @@ func (c *Client) DeleteJob(context, namespace, name string, options DeleteOption
 		return err
 	}
 
-	var deleteOptions *metav1.DeleteOptions
+	deleteOptions := &metav1.DeleteOptions{}
 	if options.Now {
 		var one int64 = 1
-		deleteOptions = &metav1.DeleteOptions{GracePeriodSeconds: &one}
+		deleteOptions.GracePeriodSeconds = &one
+	}
+	if options.DeletionPropagation {
+		bg := metav1.DeletePropagationBackground
+		deleteOptions.PropagationPolicy = &bg
 	}
 
 	return cl.BatchV1().Jobs(namespace).Delete(name, deleteOptions)

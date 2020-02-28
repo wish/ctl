@@ -1,8 +1,9 @@
 package client
 
 import (
-	"github.com/wish/ctl/pkg/client/filter"
 	"regexp"
+
+	"github.com/wish/ctl/pkg/client/filter"
 )
 
 // ListOptions is used to specify filtering on list operations
@@ -40,4 +41,6 @@ type DescribeOptions struct {
 type DeleteOptions struct {
 	// When set, the resource is deleted immediately by setting GracePeriodSeconds to 0.
 	Now bool
+	// When set, the spawned resources created by a job are also deleted
+	DeleteionPropagation bool
 }
