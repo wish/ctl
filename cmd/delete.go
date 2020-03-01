@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
+	"strings"
+
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
-	"io"
-	"strings"
 )
 
 var supportedDeleteTypes = [][]string{
@@ -67,7 +68,8 @@ func deleteCmd(c *client.Client) *cobra.Command {
 			labelColumns, _ := cmd.Flags().GetStringSlice("label-columns")
 
 			now, _ := cmd.Flags().GetBool("now")
-			deleteOptions := client.DeleteOptions{Now: now}
+			deleteChildren, _ := cmd.Flags().GetBool("delete-children")
+			deleteOptions := client.DeleteOptions{Now: now, DeletionPropagation: deleteChildren}
 
 			switch strings.ToLower(args[0]) {
 			case "pods", "pod", "po":
@@ -265,6 +267,7 @@ func deleteCmd(c *client.Client) *cobra.Command {
 
 	cmd.Flags().StringSlice("label-columns", nil, "Prints with columns that contain the value of the specified label")
 	cmd.Flags().Bool("now", false, "If true, signals the resource for immediate shutdown")
+	cmd.Flags().Bool("delete-children", true, "If true, deletes jobs' spawned resources")
 
 	return cmd
 }

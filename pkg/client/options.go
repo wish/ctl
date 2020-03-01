@@ -1,8 +1,9 @@
 package client
 
 import (
-	"github.com/wish/ctl/pkg/client/filter"
 	"regexp"
+
+	"github.com/wish/ctl/pkg/client/filter"
 )
 
 // ListOptions is used to specify filtering on list operations
@@ -39,5 +40,6 @@ type DescribeOptions struct {
 // DeleteOptions is used to specify conditions on deleting a resource
 type DeleteOptions struct {
 	// When set, the resource is deleted immediately by setting GracePeriodSeconds to 0.
-	Now bool
+	Now                 bool
+	DeletionPropagation bool
 }

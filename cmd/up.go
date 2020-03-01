@@ -20,29 +20,40 @@ import (
 )
 
 type runDetails struct {
-	Active   bool   `json:"active"`
-	Manifest string `json:"manifest"`
+	Resources resource `json:"resources"`
+	Active    bool     `json:"active"`
+	Manifest  string   `json:"manifest"`
+}
+
+type resource struct {
+	CPU    string `json:"cpu"`
+	Memory string `json:"memory"`
 }
 
 const (
-	// DefaultDeadline - default amount of time to keep the ad hoc pods running
-	DefaultDeadline string = "120"
+	// DefaultDeadline - default amount (in secs) of time to keep the ad hoc pods running
+	DefaultDeadline string = "14400" // 4 hours = 60 * 60 * 4
 	// MaxDeadline sets the max deadline for a job (defaulted to 1 day)
 	MaxDeadline int = 60 * 60 * 24
+	// DefaultCPU is used to template cpu in manifest file if no default or flag is found
+	DefaultCPU string = "0.5"
+	// DefaultMemory is used to template memory in manifest file if no default or flag is found
+	DefaultMemory string = "128Mi"
 )
 
-func runCmd(c *client.Client) *cobra.Command {
+func upCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "run APPNAME [flags]",
-		Short: "Shortcut tool to using kubectl run",
+		Use:   "up APPNAME [flags]",
+		Short: "Creates an ad hoc job with app name (defined in manifest)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			labelMatch, _ := parsing.LabelMatchFromCmd(cmd)
 			deadline, _ := cmd.Flags().GetString("deadline")
+			cpu, _ := cmd.Flags().GetString("cpu")
+			memory, _ := cmd.Flags().GetString("memory")
 
 			// Check for valid input for deadline and set default if needed
 			if deadlineInt, err := strconv.Atoi(deadline); err != nil || deadlineInt < 1 || deadlineInt > MaxDeadline {
-				fmt.Printf("Setting default deadline of %v seconds \n", DefaultDeadline)
 				deadline = DefaultDeadline
 			}
 
@@ -79,26 +90,67 @@ func runCmd(c *client.Client) *cobra.Command {
 
 					// Check if the app name exists in the raw runs
 					if run, ok := runs[appName]; ok {
-						// Check if the app is active
 						if run.Active {
 							// Get hostname to use in job name
 							user, err := os.Hostname()
 							if err != nil {
 								return errors.New("Unable to get hostname of machine")
 							}
+
+							// First, let's check if a job is already running. We want to limit 1 job per user.
+							// We find the job using its name '<app name>-<host name>' eg 'foo-bar'
+							jobs, err := c.FindJobs([]string{}, "", []string{fmt.Sprintf("%s-%s", appName, user)},
+								client.ListOptions{},
+							)
+
+							// Ask the user if they want to delete the current jobs to create a new one
+							if len(jobs) > 0 {
+								fmt.Printf("\nExisting jobs: (%d) found. Running %s will delete the current jobs, continue? [y/n]\n",
+									len(jobs), appName)
+								// Use the prompter from deleteCmd in delete.go
+								if !prompter(cmd.InOrStdin()) {
+									fmt.Printf("Aborted\n")
+									return nil
+								}
+
+								for _, job := range jobs {
+									deleteOptions := client.DeleteOptions{Now: true, DeletionPropagation: true}
+									c.DeleteJob(job.Context, job.Namespace, job.Name, deleteOptions)
+								}
+							}
+
 							// Template out hostname into job name in manifest
 							manifest := regexp.MustCompile(`({USER})`).ReplaceAllString(run.Manifest, user)
 							// Template active deadline seconds into manifest
 							manifest = regexp.MustCompile(`("{ACTIVE_DEADLINE_SECONDS}")`).ReplaceAllString(manifest, deadline)
+							// Template out resources into the manifest
+							if cpu != "" {
+								run.Resources.CPU = cpu
+							} else if run.Resources.CPU == "" {
+								run.Resources.CPU = DefaultCPU
+							}
+							manifest = regexp.MustCompile(`({CPU})`).ReplaceAllString(manifest, run.Resources.CPU)
+							if memory != "" {
+								run.Resources.Memory = memory
+							} else if run.Resources.Memory == "" {
+								run.Resources.Memory = DefaultMemory
+							}
+							manifest = regexp.MustCompile(`({MEMORY})`).ReplaceAllString(manifest, run.Resources.Memory)
+
+							// Add context flag in case the namespace does not exist in current cluster
+							context := fmt.Sprintf("--context=%s", ctx)
 
 							// Pass the manifest into a reader for stdin
 							r := strings.NewReader(manifest)
-							command := exec.Command("kubectl", "apply", "-f", "-")
+							command := exec.Command("kubectl", "apply", "-f", "-", context)
 							command.Stdout = os.Stdout
 							command.Stderr = os.Stderr
 							command.Stdin = r
 
-							fmt.Printf("Running %v in %v with a deadline of %vs\n", appName, ctx, deadline)
+							fmt.Printf("Running %v with a deadline of %v seconds. CPU: %v, Memory: %v...\n",
+								appName, deadline, run.Resources.CPU, run.Resources.Memory)
+							fmt.Printf("JOB: %v\nCONTEXT: %v\n\nUse `ctl login %s` to sh into your pod\n\n",
+								appName+"-"+user, ctx, appName)
 
 							return command.Run()
 						}
@@ -116,6 +168,8 @@ func runCmd(c *client.Client) *cobra.Command {
 	}
 
 	cmd.Flags().String("deadline", "", "Time pod will stay alive in seconds")
+	cmd.Flags().String("cpu", "", "CPU for pod, default is "+DefaultCPU+". eg. --cpu=0.5")
+	cmd.Flags().String("memory", "", "Memory for pod, default is "+DefaultMemory+". eg --memory=4.0Gi")
 
 	return cmd
 }

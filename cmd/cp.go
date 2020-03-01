@@ -20,7 +20,7 @@ import (
 const (
 	// ToPod is the command line argument for copying files into the pod
 	ToPod string = "in"
-	// FromPod is the command line argument for copying files out of the pod 
+	// FromPod is the command line argument for copying files out of the pod
 	FromPod string = "out"
 )
 
@@ -62,12 +62,12 @@ If no container is set, it will use the first one.`,
 			outputFiles := out
 			sourceFiles := source
 			if inOrOut == ToPod {
-				fmt.Printf("\nCopying files into POD %s in NAMESPACE %s and CONTECT %s\n", podName, podNamespace, podContext)
+				fmt.Printf("\nCopying files into POD %s in NAMESPACE %s and CONTEXT %s\n", podName, podNamespace, podContext)
 
 				// Point destination to the pod: <namespace>/<pod>:<destination directory>
 				outputFiles = fmt.Sprintf("%s/%s:%s", podNamespace, podName, out)
 			} else if inOrOut == FromPod {
-				fmt.Printf("\nCopying files out of POD %s in NAMESPACE %s and CONTECT %s\n", podName, podNamespace, podContext)
+				fmt.Printf("\nCopying files out of POD %s in NAMESPACE %s and CONTEXT %s\n", podName, podNamespace, podContext)
 
 				// Set source from the pod: <namespace>/<pod>:<source directory>
 				sourceFiles = fmt.Sprintf("%s/%s:%s", podNamespace, podName, source)
@@ -81,9 +81,7 @@ If no container is set, it will use the first one.`,
 
 			// Print out useful info for users
 			fmt.Printf("\nCopying files from: %s\n", source)
-			fmt.Printf("Placing them in: %v\n\n", out)
-			fmt.Printf("Running command...\nkubectl cp %v %v %v %v\n\n", sourceFiles, outputFiles, context, container)
-
+			fmt.Printf("Placing them in: %v\n", out)
 			command := exec.Command("kubectl", "cp", sourceFiles, outputFiles, context, container)
 			command.Stdout = os.Stdout
 			command.Stderr = os.Stderr
