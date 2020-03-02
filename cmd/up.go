@@ -51,6 +51,7 @@ func upCmd(c *client.Client) *cobra.Command {
 			deadline, _ := cmd.Flags().GetString("deadline")
 			cpu, _ := cmd.Flags().GetString("cpu")
 			memory, _ := cmd.Flags().GetString("memory")
+			user, _ := cmd.Flags().GetString("user")
 
 			// Check for valid input for deadline and set default if needed
 			if deadlineInt, err := strconv.Atoi(deadline); err != nil || deadlineInt < 1 || deadlineInt > MaxDeadline {
@@ -91,10 +92,12 @@ func upCmd(c *client.Client) *cobra.Command {
 					// Check if the app name exists in the raw runs
 					if run, ok := runs[appName]; ok {
 						if run.Active {
-							// Get hostname to use in job name
-							user, err := os.Hostname()
-							if err != nil {
-								return errors.New("Unable to get hostname of machine")
+							// Get hostname to use in job name if not supplied
+							if user == "" {
+								user, err = os.Hostname()
+								if err != nil {
+									return errors.New("Unable to get hostname of machine")
+								}
 							}
 
 							// First, let's check if a job is already running. We want to limit 1 job per user.
@@ -102,6 +105,9 @@ func upCmd(c *client.Client) *cobra.Command {
 							jobs, err := c.FindJobs([]string{}, "", []string{fmt.Sprintf("%s-%s", appName, user)},
 								client.ListOptions{},
 							)
+							if err != nil {
+								return fmt.Errorf("Failed to find jobs: %v", err)
+							}
 
 							// Ask the user if they want to delete the current jobs to create a new one
 							if len(jobs) > 0 {
@@ -170,6 +176,7 @@ func upCmd(c *client.Client) *cobra.Command {
 	cmd.Flags().String("deadline", "", "Time pod will stay alive in seconds")
 	cmd.Flags().String("cpu", "", "CPU for pod, default is "+DefaultCPU+". eg. --cpu=0.5")
 	cmd.Flags().String("memory", "", "Memory for pod, default is "+DefaultMemory+". eg --memory=4.0Gi")
+	cmd.Flags().StringP("user", "u", "", "Name that is used for ad hoc jobs. Defaulted to hostname.")
 
 	return cmd
 }

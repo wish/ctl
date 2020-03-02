@@ -15,18 +15,25 @@ func downCmd(c *client.Client) *cobra.Command {
 		Short: "Deletes all ad hoc job with app name (defined in manifest)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			user, _ := cmd.Flags().GetString("user")
 			appName := args[0]
 
-			// Get hostname to use in job name
-			user, err := os.Hostname()
-			if err != nil {
-				return errors.New("Unable to get hostname of machine")
+			// Get hostname to use in job name if not supplied
+			if user == "" {
+				var err error
+				user, err = os.Hostname()
+				if err != nil {
+					return errors.New("Unable to get hostname of machine")
+				}
 			}
 
 			// Find existing jobs
 			jobs, err := c.FindJobs([]string{}, "", []string{fmt.Sprintf("%s-%s", appName, user)},
 				client.ListOptions{},
 			)
+			if err != nil {
+				return fmt.Errorf("Failed to find jobs: %v", err)
+			}
 
 			// Ask the user if they want to delete the current jobs to create a new one
 			if len(jobs) > 0 {
@@ -53,6 +60,7 @@ func downCmd(c *client.Client) *cobra.Command {
 			return nil
 		},
 	}
+	cmd.Flags().StringP("user", "u", "", "Name that is used for ad hoc jobs. Defaulted to hostname.")
 
 	return cmd
 }

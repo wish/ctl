@@ -26,12 +26,17 @@ If the pod has multiple containers, it will choose the first container found.`,
 			namespace, _ := cmd.Flags().GetString("namespace")
 			container, _ := cmd.Flags().GetString("container")
 			shell, _ := cmd.Flags().GetString("shell")
+			user, _ := cmd.Flags().GetString("user")
 
 			appName := args[0]
-			// Get hostname to find pod
-			user, err := os.Hostname()
-			if err != nil {
-				return errors.New("Unable to get hostname of machine")
+
+			// Get hostname to use in job name if not supplied
+			if user == "" {
+				var err error
+				user, err = os.Hostname()
+				if err != nil {
+					return errors.New("Unable to get hostname of machine")
+				}
 			}
 
 			// We get the pod through the name label
@@ -73,6 +78,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 
 	cmd.Flags().StringP("container", "c", "", "Specify the container")
 	cmd.Flags().StringP("shell", "s", "/bin/bash", "Specify the shell path")
+	cmd.Flags().StringP("user", "u", "", "Name that is used for ad hoc jobs. Defaulted to hostname.")
 
 	return cmd
 }
