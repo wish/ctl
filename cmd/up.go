@@ -20,9 +20,10 @@ import (
 )
 
 type runDetails struct {
-	Resources resource `json:"resources"`
-	Active    bool     `json:"active"`
-	Manifest  string   `json:"manifest"`
+	Resources    resource `json:"resources"`
+	Active       bool     `json:"active"`
+	Manifest     string   `json:"manifest"`
+	LoginCommand []string `json:"login_command"`
 }
 
 type resource struct {
