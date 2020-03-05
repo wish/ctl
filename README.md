@@ -16,9 +16,9 @@ ___
   - [Multi-cluster usage](#multi-cluster-usage)
   - [Flags](#flags)
   - [Logs](#logs)
-  - [Run](#run)
   - [Config](#config)
   - [Cron](#cron)
+  - [Adhoc Jobs](#adhoc-jobs)
 - [Setup and configuration](#setup-and-configuration)
   - [Labels](#labels)
   - [Hiding clusters](#hiding-clusters)
@@ -128,12 +128,117 @@ Cluster level configs are cached. To update this cached data, run `ctl config fe
 ## Cron
 Most cronjob features can be accessed through the base ctl commands. The `ctl cron` command allows for diect manipulation of k8s cronjobs. You may see `ctl help cron` for more details.
 
+## Adhoc Jobs
+There are 4 main commands associated with running adhoc jobs, `ctl up`, `ctl down`, `ctl login`, and `ctl cp in/out`.
+
+### ctl up APPNAME [flags]
+`ctl up APPNAME` will check the ctl-config for the APPNAME and run kubectl apply to its associated manifest. The user can supply 4 flags to this command:
+
+* `--deadline=<your deadline>`, will check the manifest file for the string **"{ACTIVE_DEADLINE_SECONDS}"** and replace it with what was set in the flag. This flag determines the activeDeadlineSeconds of the job. When the job life the exceeded the deadline set, the job along with its associated resource will be deleted. The current default is _4 hours_.
+* `--cpu=<your cpu>`, will check the manifest file for the string **{CPU}** and replace it with what was set in the flag. If no value is set, it will check ctl-config for a default value and if none is found, it will use _0.5_ as a default.
+* `--memory=<your memory>`, will check the manifest file for the string **"{ACTIVE_DEADLINE_SECODS}"** and replace it with what was set in the flag. If no value is set, it will check ctl-config for a default value and if none is found, it will use _128Mi_ as a default.
+* `--user=<your user>`, will check the manifest file for the string **{USER}** and replace it with what was set in the flag. This flag is used for spawning the job and finding the ad hoc pods associated with your name. The default name used is the user's hostname.
+
+_Note that the [TTLAfterFinished](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/) feature must be enabled on your kubernetes cluster_
+
+### ctl down APPNAME [flags]
+`ctl down APPNAME` will simply look through all of the clusters and namespaces for the users' jobs created through `ctl up` and delete them.
+
+* `--user=<your user>`, will check for jobs spawned by the user. The default name used is the user's hostname.
+
+### ctl login APPNAME [flags]
+`ctl login APPNAME` will run a `kubectl exec` command on your following job. the command to be run will be defined in the ctl-config configmap and will use the pod associated with the job (if there is one).
+
+Also, when running login, it will give the name of the pod spawned by the job so the user can use `ctl cp`
+
+* `--user=<your user>`, will check for jobs spawned by the user. The default name used is the user's hostname.
+* `--container=<your container>`, will check the pod for the following container and run the command on that container. If no container is specified it will use the first one found if there are multiple containers.
+
+### ctl cp in/out POD SOURCE [flags]
+`ctl cp in/out POD SOURCE` will copy files into the pod (`ctl cp in`) or out of the pod (`ctl cp out`) using `kubectl cp`
+
+* `--out=<your output destination>`, the destination of the copied files. If no destination is set it will default to **/tmp/ctl**
+* `--container=<your container>`, will check the pod for the following container and run the command on that container. If no container is specified it will use the first one found if there are multiple containers.
+
 # Setup and Configuration
-This section refers to the optional setup on the server-side of configuration ctl for all users. To use the optional features of ctl, a ConfigMap should be added to clusters.
+This section refers to the optional setup on the server-side of configuration ctl for all users. To use the optional features of ctl (such as `ctl up`, `ctl down`, and `ctl login`), a ConfigMap should be added to clusters.
 
 This ConfigMap should be located in namespace `kube-system` and have name `ctl-config`.
 
-The data of the ConfigMap can be used to specify behaviour.
+## Adhoc Job Config Setup
+To use the ad hoc job feature above, the ctl-config must be configured in a certain way. This example will use [jsonnet](https://jsonnet.org/) to make the config file. This jsonnet can generate json and yaml files. Anything with `<text>` wrapped you should change to your specific needs.
+
+```yaml
+[
+    {
+        apiVersion: 'v1',
+        kind: 'ConfigMap',
+        metadata: {
+            namespace: 'kube-system',
+            name: 'ctl-config',
+        },
+        data: {
+            k8s_env: <YOUR ENVIRONMENT>,
+            region: <YOUR REGION>,
+            _hidden: <TRUE OR FALSE>,
+            _run: std.toString({
+                "<YOUR APPNAME>": {
+                    resources: {
+                        cpu: "<YOUR DEFAULT CPU>",
+                        memory: "<YOUR DEFAULT MEMORY>"
+                    },
+                    active: <TRUE OR FALSE>,
+                    login_command: "<YOUR LOGIN COMMAND HERE>",
+                    manifest: std.manifestJson(
+                        <YOUR JOB MANNIFEST HERE>
+
+                        for example 
+
+                        {
+                            apiVersion: 'batch/v1',
+                            kind: 'Job',
+                            metadata: {
+                            name: '<YOUR APPNAME>-{USER}',
+                            namespace: 'ctl-oneoff',
+                            },
+                            spec: {
+                                activeDeadlineSeconds: "{ACTIVE_DEADLINE_SECONDS}",
+                                ttlSecondsAfterFinished: 0,
+                                template: {
+                                    metadata: {
+                                        labels: {
+                                            name: '<YOUR APPNAME>-{USER}',
+                                            tier: 'merchant-oneoff-pod',
+                                        },
+                                        namespace: 'merchant-oneoff',
+                                    },
+                                    spec: {
+                                        restartPolicy: Never,
+                                        containers: [
+                                            {
+                                                name: '<YOUR APPNAME>-pod-{USER}',
+                                                command: ['/bin/bash', '-c', '--'],
+                                                args: ['while true; do sleep 30; done;'],
+                                                image: perl,
+                                                resources: {
+                                                    requests: {
+                                                        cpu: '{CPU}',
+                                                        memory: '{MEMORY}',
+                                                    },
+                                                },
+                                            }
+                                        ],
+                                    }
+                                },
+                            }
+                        }
+                    ),
+                }
+            })
+        },
+    }
+]
+```
 
 ## Labels
 All fields in the ConfigMap that are not prefixed with an underscore are set as cluster-level labels. These labels will be propagated down to the objects on each cluster. Setting these labels are useful for describing and filtering the clusters.
