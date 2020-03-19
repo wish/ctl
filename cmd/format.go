@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/robfig/cron"
-	"github.com/spf13/viper"
-	"github.com/wish/ctl/pkg/client/types"
 	"io"
 	"os"
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/robfig/cron"
+	"github.com/spf13/viper"
+	"github.com/wish/ctl/pkg/client/types"
 )
 
 // REVIEW: Most of the processing here was guessed with reverse engineering

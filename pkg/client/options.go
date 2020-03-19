@@ -40,7 +40,6 @@ type DescribeOptions struct {
 // DeleteOptions is used to specify conditions on deleting a resource
 type DeleteOptions struct {
 	// When set, the resource is deleted immediately by setting GracePeriodSeconds to 0.
-	Now bool
-	// When set, the spawned resources created by a job are also deleted
+	Now                 bool
 	DeletionPropagation bool
 }

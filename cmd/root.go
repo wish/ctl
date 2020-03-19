@@ -14,6 +14,8 @@ import (
 )
 
 func cmd() *cobra.Command {
+	viper.SetDefault("deadline", 18000)
+
 	viper.SetConfigName("config")
 	var conf string
 	if len(conf) == 0 {
@@ -74,10 +76,13 @@ func cmd() *cobra.Command {
 	cmd.AddCommand(describeCmd(c))
 	cmd.AddCommand(getCmd(c))
 	cmd.AddCommand(logsCmd(c))
+	cmd.AddCommand(loginCmd(c))
 	cmd.AddCommand(shCmd(c))
 	cmd.AddCommand(versionCmd(c))
-	cmd.AddCommand(runCmd(c))
+	cmd.AddCommand(upCmd(c))
 	cmd.AddCommand(deleteCmd(c))
+	cmd.AddCommand(cpCmd(c))
+	cmd.AddCommand(downCmd(c))
 	cmd.AddCommand(cron.Cmd(c))
 	cmd.AddCommand(configcmd.Cmd(c))
 
