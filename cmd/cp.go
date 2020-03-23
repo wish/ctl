@@ -1,17 +1,16 @@
 package cmd
 
 import (
-	"fmt"
-	"os/exec"
-	"os"
 	"errors"
+	"fmt"
+	"os"
+	"os/exec"
 
-	"github.com/wish/ctl/pkg/client"
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
-
+	"github.com/wish/ctl/pkg/client"
+	v1 "k8s.io/api/core/v1"
 )
-
 
 // func cpTest() {
 // 	fmt.Printf("test")
@@ -33,7 +32,7 @@ Use 'cp in' to copy a file from your local macine into the pod.
 Use 'cp out' to copy a file out of the pod your local machine.
 If there are multiple pods with the same name, it will take the first pod it finds.
 If no container is set, it will use the first one.`,
-		Args:  cobra.ExactArgs(3),
+		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctxs, _ := cmd.Flags().GetStringSlice("context")
 			namespace, _ := cmd.Flags().GetString("namespace")
@@ -47,6 +46,43 @@ If no container is set, it will use the first one.`,
 			inOrOut := args[0]
 			nameOfPod := args[1]
 			source := args[2]
+
+			customPod, _ := cmd.Flags().GetBool("custom-pod")
+			if customPod == false { // Find the pod created by ctl up
+				user, _ := cmd.Flags().GetString("user")
+
+				// Get hostname to use in job name if not supplied
+				if user == "" {
+					var err error
+					user, err = os.Hostname()
+					if err != nil {
+						return errors.New("Unable to get hostname of machine")
+					}
+				}
+
+				// We get the pod through the name label
+				podName := fmt.Sprintf("%s-%s", nameOfPod, user)
+				lm, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", podName))
+				options := client.ListOptions{LabelMatch: lm}
+
+				pods, err := c.ListPodsOverContexts(ctxs, namespace, options)
+				if err != nil {
+					return err
+				}
+				if len(pods) < 1 {
+					return fmt.Errorf("No pod found, try running `ctl up %s` to start your pod", nameOfPod)
+				}
+
+				pod := pods[0]
+
+				podPhase := pod.Status.Phase
+				// Check to see if pod is running
+				if podPhase == v1.PodPending {
+					return fmt.Errorf("Pod %s is still being created", pod.Name)
+				}
+
+				nameOfPod = pod.Name
+			}
 
 			// Find pod, if there are multiple pods, pick the first one
 			pod, container, err := c.FindPodWithContainer(ctxs, namespace, nameOfPod, container, options)
@@ -94,6 +130,8 @@ If no container is set, it will use the first one.`,
 
 	cmd.Flags().StringP("out", "o", "/tmp/ctl", "Specify output folder, default to /tmp/ctl")
 	cmd.Flags().StringP("container", "c", "", "Specify the container")
+	cmd.Flags().Bool("custom-pod", false, "Default false. If true, will find a pod with name instead of searching for pods created by ctl up")
+	cmd.Flags().StringP("user", "u", "", "Name that is used for ad hoc jobs. Defaulted to hostname.")
 
 	return cmd
 }
