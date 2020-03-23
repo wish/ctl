@@ -25,11 +25,12 @@ const (
 
 func cpCmd(c *client.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cp in/out POD SOURCE [flags]",
+		Use:   "cp in/out APPNAME SOURCE [flags]",
 		Short: "Shortcut tool to using kubectl cp",
 		Long: `Shortcut tool to using kubectl cp.
-Use 'cp in' to copy a file from your local macine into the pod.
+Use 'cp in' to copy a file from your local machine into the pod.
 Use 'cp out' to copy a file out of the pod your local machine.
+For custom pods not created by 'ctl up' use --custom-pod flag.
 If there are multiple pods with the same name, it will take the first pod it finds.
 If no container is set, it will use the first one.`,
 		Args: cobra.ExactArgs(3),
