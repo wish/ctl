@@ -95,7 +95,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 				"Use `ctl cp in %s <files> -o <destination>` to copy files into pod\n"+
 				"Use `ctl cp out %s <files> -o <destination>` to copy files out of pod\n"+
 				"Use `ctl cp -h` for more info about file copying\n\n",
-				strings.Join(loginCommand, " "), pod.Name, pod.Name)
+				strings.Join(loginCommand, " "), appName, appName)
 
 			// Build kubectl exec command
 			context := fmt.Sprintf("--context=%s", pod.Context)
