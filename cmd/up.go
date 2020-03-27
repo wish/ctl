@@ -33,7 +33,7 @@ type resource struct {
 
 const (
 	// DefaultDeadline - default amount (in secs) of time to keep the ad hoc pods running
-	DefaultDeadline string = "14400" // 4 hours = 60 * 60 * 4
+	DefaultDeadline string = "43200" // 12 hours = 60 * 60 * 12
 	// MaxDeadline sets the max deadline for a job (defaulted to 1 day)
 	MaxDeadline int = 60 * 60 * 24
 	// DefaultCPU is used to template cpu in manifest file if no default or flag is found
