@@ -1,5 +1,4 @@
 .idea/*
-vendor
 bin
 ctl
 coverage.txt
