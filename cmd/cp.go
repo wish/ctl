@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
@@ -60,6 +61,9 @@ If no container is set, it will use the first one.`,
 						return errors.New("Unable to get hostname of machine")
 					}
 				}
+
+				//Replace periods with dashes to follow K8's name constraints
+				user = strings.Replace(user, ".", "-", -1) 
 
 				// We get the pod through the name label
 				podName := fmt.Sprintf("%s-%s", nameOfPod, user)
