@@ -101,6 +101,9 @@ func upCmd(c *client.Client) *cobra.Command {
 								}
 							}
 
+							//Replace periods with dashes to follow K8's name constraints
+							user = strings.Replace(user, ".", "-", -1) 
+							
 							// First, let's check if a job is already running. We want to limit 1 job per user.
 							// We find the job using its name '<app name>-<host name>' eg 'foo-bar'
 							jobs, err := c.FindJobs([]string{}, "", []string{fmt.Sprintf("%s-%s", appName, user)},
