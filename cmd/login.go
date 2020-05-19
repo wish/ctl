@@ -48,6 +48,9 @@ If the pod has multiple containers, it will choose the first container found.`,
 				}
 			}
 
+			//Replace periods with dashes to follow K8's name constraints
+			user = strings.Replace(user, ".", "-", -1) 
+			
 			// We get the pod through the name label
 			podName := fmt.Sprintf("%s-%s", appName, user)
 			lm, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", podName))

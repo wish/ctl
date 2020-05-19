@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/pkg/client"
@@ -26,6 +27,9 @@ func downCmd(c *client.Client) *cobra.Command {
 					return errors.New("Unable to get hostname of machine")
 				}
 			}
+
+			//Replace periods with dashes to follow K8's name constraints
+			user = strings.Replace(user, ".", "-", -1) 
 
 			// Find existing jobs
 			jobs, err := c.FindJobs([]string{}, "", []string{fmt.Sprintf("%s-%s", appName, user)},
