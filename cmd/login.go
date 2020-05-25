@@ -60,8 +60,20 @@ If the pod has multiple containers, it will choose the first container found.`,
 			if err != nil {
 				return err
 			}
+			
+			// Create a new pod if no existing pods were found
 			if len(pods) < 1 {
-				return fmt.Errorf("No pod found, try running `ctl up %s` to start your pod", appName)
+				fmt.Printf("No existing pods were found. Creating a new ad hoc pod by running `ctl up %s`\n",
+					appName)
+				// Invoke the `ctl up` command 
+
+				if err := upCmd(c).RunE(cmd, args); err != nil {
+					return fmt.Errorf("Failed to create ad hoc pod: %v", err)
+				} 
+				pods, err = c.ListPodsOverContexts(ctxs, namespace, options)
+				if err != nil {
+					return err
+				}
 			}
 
 			pod := pods[0]
