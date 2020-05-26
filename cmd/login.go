@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/config"
@@ -66,10 +67,11 @@ If the pod has multiple containers, it will choose the first container found.`,
 				fmt.Printf("No existing pods were found. Creating a new ad hoc pod by running `ctl up %s`\n",
 					appName)
 				// Invoke the `ctl up` command 
-
 				if err := upCmd(c).RunE(cmd, args); err != nil {
 					return fmt.Errorf("Failed to create ad hoc pod: %v", err)
 				} 
+				time.Sleep(time.Second * 5) // Delay after invoking command to allow clusters to update
+				
 				pods, err = c.ListPodsOverContexts(ctxs, namespace, options)
 				if err != nil {
 					return err
