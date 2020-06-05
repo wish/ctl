@@ -37,6 +37,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 			namespace, _ := cmd.Flags().GetString("namespace")
 			container, _ := cmd.Flags().GetString("container")
 			user, _ := cmd.Flags().GetString("user")
+			python, _ := cmd.Flags().GetString("python")
 
 			appName := args[0]
 
@@ -102,6 +103,14 @@ If the pod has multiple containers, it will choose the first container found.`,
 				}
 				loginCommand = runs[appName].LoginCommand
 			}
+			// If python flag is present, the login command is overwritten to run the python script or start python shell
+			if python != "" {
+				loginCommand = []string{ "/home/app/virtualenv/bin/python"}
+				defaultVal := cmd.Flags().Lookup("python").NoOptDefVal
+				if python != defaultVal {
+					loginCommand = append(loginCommand,python)
+				}
+			}
 			// If no loginCommand is supplied then default to bash
 			if len(loginCommand) < 1 {
 				fmt.Printf("Using default command: %v\n", DefaultLoginCommand)
@@ -137,6 +146,8 @@ If the pod has multiple containers, it will choose the first container found.`,
 
 	cmd.Flags().StringP("container", "c", "", "Specify the container")
 	cmd.Flags().StringP("user", "u", "", "Name that is used for ad hoc jobs. Defaulted to hostname.")
+	cmd.Flags().StringP("python", "p", "", "Name of the python script to run in the pod. If no argument is passed, a python shell will be started ")
+	cmd.Flags().Lookup("python").NoOptDefVal = "default" // Hack to allow flag to be passed without arguments
 
 	return cmd
 }
