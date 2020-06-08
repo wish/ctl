@@ -25,7 +25,7 @@ func (c *Client) ListPods(context string, namespace string, options ListOptions)
 	for _, pod := range pods.Items {
 		p := types.PodDiscovery{context, pod}
 		c.Transform(&p)
-		if filter.MatchLabel(p, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(p.Name)) {
+		if filter.MatchLabel(p, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(p.Name)) && (options.StatusMatch.State == "" || p.Status.Phase == options.StatusMatch.State) {
 			items = append(items, p)
 		}
 	}

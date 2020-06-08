@@ -107,6 +107,7 @@ Optionally, it filters through names match any of the regular expressions set.` 
 	}
 
 	cmd.Flags().StringSlice("label-columns", nil, "Prints with columns that contain the value of the specified label")
+	cmd.Flags().StringP("status", "s", "", "Filter pods by specified status")
 
 	return cmd
 }

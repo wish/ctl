@@ -12,7 +12,7 @@ import (
 
 // LogPodOverContexts retrieves logs of a single pod (uses first found if multiple)
 func (c *Client) LogPodOverContexts(contexts []string, namespace, name, container string, options LogOptions) (*rest.Request, error) {
-	pod, container, err := c.FindPodWithContainer(contexts, namespace, name, container, ListOptions{options.LabelMatch, nil})
+	pod, container, err := c.FindPodWithContainer(contexts, namespace, name, container, ListOptions{options.LabelMatch, options.StatusMatch, nil})
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (c *Client) LogPodOverContexts(contexts []string, namespace, name, containe
 
 // LogPodsOverContexts retrieves logs of multiple pods (uses first found if multiple)
 func (c *Client) LogPodsOverContexts(contexts []string, namespace, container string, options LogOptions) (io.Reader, error) {
-	pods, err := c.ListPodsOverContexts(contexts, namespace, ListOptions{options.LabelMatch, options.Search})
+	pods, err := c.ListPodsOverContexts(contexts, namespace, ListOptions{options.LabelMatch, options.StatusMatch, options.Search})
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (c *Client) LogPod(context, namespace, name, container string, options LogO
 
 	// Find first container
 	if container == "" || namespace == "" {
-		pod, err := c.findPod([]string{context}, namespace, name, ListOptions{options.LabelMatch, nil})
+		pod, err := c.findPod([]string{context}, namespace, name, ListOptions{options.LabelMatch, options.StatusMatch, nil})
 		if err != nil {
 			return nil, err
 		}
