@@ -158,6 +158,7 @@ The names are regex expressions. ` + "\n\n" + describeResourceStr(),
 	}
 
 	cmd.Flags().Bool("show-events", true, "If true, display events related to the described object.")
+	cmd.Flags().StringP("status", "s", "", "Filter pods by specified status")
 
 	return cmd
 }

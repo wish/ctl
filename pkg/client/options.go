@@ -10,6 +10,8 @@ import (
 type ListOptions struct {
 	// Filtering by labels
 	filter.LabelMatch
+	// Filtering by status
+	filter.StatusMatch
 	// Filtering by name
 	Search *regexp.Regexp
 }
@@ -24,6 +26,8 @@ type GetOptions struct {
 type LogOptions struct {
 	// Filtering by labels
 	filter.LabelMatch
+	// Filtering by status
+	filter.StatusMatch
 	// When set streams logs
 	Follow bool
 	// Filtering by name

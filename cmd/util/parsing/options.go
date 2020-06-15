@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/client/filter"
+	v1 "k8s.io/api/core/v1"
 	"regexp"
 	"strings"
 )
@@ -21,12 +22,26 @@ func LabelMatchFromCmd(cmd *cobra.Command) (filter.LabelMatch, error) {
 	return LabelMatchSlice(s)
 }
 
+//StatusFromCmd automatically parses the status flag from a command
+//and returns the filtering.StatusMatch specified.
+func StatusFromCmd(cmd *cobra.Command) (filter.StatusMatch, error) {
+	s , err := cmd.Flags().GetString("status")
+	status := filter.StatusMatch{State: v1.PodPhase(s)}
+	return status, err
+}
+
 // ListOptions parses a client.ListOptions from a command
 func ListOptions(cmd *cobra.Command, searches []string) (client.ListOptions, error) {
 	l, err := LabelMatchFromCmd(cmd)
 	if err != nil {
 		return client.ListOptions{}, err
 	}
+
+	s, err := StatusFromCmd(cmd)
+	if err != nil {
+		return client.ListOptions{}, err
+	}
+
 	var re *regexp.Regexp
 	if len(searches) > 0 {
 		// Check that each individual search is a valid regex
@@ -40,7 +55,7 @@ func ListOptions(cmd *cobra.Command, searches []string) (client.ListOptions, err
 	if err != nil {
 		return client.ListOptions{}, err
 	}
-	return client.ListOptions{LabelMatch: l, Search: re}, nil
+	return client.ListOptions{LabelMatch: l, StatusMatch: s, Search: re}, nil
 }
 
 // GetOptions parses a client.GetOptions from a command
