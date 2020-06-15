@@ -32,7 +32,7 @@ type resource struct {
 }
 
 type manifestDetails struct {
-	ApiVersion string `json:"apiVersion"`
+	APIVersion string `json:"apiVersion"`
 	Kind 	   string `json:"kind"`
 	Spec 	   struct {
 		Template	template `json:"template"`
@@ -180,7 +180,7 @@ func upCmd(c *client.Client) *cobra.Command {
 								var manifestData manifestDetails
 								err = json.Unmarshal([]byte(manifest), &manifestData)
 								if err != nil {
-									return fmt.Errorf("Error parsing manifestJson: %s \n", err)
+									return fmt.Errorf("Error parsing manifestJson: %s", err)
 								}
 								for i, containerDetail := range manifestData.Spec.Template.Spec.Containers {
 									fmt.Printf(containerDetail.Name)
@@ -188,7 +188,7 @@ func upCmd(c *client.Client) *cobra.Command {
 										manifest = strings.ReplaceAll(manifest, containerDetail.Image, image)
 										break;
 									} else if i == len(manifestData.Spec.Template.Spec.Containers)-1 {
-											return fmt.Errorf("Container %s not found \n", container)
+											return fmt.Errorf("Container %s not found", container)
 									}
 								}
 							}
