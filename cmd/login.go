@@ -92,7 +92,8 @@ If the pod has multiple containers, it will choose the first container found.`,
 				return err
 			}
 
-			// Get loginCommand to use with kubectl exec from the config file
+			// Get preLoginCommand to run before logging into the pod and loginCommand to use with kubectl exec from the config file and
+			preLoginCommand := []string{}
 			loginCommand := []string{}
 			if rawruns, ok := m[pod.Context]["_run"]; ok {
 				runs := make(map[string]runDetails)
@@ -101,6 +102,18 @@ If the pod has multiple containers, it will choose the first container found.`,
 					return fmt.Errorf("Failed to get rawruns from ctl-config: %v", err)
 				}
 				loginCommand = runs[appName].LoginCommand
+				preLoginCommand = runs[appName].PreLogin
+			}
+			//If preloginCommand is supplied then run those commands
+			if len(preLoginCommand) > 0 {
+				command := exec.Command("bash", preLoginCommand...)
+				command.Stdout = os.Stdout
+				command.Stdin = os.Stdin
+				command.Stderr = os.Stderr
+				err =  command.Run()
+				if err != nil {
+					return fmt.Errorf("Failed to run pre-login commands: %v", err)
+				}
 			}
 			// If no loginCommand is supplied then default to bash
 			if len(loginCommand) < 1 {
@@ -121,20 +134,6 @@ If the pod has multiple containers, it will choose the first container found.`,
 			if container == "" { // If container flag is empty, grab first one
 				container = fmt.Sprintf("--container=%s", pod.Spec.Containers[0].Name)
 			}
-
-			fmt.Printf("Populating current pod %s with dbshell history from other user pods \n\n", name)
-
-			// Check if dbshell history file exists and then append it to a local file `.py_dbshell`
-			copyFile := []string{ "-c", "\"\"kubectl exec -i " + name + " " + container + " " + context + " " + namespace + " -- /bin/bash -c " +
-					"\"[ -f .ipython/profile_default/history.sqlite ] && cat .ipython/profile_default/history.sqlite\"\"\" >> ~/.py_dbshell"}
-			exec.Command("bash", copyFile...).CombinedOutput()
-
-			// Populate the pod's dbshell history file with the local file `.py_dbshell` if it exists
-			populateDbshell := []string{"-c", "\"\"[ -f ~/.py_dbshell ] && kubectl exec -i " + name + " " + container + " " + context + " " + namespace + " -- /bin/bash -c " +
-					"\"( [ -f .ipython/profile_default/history.sqlite ] || mkdir -p .ipython/profile_default && touch .ipython/profile_default/history.sqlite ) " +
-					"&& cat > .ipython/profile_default/history.sqlite\"\"\" < ~/.py_dbshell"}
-			exec.Command("bash", populateDbshell...).CombinedOutput()
-
 			combinedArgs := append(
 				[]string{"exec", "-i", "-t", name, container, context, namespace, "--"},
 				loginCommand...,

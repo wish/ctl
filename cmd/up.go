@@ -23,7 +23,8 @@ type runDetails struct {
 	Resources    resource `json:"resources"`
 	Active       bool     `json:"active"`
 	Manifest     string   `json:"manifest"`
-	LoginCommand []string `json:"login_command"`
+	PreLogin	 []string `json:"pre_login"`
+	LoginCommand []string `json:"login_command,omitempty"`
 }
 
 type resource struct {
