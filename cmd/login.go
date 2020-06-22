@@ -91,15 +91,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 			if err != nil {
 				return err
 			}
-
-			// Build kubectl exec command
-			context := fmt.Sprintf("--context=%s", pod.Context)
-			namespace = fmt.Sprintf("--namespace=%s", pod.Namespace)
-			name := pod.Name
-			if container == "" { // If container flag is empty, grab first one
-				container = fmt.Sprintf("--container=%s", pod.Spec.Containers[0].Name)
-			}
-			// Get preLoginCommand to run before logging into the pod and loginCommand to use with kubectl exec from the config file and
+			// Get preLoginCommand to run before logging into the pod and loginCommand to use with kubectl exec from the config file
 			preLoginCommand := [][]string{}
 			loginCommand := []string{}
 			if rawruns, ok := m[pod.Context]["_run"]; ok {
@@ -112,9 +104,16 @@ If the pod has multiple containers, it will choose the first container found.`,
 				preLoginCommand = runs[appName].PreLogin
 			}
 
+			// Build kubectl exec command
+			context := fmt.Sprintf("--context=%s", pod.Context)
+			namespace = fmt.Sprintf("--namespace=%s", pod.Namespace)
+			name := pod.Name
+			if container == "" { // If container flag is empty, grab first one
+				container = fmt.Sprintf("--container=%s", pod.Spec.Containers[0].Name)
+			}
+
 			// If preloginCommand is supplied then run those commands
-			// preloginCommand form : {{kubectl cmd, bash args}, { kubectl cmd, bash args}, ...}
-			// bash args are optional
+			// preloginCommand form (bash args are optional): {{kubectl cmd, bash args}, { kubectl cmd, bash args}, ...}
 			if len(preLoginCommand) > 0 {
 				for _, cmd := range  preLoginCommand {
 					// Setup `kubectl exec` command
@@ -144,7 +143,6 @@ If the pod has multiple containers, it will choose the first container found.`,
 				"Use `ctl cp out %s <files> -o <destination>` to copy files out of pod\n"+
 				"Use `ctl cp -h` for more info about file copying\n\n",
 				strings.Join(loginCommand, " "), appName, appName)
-
 
 			combinedArgs := append(
 				[]string{"exec", "-i", "-t", name, container, context, namespace, "--"},
