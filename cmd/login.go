@@ -92,8 +92,15 @@ If the pod has multiple containers, it will choose the first container found.`,
 				return err
 			}
 
+			// Build kubectl exec command
+			context := fmt.Sprintf("--context=%s", pod.Context)
+			namespace = fmt.Sprintf("--namespace=%s", pod.Namespace)
+			name := pod.Name
+			if container == "" { // If container flag is empty, grab first one
+				container = fmt.Sprintf("--container=%s", pod.Spec.Containers[0].Name)
+			}
 			// Get preLoginCommand to run before logging into the pod and loginCommand to use with kubectl exec from the config file and
-			preLoginCommand := []string{}
+			preLoginCommand := [][]string{}
 			loginCommand := []string{}
 			if rawruns, ok := m[pod.Context]["_run"]; ok {
 				runs := make(map[string]runDetails)
@@ -104,15 +111,26 @@ If the pod has multiple containers, it will choose the first container found.`,
 				loginCommand = runs[appName].LoginCommand
 				preLoginCommand = runs[appName].PreLogin
 			}
-			//If preloginCommand is supplied then run those commands
+
+			// If preloginCommand is supplied then run those commands
+			// preloginCommand form : {{kubectl cmd, bash args}, { kubectl cmd, bash args}, ...}
+			// bash args are optional
 			if len(preLoginCommand) > 0 {
-				command := exec.Command("bash", preLoginCommand...)
-				command.Stdout = os.Stdout
-				command.Stdin = os.Stdin
-				command.Stderr = os.Stderr
-				err =  command.Run()
-				if err != nil {
-					return fmt.Errorf("Failed to run pre-login commands: %v", err)
+				for _, cmd := range  preLoginCommand {
+					// Setup `kubectl exec` command
+					preLoginCmd := []string {"\"\"kubectl", "exec", "-i", name, container, context, namespace, "--", cmd[0], "\"\""}
+					// Append other bash commands if any
+					if len(cmd) >= 1 {
+						preLoginCmd = append ( preLoginCmd, cmd[1:]...)
+					}
+					combinedArgs := append (
+						[]string{"-c"},
+						strings.Join(preLoginCmd," "),
+					)
+					err =  exec.Command("bash", combinedArgs...).Run()
+					if err != nil {
+						return fmt.Errorf("Failed to run pre-login commands: %v", err)
+					}
 				}
 			}
 			// If no loginCommand is supplied then default to bash
@@ -127,13 +145,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 				"Use `ctl cp -h` for more info about file copying\n\n",
 				strings.Join(loginCommand, " "), appName, appName)
 
-			// Build kubectl exec command
-			context := fmt.Sprintf("--context=%s", pod.Context)
-			namespace = fmt.Sprintf("--namespace=%s", pod.Namespace)
-			name := pod.Name
-			if container == "" { // If container flag is empty, grab first one
-				container = fmt.Sprintf("--container=%s", pod.Spec.Containers[0].Name)
-			}
+
 			combinedArgs := append(
 				[]string{"exec", "-i", "-t", name, container, context, namespace, "--"},
 				loginCommand...,
