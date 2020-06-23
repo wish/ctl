@@ -183,11 +183,10 @@ func upCmd(c *client.Client) *cobra.Command {
 									return fmt.Errorf("Error parsing manifestJson: %s", err)
 								}
 								for i, containerDetail := range manifestData.Spec.Template.Spec.Containers {
-									fmt.Printf(containerDetail.Name)
 									if containerDetail.Name == container {
 										manifest = strings.ReplaceAll(manifest, containerDetail.Image, image)
 										break;
-									} else if i == len(manifestData.Spec.Template.Spec.Containers)-1 {
+									} else if i == len(manifestData.Spec.Template.Spec.Containers)-1 { // If container is not found
 											return fmt.Errorf("Container %s not found", container)
 									}
 								}
