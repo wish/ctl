@@ -48,8 +48,8 @@ type template struct {
 
 type container struct {
 	Name	string `json:"name"`
-	Command	[]string `json:"command"`
-	Args	[]string `json:"args"`
+	Command	[]string `json:"command,omitempty"`
+	Args	[]string `json:"args,omitempty"`
 	Image 	string `json:"image"`
 }
 
