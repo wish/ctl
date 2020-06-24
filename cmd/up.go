@@ -32,6 +32,28 @@ type resource struct {
 	Memory string `json:"memory"`
 }
 
+type manifestDetails struct {
+	APIVersion string `json:"apiVersion"`
+	Kind 	   string `json:"kind"`
+	Spec 	   struct {
+		Template	template `json:"template"`
+	} `json:"spec"`
+
+}
+
+type template struct {
+	Spec 		struct {
+		Containers    []container `json:"containers"`
+	}  `json:"spec"`
+}
+
+type container struct {
+	Name	string `json:"name"`
+	Command	[]string `json:"command,omitempty"`
+	Args	[]string `json:"args,omitempty"`
+	Image 	string `json:"image"`
+}
+
 const (
 	// DefaultDeadline - default amount (in secs) of time to keep the ad hoc pods running
 	DefaultDeadline string = "43200" // 12 hours = 60 * 60 * 12
@@ -52,6 +74,8 @@ func upCmd(c *client.Client) *cobra.Command {
 			labelMatch, _ := parsing.LabelMatchFromCmd(cmd)
 			deadline, _ := cmd.Flags().GetString("deadline")
 			cpu, _ := cmd.Flags().GetString("cpu")
+			image, _ := cmd.Flags().GetString("image")
+			container, _ := cmd.Flags().GetString("container")
 			memory, _ := cmd.Flags().GetString("memory")
 			user, _ := cmd.Flags().GetString("user")
 
@@ -148,6 +172,27 @@ func upCmd(c *client.Client) *cobra.Command {
 							}
 							manifest = regexp.MustCompile(`({MEMORY})`).ReplaceAllString(manifest, run.Resources.Memory)
 
+							// Update image for specified container after parsing manifest
+							if image != "" {
+								if container == "" {
+									return fmt.Errorf("Container name missing. To update image of a container, `container` and `image` flags are required")
+								}
+								// Extract manifest json as struct to parse
+								var manifestData manifestDetails
+								err = json.Unmarshal([]byte(manifest), &manifestData)
+								if err != nil {
+									return fmt.Errorf("Error parsing manifestJson: %s", err)
+								}
+								for i, containerDetail := range manifestData.Spec.Template.Spec.Containers {
+									if containerDetail.Name == container {
+										manifest = strings.ReplaceAll(manifest, containerDetail.Image, image)
+										break;
+									} else if i == len(manifestData.Spec.Template.Spec.Containers)-1 { // If container is not found
+											return fmt.Errorf("Container %s not found", container)
+									}
+								}
+							}
+
 							// Add context flag in case the namespace does not exist in current cluster
 							context := fmt.Sprintf("--context=%s", ctx)
 
@@ -182,6 +227,8 @@ func upCmd(c *client.Client) *cobra.Command {
 	cmd.Flags().String("cpu", "", "CPU for pod, default is "+DefaultCPU+". eg. --cpu=0.5")
 	cmd.Flags().String("memory", "", "Memory for pod, default is "+DefaultMemory+". eg --memory=4.0Gi")
 	cmd.Flags().StringP("user", "u", "", "Name that is used for ad hoc jobs. Defaulted to hostname.")
+	cmd.Flags().StringP("image", "i", "", "Custom image to launch the pod with. Specify the container that is to be updated with image using `container` flag ")
+	cmd.Flags().StringP("container", "c", "", "Name of container that is to be updated with custom image")
 
 	return cmd
 }
