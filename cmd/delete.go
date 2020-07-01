@@ -268,6 +268,7 @@ func deleteCmd(c *client.Client) *cobra.Command {
 	cmd.Flags().StringSlice("label-columns", nil, "Prints with columns that contain the value of the specified label")
 	cmd.Flags().Bool("now", false, "If true, signals the resource for immediate shutdown")
 	cmd.Flags().Bool("delete-children", true, "If true, deletes jobs' spawned resources")
+	cmd.Flags().StringP("status", "s", "", "Filter pods by specified status")
 
 	return cmd
 }

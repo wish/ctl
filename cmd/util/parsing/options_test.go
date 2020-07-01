@@ -54,7 +54,6 @@ func TestAllOptions(t *testing.T) {
 			},
 		}
 		cmd.Flags().StringArrayP("label", "l", nil, "blah")
-		cmd.Flags().StringP("status", "s", "", "test")
 		cmd.SetArgs(test.flags)
 
 		_, err := cmd.ExecuteC()

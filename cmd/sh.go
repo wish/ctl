@@ -38,6 +38,7 @@ If the pod has multiple containers, user have to choose one from them.`,
 
 	cmd.Flags().StringP("container", "c", "", "Specify the container")
 	cmd.Flags().StringP("shell", "s", "/bin/bash", "Specify the shell path")
+	cmd.Flags().StringP("status", "", "", "Find pod by specified status")
 
 	return cmd
 }

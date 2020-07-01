@@ -16,6 +16,7 @@ var supportedGetTypes = [][]string{
 	{"deployments", "deployment", "deploy"},
 	{"replicasets", "replicaset", "rs"},
 	{"cronjobs", "cronjob"},
+	{"k8s_env"},
 }
 
 func getResourceStr() string {
