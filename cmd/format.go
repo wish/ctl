@@ -229,7 +229,7 @@ func printReplicaSetList(w io.Writer, lst []types.ReplicaSetDiscovery, labelColu
 
 func printJobList(w io.Writer, lst []types.JobDiscovery, labelColumns []string) {
 	if len(lst) == 0 {
-		fmt.Fprintln(w, "No replicasets found")
+		fmt.Fprintln(w, "No jobs found")
 		return
 	}
 	// Insert default columns
