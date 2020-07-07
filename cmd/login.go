@@ -80,7 +80,16 @@ If the pod has multiple containers, it will choose the first container found.`,
 			}
 
 			pod := pods[0]
-
+			// Find the pod's job deadline
+			for _, owners := range pod.OwnerReferences {
+				if owners.Kind == "Job" {
+					jobLM, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", owners.Name))
+					option := client.ListOptions{LabelMatch: jobLM}
+					list, _ := c.ListJobsOverContexts(ctxs, namespace, option)
+					fmt.Printf("Running %v with a deadline of %v seconds.\n", appName, *list[0].Spec.ActiveDeadlineSeconds)
+					break
+				}
+			}
 			podPhase := pod.Status.Phase
 			// Check to see if pod is running
 			if podPhase == v1.PodPending {
