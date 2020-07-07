@@ -81,6 +81,12 @@ If the pod has multiple containers, it will choose the first container found.`,
 
 			pod := pods[0]
 
+			podPhase := pod.Status.Phase
+			// Check to see if pod is running
+			if podPhase == v1.PodPending {
+				return fmt.Errorf("Pod %s is still being created", pod.Name)
+			}
+
 			// Find the pod's job deadline
 			deadline := 0
 			for _, owners := range pod.OwnerReferences {
@@ -91,11 +97,6 @@ If the pod has multiple containers, it will choose the first container found.`,
 					deadline = int(*list[0].Spec.ActiveDeadlineSeconds)
 					break
 				}
-			}
-			podPhase := pod.Status.Phase
-			// Check to see if pod is running
-			if podPhase == v1.PodPending {
-				return fmt.Errorf("Pod %s is still being created", pod.Name)
 			}
 
 			// Get the login command from the ctl-config configmap
