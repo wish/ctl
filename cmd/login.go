@@ -87,6 +87,18 @@ If the pod has multiple containers, it will choose the first container found.`,
 				return fmt.Errorf("Pod %s is still being created", pod.Name)
 			}
 
+			// Find the pod's job deadline
+			deadline := 0
+			for _, owners := range pod.OwnerReferences {
+				if owners.Kind == "Job" {
+					jobLM, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", owners.Name))
+					option := client.ListOptions{LabelMatch: jobLM}
+					list, _ := c.ListJobsOverContexts(ctxs, namespace, option)
+					deadline = int(*list[0].Spec.ActiveDeadlineSeconds)
+					break
+				}
+			}
+
 			// Get the login command from the ctl-config configmap
 			m, err := config.GetCtlExt()
 			if err != nil {
@@ -147,6 +159,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 				loginCommand = []string{DefaultLoginCommand}
 			}
 
+			fmt.Printf("Running %v with a deadline of %v seconds\n", appName, deadline)
 			fmt.Printf("Running following commands in pod: %s\n"+
 				"Use `ctl cp in %s <files> -o <destination>` to copy files into pod\n"+
 				"Use `ctl cp out %s <files> -o <destination>` to copy files out of pod\n"+
