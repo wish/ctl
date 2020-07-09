@@ -137,6 +137,7 @@ If no container is set, it will use the first one.`,
 	cmd.Flags().StringP("container", "c", "", "Specify the container")
 	cmd.Flags().Bool("custom-pod", false, "Default false. If true, will find a pod with name instead of searching for pods created by ctl up")
 	cmd.Flags().StringP("user", "u", "", "Name that is used for ad hoc jobs. Defaulted to hostname.")
+	cmd.Flags().StringP("status", "s", "", "Filter pods by specified status if custom-pod flag is set")
 
 	return cmd
 }

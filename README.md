@@ -138,6 +138,8 @@ There are 4 main commands associated with running adhoc jobs, `ctl up`, `ctl dow
 * `--cpu=<your cpu>`, will check the manifest file for the string **{CPU}** and replace it with what was set in the flag. If no value is set, it will check ctl-config for a default value and if none is found, it will use _0.5_ as a default.
 * `--memory=<your memory>`, will check the manifest file for the string **"{ACTIVE_DEADLINE_SECODS}"** and replace it with what was set in the flag. If no value is set, it will check ctl-config for a default value and if none is found, it will use _128Mi_ as a default.
 * `--user=<your user>`, will check the manifest file for the string **{USER}** and replace it with what was set in the flag. This flag is used for spawning the job and finding the ad hoc pods associated with your name. The default name used is the user's hostname.
+* `--image=<your image>`, will check the manifest file for the container specified by `--container` and override this container's image with your image
+* `--container=<your container>`, will check the manifest file for your container and update it's image with the image specified by `--image` 
 
 _Note that the [TTLAfterFinished](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/) feature must be enabled on your kubernetes cluster_
 
@@ -147,12 +149,13 @@ _Note that the [TTLAfterFinished](https://kubernetes.io/docs/concepts/workloads/
 * `--user=<your user>`, will check for jobs spawned by the user. The default name used is the user's hostname.
 
 ### ctl login APPNAME [flags]
-`ctl login APPNAME` will run a `kubectl exec` command on your following job. the command to be run will be defined in the ctl-config configmap and will use the pod associated with the job (if there is one).
+`ctl login APPNAME` will run a `kubectl exec` command on your following job. the command to be run will be defined in the ctl-config configmap and will use the pod associated with the job (if there is one). If there is no existing pod, `ctl up APPNAME` will be run before this command is executed on the newly created pod. 
 
 Also, when running login, it will give the name of the pod spawned by the job so the user can use `ctl cp`
 
 * `--user=<your user>`, will check for jobs spawned by the user. The default name used is the user's hostname.
 * `--container=<your container>`, will check the pod for the following container and run the command on that container. If no container is specified it will use the first one found if there are multiple containers.
+* `--python=<your python script>`, will run your python script if specified or start a python shell on login
 
 ### ctl cp in/out POD SOURCE [flags]
 `ctl cp in/out POD SOURCE` will copy files into the pod (`ctl cp in`) or out of the pod (`ctl cp out`) using `kubectl cp`

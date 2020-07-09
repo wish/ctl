@@ -33,11 +33,10 @@ func StatusFromCmd(cmd *cobra.Command) (filter.StatusMatch, error) {
 // ListOptions parses a client.ListOptions from a command
 func ListOptions(cmd *cobra.Command, searches []string) (client.ListOptions, error) {
 	l, err := LabelMatchFromCmd(cmd)
-	if err != nil {
-		return client.ListOptions{}, err
+	s := filter.StatusMatch{}
+	if cmd.Flags().Lookup("status") != nil {
+		s, err = StatusFromCmd(cmd)
 	}
-
-	s, err := StatusFromCmd(cmd)
 	if err != nil {
 		return client.ListOptions{}, err
 	}
