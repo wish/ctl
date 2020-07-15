@@ -22,8 +22,8 @@ import (
 type runDetails struct {
 	Resources    resource `json:"resources"`
 	Active       bool     `json:"active"`
+	PreLoginCommand	 [][]string `json:"pre_login_command,omitempty"`
 	Manifest     string   `json:"manifest"`
-	PreLogin	 [][]string `json:"pre_login_command,omitempty"`
 	LoginCommand []string `json:"login_command"`
 }
 
@@ -126,8 +126,9 @@ func upCmd(c *client.Client) *cobra.Command {
 								}
 							}
 
-							//Replace periods with dashes to follow K8's name constraints
-							user = strings.Replace(user, ".", "-", -1) 
+							//Replace periods with dashes and convert to lower case to follow K8's name constraints
+							user = strings.Replace(user, ".", "-", -1)
+							user = strings.ToLower(user)
 							
 							// First, let's check if a job is already running. We want to limit 1 job per user.
 							// We find the job using its name '<app name>-<host name>' eg 'foo-bar'

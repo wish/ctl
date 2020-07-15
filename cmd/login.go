@@ -50,8 +50,9 @@ If the pod has multiple containers, it will choose the first container found.`,
 				}
 			}
 
-			//Replace periods with dashes to follow K8's name constraints
-			user = strings.Replace(user, ".", "-", -1) 
+			//Replace periods with dashes and convert to lower case to follow K8's name constraints
+			user = strings.Replace(user, ".", "-", -1)
+			user = strings.ToLower(user)
 			
 			// We get the pod through the name label
 			podName := fmt.Sprintf("%s-%s", appName, user)
@@ -114,7 +115,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 					return fmt.Errorf("Failed to get rawruns from ctl-config: %v", err)
 				}
 				loginCommand = runs[appName].LoginCommand
-				preLoginCommand = runs[appName].PreLogin
+				preLoginCommand = runs[appName].PreLoginCommand
 			}
 
 			// Build kubectl exec command
@@ -139,6 +140,8 @@ If the pod has multiple containers, it will choose the first container found.`,
 						[]string{"-c"},
 						strings.Join(preLoginCmd," "),
 					)
+
+					fmt.Printf("command : %s\n\n", combinedArgs)
 					err =  exec.Command("bash", combinedArgs...).Run()
 					if err != nil {
 						return fmt.Errorf("Failed to run pre-login commands: %v", err)
