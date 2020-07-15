@@ -62,7 +62,7 @@ If no container is set, it will use the first one.`,
 					}
 				}
 
-				//Replace periods with dashes and convert to lower case to follow K8's name constraints
+				// Replace periods with dashes and convert to lower case to follow K8's name constraints
 				user = strings.Replace(user, ".", "-", -1)
 				user = strings.ToLower(user)
 

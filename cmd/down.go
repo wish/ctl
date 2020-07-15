@@ -28,7 +28,7 @@ func downCmd(c *client.Client) *cobra.Command {
 				}
 			}
 
-			//Replace periods with dashes and convert to lower case to follow K8's name constraints
+			// Replace periods with dashes and convert to lower case to follow K8's name constraints
 			user = strings.Replace(user, ".", "-", -1)
 			user = strings.ToLower(user)
 
