@@ -62,8 +62,9 @@ If no container is set, it will use the first one.`,
 					}
 				}
 
-				//Replace periods with dashes to follow K8's name constraints
-				user = strings.Replace(user, ".", "-", -1) 
+				// Replace periods with dashes and convert to lower case to follow K8's name constraints
+				user = strings.Replace(user, ".", "-", -1)
+				user = strings.ToLower(user)
 
 				// We get the pod through the name label
 				podName := fmt.Sprintf("%s-%s", nameOfPod, user)
