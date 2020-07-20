@@ -99,7 +99,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 						deadline = int(*list[0].Spec.ActiveDeadlineSeconds)
 						break
 					} else {
-						fmt.Errorf("Failed to find pod's job: %v", err)
+						return fmt.Errorf("Failed to find pod's job: %v", err)
 					}
 				}
 			}
