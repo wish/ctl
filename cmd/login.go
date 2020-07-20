@@ -95,8 +95,12 @@ If the pod has multiple containers, it will choose the first container found.`,
 					jobLM, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", owners.Name))
 					option := client.ListOptions{LabelMatch: jobLM}
 					list, _ := c.ListJobsOverContexts(ctxs, namespace, option)
-					deadline = int(*list[0].Spec.ActiveDeadlineSeconds)
-					break
+					if len(list) > 0 {
+						deadline = int(*list[0].Spec.ActiveDeadlineSeconds)
+						break
+					} else {
+						return fmt.Errorf("Failed to find pod's job: %v", err)
+					}
 				}
 			}
 
@@ -140,7 +144,12 @@ If the pod has multiple containers, it will choose the first container found.`,
 						[]string{"-c"},
 						strings.Join(preLoginCmd," "),
 					)
-					err =  exec.Command("bash", combinedArgs...).Run()
+					fmt.Printf("Running pre-login command: %s \n", combinedArgs)
+					command :=  exec.Command("bash", combinedArgs...)
+					command.Stdout = os.Stdout
+					command.Stderr = os.Stderr
+					command.Stdin = os.Stdin
+					err =  command.Run()
 					if err != nil {
 						return fmt.Errorf("Failed to run pre-login commands: %v", err)
 					}
