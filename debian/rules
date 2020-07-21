@@ -24,7 +24,7 @@
 #	dh_auto_configure -- #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
 
 override_dh_auto_build:
-	GOCACHE=/tmp /usr/lib/go-1.12/bin/go build -mod=vendor
+	GOCACHE=/tmp /usr/lib/go-1.13/bin/go build -mod=vendor
 
 override_dh_auto_test:
 	exit 0
