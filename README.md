@@ -166,7 +166,7 @@ Also, when running login, it will give the name of the pod spawned by the job so
 # Setup and Configuration
 This section refers to the optional setup on the server-side of configuration ctl for all users. To use the optional features of ctl (such as `ctl up`, `ctl down`, and `ctl login`), a ConfigMap should be added to clusters.
 
-This ConfigMap should be located in namespace `kube-system` and have name `ctl-config`.
+This ConfigMap should be located in namespace `ctl` and have name `ctl-config`.
 
 ## Adhoc Job Config Setup
 To use the ad hoc job feature above, the ctl-config must be configured in a certain way. This example will use [jsonnet](https://jsonnet.org/) to make the config file. This jsonnet can generate json and yaml files. Anything with `<text>` wrapped you should change to your specific needs.
@@ -177,7 +177,7 @@ To use the ad hoc job feature above, the ctl-config must be configured in a cert
         apiVersion: 'v1',
         kind: 'ConfigMap',
         metadata: {
-            namespace: 'kube-system',
+            namespace: 'ctl',
             name: 'ctl-config',
         },
         data: {
