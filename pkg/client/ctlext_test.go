@@ -34,7 +34,6 @@ func TestGetCtlExt(t *testing.T) {
 
 	ans := map[string]map[string]string{
 		"cluster1": {"_hidden": "true"},
-		"cluster2": nil,
 		"c4":       make(map[string]string),
 	}
 

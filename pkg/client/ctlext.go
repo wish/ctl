@@ -16,15 +16,8 @@ func (c *Client) GetCtlExt() map[string]map[string]string {
 			continue
 		}
 
-		// Check if the cluster is connectable by attempting to fetch all configmaps
-		_, err = ci.CoreV1().ConfigMaps("").List(metav1.ListOptions{})
-		if err != nil {
-			continue
-		}
-
 		cf, err := ci.CoreV1().ConfigMaps("ctl").Get("ctl-config", metav1.GetOptions{})
 		if err != nil {
-			m[ctx] = nil
 			continue
 		}
 		m[ctx] = cf.Data

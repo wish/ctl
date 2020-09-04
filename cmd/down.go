@@ -3,11 +3,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"os"
-	"strings"
-
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/pkg/client"
+	"os"
+	"strings"
 )
 
 func downCmd(c *client.Client) *cobra.Command {
@@ -33,34 +32,29 @@ func downCmd(c *client.Client) *cobra.Command {
 			user = strings.ToLower(user)
 
 			// Find existing jobs
-			jobs, err := c.FindJobs([]string{}, "", []string{fmt.Sprintf("%s-%s", appName, user)},
-				client.ListOptions{},
-			)
+			job, err := c.FindAdhocJob(appName,user)
 			if err != nil {
 				return fmt.Errorf("Failed to find jobs: %v", err)
 			}
 
 			// Ask the user if they want to delete the current jobs to create a new one
-			if len(jobs) > 0 {
-				fmt.Printf("Existing jobs: (%d) found. Running %s will delete the current jobs, continue? [y/n]\n",
-					len(jobs), appName)
+			if job != nil {
+				fmt.Printf("Existing job found. Running %s will delete the current jobs, continue? [y/n]\n", appName)
 				// Use the prompter from deleteCmd in delete.go
 				if !prompter(cmd.InOrStdin()) {
 					fmt.Printf("Aborted\n")
 					return nil
 				}
 
-				for _, job := range jobs {
-					fmt.Printf("Deleting %s in %s in context %s...\n", job.Name, job.Namespace, job.Context)
-					deleteOptions := client.DeleteOptions{Now: true, DeletionPropagation: true}
-					err := c.DeleteJob(job.Context, job.Namespace, job.Name, deleteOptions)
-					if err != nil {
+				fmt.Printf("Deleting %s in %s in context %s...\n", job.Name, job.Namespace, job.Context)
+				deleteOptions := client.DeleteOptions{Now: true, DeletionPropagation: true}
+				err := c.DeleteJob(job.Context, job.Namespace, job.Name, deleteOptions)
+				if err != nil {
 						return fmt.Errorf("Error deleting job:\n%v", err)
 					}
-				}
 			}
 
-			fmt.Printf("All %s jobs deleted.\n", appName)
+			fmt.Printf("Job %s deleted.\n", appName)
 
 			return nil
 		},

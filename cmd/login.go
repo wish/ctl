@@ -1,19 +1,15 @@
 package cmd
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/spf13/cobra"
+	"github.com/wish/ctl/pkg/client"
+	v1 "k8s.io/api/core/v1"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
-
-	"github.com/spf13/cobra"
-	"github.com/wish/ctl/cmd/util/config"
-	"github.com/wish/ctl/cmd/util/parsing"
-	"github.com/wish/ctl/pkg/client"
-	v1 "k8s.io/api/core/v1"
 )
 
 const (
@@ -33,8 +29,6 @@ If the pod has only one container, the container name is optional.
 If the pod has multiple containers, it will choose the first container found.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctxs, _ := cmd.Flags().GetStringSlice("context")
-			namespace, _ := cmd.Flags().GetString("namespace")
 			container, _ := cmd.Flags().GetString("container")
 			user, _ := cmd.Flags().GetString("user")
 			python, _ := cmd.Flags().GetString("python")
@@ -53,73 +47,36 @@ If the pod has multiple containers, it will choose the first container found.`,
 			// Replace periods with dashes and convert to lower case to follow K8's name constraints
 			user = strings.Replace(user, ".", "-", -1)
 			user = strings.ToLower(user)
-			
-			// We get the pod through the name label
-			podName := fmt.Sprintf("%s-%s", appName, user)
-			lm, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", podName))
-			options := client.ListOptions{LabelMatch: lm}
 
-			pods, err := c.ListPodsOverContexts(ctxs, namespace, options)
+			pod, manifestData, runDetails, err := c.FindAdhocPodAndAppDetails(appName, user)
 			if err != nil {
-				return err
+				return fmt.Errorf("Failed to find adhoc pod and app details: %v", err)
 			}
-			
-			// Create a new pod if no existing pods were found
-			if len(pods) < 1 {
+
+			if pod == nil {
 				fmt.Printf("No existing pods were found. Creating a new ad hoc pod by running `ctl up %s`\n",
 					appName)
-				// Invoke the `ctl up` command 
+				// Invoke the `ctl up` command
 				if err := upCmd(c).RunE(cmd, args); err != nil {
 					return fmt.Errorf("Failed to create ad hoc pod: %v", err)
-				} 
-				time.Sleep(time.Second * 5) // Delay after invoking command to allow clusters to update
-				
-				pods, err = c.ListPodsOverContexts(ctxs, namespace, options)
+				}
+				time.Sleep(time.Second * 10) // Delay after invoking command to allow clusters to update
+
+				pod, manifestData, runDetails, err = c.FindAdhocPodAndAppDetails(appName,user)
 				if err != nil {
 					return err
 				}
 			}
-
-			pod := pods[0]
+			namespace := manifestData.Metadata.Namespace
+			// Find the pod's job deadline
+			deadline := manifestData.Spec.ActiveDeadlineSeconds
+			loginCommand := runDetails.LoginCommand
+			preLoginCommand := runDetails.PreLogin
 
 			podPhase := pod.Status.Phase
 			// Check to see if pod is running
 			if podPhase == v1.PodPending {
 				return fmt.Errorf("Pod %s is still being created", pod.Name)
-			}
-
-			// Find the pod's job deadline
-			deadline := 0
-			for _, owners := range pod.OwnerReferences {
-				if owners.Kind == "Job" {
-					jobLM, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", owners.Name))
-					option := client.ListOptions{LabelMatch: jobLM}
-					list, _ := c.ListJobsOverContexts(ctxs, namespace, option)
-					if len(list) > 0 {
-						deadline = int(*list[0].Spec.ActiveDeadlineSeconds)
-						break
-					} else {
-						return fmt.Errorf("Failed to find pod's job: %v", err)
-					}
-				}
-			}
-
-			// Get the login command from the ctl-config configmap
-			m, err := config.GetCtlExt()
-			if err != nil {
-				return err
-			}
-			// Get preLoginCommand to run before logging into the pod and loginCommand to use with kubectl exec from the config file
-			preLoginCommand := [][]string{}
-			loginCommand := []string{}
-			if rawruns, ok := m[pod.Context]["_run"]; ok {
-				runs := make(map[string]runDetails)
-				err := json.Unmarshal([]byte(rawruns), &runs)
-				if err != nil {
-					return fmt.Errorf("Failed to get rawruns from ctl-config: %v", err)
-				}
-				loginCommand = runs[appName].LoginCommand
-				preLoginCommand = runs[appName].PreLogin
 			}
 
 			// Build kubectl exec command
