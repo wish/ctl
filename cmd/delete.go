@@ -3,7 +3,6 @@ package cmd
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 
@@ -19,17 +18,6 @@ var supportedDeleteTypes = [][]string{
 	{"deployments", "deployment", "deploy"},
 	{"replicasets", "replicaset", "rs"},
 	{"cronjobs", "cronjob"},
-}
-
-func deleteResourceStr() string {
-	var str strings.Builder
-
-	fmt.Fprintln(&str, "Choose from the list of supported resources:")
-	for _, names := range supportedGetTypes {
-		fmt.Fprintf(&str, " * %s\n", names[0])
-	}
-
-	return str.String()
 }
 
 // Default Y/n

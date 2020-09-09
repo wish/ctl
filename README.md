@@ -87,7 +87,7 @@ Additional columns are added to get output from labels. These columns are set by
 
 ## Flags
 ### Namespace
-Most objects can be scoped to a namespace. By default, ctl operates on all namespaces, but you may specify a single namespace with the `-n, --namespace` flag. For more expensive operations, specifying contexts and namespaces can improve the performance.
+Most objects can be scoped to a namespace. By default, ctl will operate on the specified namespace in your ctl config for adhoc jobs but otherwise operates on all namespaces, but you may specify a single namespace with the `-n, --namespace` flag. For more expensive operations, specifying contexts and namespaces can improve the performance.
 
 ### Labels
 Objects can be filtered by labels. The cluster-level labels above are shorthands for these labels filters (`--k8s_env=dev` is equivalent to `-l k8s_env=dev`). Use flag `-l, --label`. You can set any number of labels together: `-l a=b,b=c -l c!=d` is valid.
@@ -157,8 +157,8 @@ Also, when running login, it will give the name of the pod spawned by the job so
 * `--container=<your container>`, will check the pod for the following container and run the command on that container. If no container is specified it will use the first one found if there are multiple containers.
 * `--python=<your python script>`, will run your python script if specified or start a python shell on login
 
-### ctl cp in/out POD SOURCE [flags]
-`ctl cp in/out POD SOURCE` will copy files into the pod (`ctl cp in`) or out of the pod (`ctl cp out`) using `kubectl cp`
+### ctl cp in/out APPNAME SOURCE [flags]
+`ctl cp in/out APPNAME SOURCE` will copy files into the adhoc job pod for the given app name(`ctl cp in`) or out of the pod (`ctl cp out`) using `kubectl cp`
 
 * `--out=<your output destination>`, the destination of the copied files. If no destination is set it will default to **/tmp/ctl**
 * `--container=<your container>`, will check the pod for the following container and run the command on that container. If no container is specified it will use the first one found if there are multiple containers.

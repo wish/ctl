@@ -72,3 +72,45 @@ type ReplicaSetDiscovery struct {
 func (c ReplicaSetDiscovery) GetLabels() map[string]string {
 	return c.Labels
 }
+
+// RunDetails represents the commands and manifest to apply to launch an adhoc pod
+type RunDetails struct {
+	Resources    resource `json:"resources"`
+	Active       bool     `json:"active"`
+	Manifest     string   `json:"manifest"`
+	PreLogin	 [][]string `json:"pre_login_command,omitempty"`
+	LoginCommand []string `json:"login_command"`
+}
+
+type resource struct {
+	CPU    string `json:"cpu"`
+	Memory string `json:"memory"`
+}
+
+// ManifestDetails represents the manifest details of a running adhoc pod to get attributes like the namespace
+type ManifestDetails struct {
+	Metadata   struct {
+		Name      string `json:"name"`
+		Namespace string `json:"namespace"`
+	} `json:"metadata"`
+	APIVersion string `json:"apiVersion"`
+	Kind 	   string `json:"kind"`
+	Spec 	   struct {
+		ActiveDeadlineSeconds string `json:"activeDeadlineSeconds"`
+		Template	template `json:"template"`
+	} `json:"spec"`
+
+}
+
+type template struct {
+	Spec 		struct {
+		Containers    []container `json:"containers"`
+	}  `json:"spec"`
+}
+
+type container struct {
+	Name	string `json:"name"`
+	Command	[]string `json:"command,omitempty"`
+	Args	[]string `json:"args,omitempty"`
+	Image 	string `json:"image"`
+}

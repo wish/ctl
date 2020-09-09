@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wish/ctl/pkg/client/types"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -18,41 +19,6 @@ import (
 	"github.com/wish/ctl/pkg/client"
 	"github.com/wish/ctl/pkg/client/clusterext"
 )
-
-type runDetails struct {
-	Resources    resource `json:"resources"`
-	Active       bool     `json:"active"`
-	Manifest     string   `json:"manifest"`
-	PreLogin	 [][]string `json:"pre_login_command,omitempty"`
-	LoginCommand []string `json:"login_command"`
-}
-
-type resource struct {
-	CPU    string `json:"cpu"`
-	Memory string `json:"memory"`
-}
-
-type manifestDetails struct {
-	APIVersion string `json:"apiVersion"`
-	Kind 	   string `json:"kind"`
-	Spec 	   struct {
-		Template	template `json:"template"`
-	} `json:"spec"`
-
-}
-
-type template struct {
-	Spec 		struct {
-		Containers    []container `json:"containers"`
-	}  `json:"spec"`
-}
-
-type container struct {
-	Name	string `json:"name"`
-	Command	[]string `json:"command,omitempty"`
-	Args	[]string `json:"args,omitempty"`
-	Image 	string `json:"image"`
-}
 
 const (
 	// DefaultDeadline - default amount (in secs) of time to keep the ad hoc pods running
@@ -84,6 +50,19 @@ func upCmd(c *client.Client) *cobra.Command {
 				deadline = DefaultDeadline
 			}
 
+			// Get hostname to use in job name if not supplied
+			if user == "" {
+				var err error
+				user, err = os.Hostname()
+				if err != nil {
+					return errors.New("Unable to get hostname of machine")
+				}
+			}
+
+			// Replace periods with dashes and convert to lower case to follow K8's name constraints
+			user = strings.Replace(user, ".", "-", -1)
+			user = strings.ToLower(user)
+
 			appName := args[0]
 
 			// Get all kubernetes contexts from config file
@@ -101,7 +80,7 @@ func upCmd(c *client.Client) *cobra.Command {
 			for _, ctx := range ctxs {
 
 				if rawruns, ok := m[ctx]["_run"]; ok {
-					runs := make(map[string]runDetails)
+					runs := make(map[string]types.RunDetails)
 					err := json.Unmarshal([]byte(rawruns), &runs)
 					if err != nil { // bad
 						continue
@@ -125,34 +104,11 @@ func upCmd(c *client.Client) *cobra.Command {
 									return errors.New("Unable to get hostname of machine")
 								}
 							}
-
-							// Replace periods with dashes and convert to lower case to follow K8's name constraints
-							user = strings.Replace(user, ".", "-", -1)
-							user = strings.ToLower(user)
-							
-							// First, let's check if a job is already running. We want to limit 1 job per user.
-							// We find the job using its name '<app name>-<host name>' eg 'foo-bar'
-							jobs, err := c.FindJobs([]string{}, "", []string{fmt.Sprintf("%s-%s", appName, user)},
-								client.ListOptions{},
-							)
+							// Extract manifest json as struct to parse
+							var manifestData types.ManifestDetails
+							err = json.Unmarshal([]byte(run.Manifest), &manifestData)
 							if err != nil {
-								return fmt.Errorf("Failed to find jobs: %v", err)
-							}
-
-							// Ask the user if they want to delete the current jobs to create a new one
-							if len(jobs) > 0 {
-								fmt.Printf("\nExisting jobs: (%d) found. Running %s will delete the current jobs, continue? [y/n]\n",
-									len(jobs), appName)
-								// Use the prompter from deleteCmd in delete.go
-								if !prompter(cmd.InOrStdin()) {
-									fmt.Printf("Aborted\n")
-									return nil
-								}
-
-								for _, job := range jobs {
-									deleteOptions := client.DeleteOptions{Now: true, DeletionPropagation: true}
-									c.DeleteJob(job.Context, job.Namespace, job.Name, deleteOptions)
-								}
+								return fmt.Errorf("Error parsing manifestJson: %s", err)
 							}
 
 							// Template out hostname into job name in manifest
@@ -173,17 +129,41 @@ func upCmd(c *client.Client) *cobra.Command {
 							}
 							manifest = regexp.MustCompile(`({MEMORY})`).ReplaceAllString(manifest, run.Resources.Memory)
 
-							// Update image for specified container after parsing manifest
+							// Check if a job is already running. We want to limit 1 job per user.
+							// Get the namespace for the job from the manifest
+							// We find the job using its name '<app name>-<host name>' eg 'foo-bar'
+							jobs, err := c.FindJobs([]string{}, manifestData.Metadata.Namespace, []string{fmt.Sprintf("%s-%s", appName, user)},
+								client.ListOptions{},
+							)
+							if err != nil {
+								return fmt.Errorf("Failed to find jobs: %v", err)
+							}
+
+							// Ask the user if they want to delete the current jobs to create a new one
+							if len(jobs) > 0 {
+								fmt.Printf("\nExisting jobs: (%d) found. Running %s will delete the current jobs, continue? [y/n]\n",
+									len(jobs), appName)
+								// Use the prompter from deleteCmd in delete.go
+								if !prompter(cmd.InOrStdin()) {
+									fmt.Printf("Aborted\n")
+									return nil
+								}
+
+								for _, job := range jobs {
+									deleteOptions := client.DeleteOptions{Now: true, DeletionPropagation: true}
+									err := c.DeleteJob(job.Context, job.Namespace, job.Name, deleteOptions)
+									if err != nil {
+										fmt.Printf("Failed to delete job: %v", err)
+									}
+								}
+							}
+
+							// Update image for specified container if user wants to override default images
 							if image != "" {
 								if container == "" {
 									return fmt.Errorf("Container name missing. To update image of a container, `container` and `image` flags are required")
 								}
-								// Extract manifest json as struct to parse
-								var manifestData manifestDetails
-								err = json.Unmarshal([]byte(manifest), &manifestData)
-								if err != nil {
-									return fmt.Errorf("Error parsing manifestJson: %s", err)
-								}
+
 								for i, containerDetail := range manifestData.Spec.Template.Spec.Containers {
 									if containerDetail.Name == container {
 										manifest = strings.ReplaceAll(manifest, containerDetail.Image, image)
