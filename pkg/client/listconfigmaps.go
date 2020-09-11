@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/wish/ctl/pkg/client/filter"
@@ -12,18 +13,18 @@ import (
 )
 
 // ListConfigMaps returns a list of all configmap that match the query
-func (c *Client) ListConfigMaps(context string, namespace string, options ListOptions) ([]types.ConfigMapDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) ListConfigMaps(contextStr string, namespace string, options ListOptions) ([]types.ConfigMapDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
-	configmaps, err := cs.CoreV1().ConfigMaps(namespace).List(metav1.ListOptions{})
+	configmaps, err := cs.CoreV1().ConfigMaps(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 	var items []types.ConfigMapDiscovery
 	for _, configmap := range configmaps.Items {
-		cm := types.ConfigMapDiscovery{context, configmap}
+		cm := types.ConfigMapDiscovery{contextStr, configmap}
 		c.Transform(&cm)
 		if filter.MatchLabel(cm, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(cm.Name)) {
 			items = append(items, cm)

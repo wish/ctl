@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"github.com/wish/ctl/pkg/client/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,16 +29,16 @@ func (c *Client) findCronJob(contexts []string, namespace, name string, options 
 	return &cron, nil
 }
 
-func (c *Client) findExactCronJob(context, namespace, name string) (*types.CronJobDiscovery, error) {
-	cl, err := c.getContextInterface(context)
+func (c *Client) findExactCronJob(contextStr, namespace, name string) (*types.CronJobDiscovery, error) {
+	cl, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
 
-	cj, err := cl.BatchV1beta1().CronJobs(namespace).Get(name, metav1.GetOptions{})
+	cj, err := cl.BatchV1beta1().CronJobs(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.CronJobDiscovery{context, *cj}, nil
+	return &types.CronJobDiscovery{contextStr, *cj}, nil
 }

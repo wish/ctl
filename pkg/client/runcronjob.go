@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"github.com/wish/ctl/pkg/client/types"
 	batchv1 "k8s.io/api/batch/v1"
@@ -21,6 +22,7 @@ func (c *Client) RunCronJob(contexts []string, namespace, cronjobName string, op
 	}
 
 	job, err := cl.BatchV1().Jobs(cronjob.Namespace).Create(
+		context.TODO(),
 		&batchv1.Job{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("%s-%d", cronjobName, time.Now().Unix()), // REVIEW: What if name is not unique??
@@ -36,7 +38,8 @@ func (c *Client) RunCronJob(contexts []string, namespace, cronjobName string, op
 				},
 			},
 			Spec: cronjob.CronJob.Spec.JobTemplate.Spec,
-		})
+		},
+		metav1.CreateOptions{})
 
 	if err != nil {
 		return nil, err

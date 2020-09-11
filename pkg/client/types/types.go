@@ -1,10 +1,10 @@
 package types
 
 import (
+	v1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
-	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 )
 
 // CronJobDiscovery represents a cron job with the context information
@@ -54,7 +54,7 @@ func (c ConfigMapDiscovery) GetLabels() map[string]string {
 // DeploymentDiscovery represents a deployment with the context information
 type DeploymentDiscovery struct {
 	Context string
-	extensionsv1beta1.Deployment
+	v1.Deployment
 }
 
 // GetLabels allows DeploymentDiscovery to implement the Labeled interface
@@ -65,7 +65,7 @@ func (c DeploymentDiscovery) GetLabels() map[string]string {
 // ReplicaSetDiscovery represents a deployment with the context information
 type ReplicaSetDiscovery struct {
 	Context string
-	extensionsv1beta1.ReplicaSet
+	v1.ReplicaSet
 }
 
 // GetLabels allows ReplicaSetDiscovery to implement the Labeled interface

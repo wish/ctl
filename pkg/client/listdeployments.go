@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/wish/ctl/pkg/client/filter"
@@ -12,18 +13,18 @@ import (
 )
 
 // ListDeployments returns a list of all deployments that match the query
-func (c *Client) ListDeployments(context string, namespace string, options ListOptions) ([]types.DeploymentDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) ListDeployments(contextStr string, namespace string, options ListOptions) ([]types.DeploymentDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
-	deployments, err := cs.ExtensionsV1beta1().Deployments(namespace).List(metav1.ListOptions{})
+	deployments, err := cs.AppsV1().Deployments(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 	var items []types.DeploymentDiscovery
 	for _, deployment := range deployments.Items {
-		cm := types.DeploymentDiscovery{context, deployment}
+		cm := types.DeploymentDiscovery{contextStr, deployment}
 		c.Transform(&cm)
 		if filter.MatchLabel(cm, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(cm.Name)) {
 			items = append(items, cm)

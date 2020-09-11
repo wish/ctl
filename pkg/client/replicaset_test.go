@@ -1,18 +1,18 @@
 package client
 
 import (
+	v1 "k8s.io/api/apps/v1"
 	"strconv"
 	"testing"
 
-	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func getRandomReplicaSets(N int) []*extensionsv1beta1.ReplicaSet {
-	replicasets := make([]*extensionsv1beta1.ReplicaSet, N)
+func getRandomReplicaSets(N int) []*v1.ReplicaSet {
+	replicasets := make([]*v1.ReplicaSet, N)
 	for n := 0; n < N; n++ {
-		replicasets[n] = &extensionsv1beta1.ReplicaSet{
+		replicasets[n] = &v1.ReplicaSet{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "replicaset",
 				APIVersion: "v1",
@@ -29,7 +29,7 @@ func getRandomReplicaSets(N int) []*extensionsv1beta1.ReplicaSet {
 func getRandomReplicaSetsObject(N int) []runtime.Object {
 	replicasets := make([]runtime.Object, N)
 	for n := 0; n < N; n++ {
-		temp := &extensionsv1beta1.ReplicaSet{
+		temp := &v1.ReplicaSet{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "replicaset",
 				APIVersion: "v1",
@@ -45,7 +45,7 @@ func getRandomReplicaSetsObject(N int) []runtime.Object {
 }
 
 func TestListReplicaSetsSingle(t *testing.T) {
-	replicaset := extensionsv1beta1.ReplicaSet{
+	replicaset := v1.ReplicaSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "replicaset",
 			APIVersion: "v1",
@@ -70,7 +70,7 @@ func TestListReplicaSetsSingle(t *testing.T) {
 }
 
 func TestListReplicaSetsBadContext(t *testing.T) {
-	replicaset := extensionsv1beta1.ReplicaSet{
+	replicaset := v1.ReplicaSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "replicaset",
 			APIVersion: "v1",

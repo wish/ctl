@@ -9,12 +9,11 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kubectl/pkg/describe"
-	describeversioned "k8s.io/kubectl/pkg/describe/versioned"
 )
 
 type clientsetGetter interface {
 	getContextInterface(string) (kubernetes.Interface, error)
-	getDescriber(string, schema.GroupKind) (describe.Describer, error)
+	getDescriber(string, schema.GroupKind) (describe.ResourceDescriber, error)
 }
 
 type clusterFunctionality struct {
@@ -53,13 +52,13 @@ func (d *configClientsetGetter) getContextInterface(context string) (kubernetes.
 	return clientset, nil
 }
 
-func (d *configClientsetGetter) getDescriber(context string, kind schema.GroupKind) (describe.Describer, error) {
+func (d *configClientsetGetter) getDescriber(context string, kind schema.GroupKind) (describe.ResourceDescriber, error) {
 	_, err := d.getContextInterface(context)
 	if err != nil {
 		return nil, err
 	}
 	config := d.clientsets[context].config
-	describer, ok := describeversioned.DescriberFor(kind, config)
+	describer, ok := describe.DescriberFor(kind, config)
 	if !ok {
 		return nil, errors.New("could not retrieve describer for context " + context)
 	}
@@ -77,6 +76,6 @@ func (f *fakeClientsetGetter) getContextInterface(context string) (kubernetes.In
 	return nil, errors.New("the context specified does not exist")
 }
 
-func (*fakeClientsetGetter) getDescriber(string, schema.GroupKind) (describe.Describer, error) {
+func (*fakeClientsetGetter) getDescriber(string, schema.GroupKind) (describe.ResourceDescriber, error) {
 	return nil, errors.New("fake client cannot describe")
 }

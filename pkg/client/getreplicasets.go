@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"github.com/wish/ctl/pkg/client/filter"
 	"github.com/wish/ctl/pkg/client/types"
@@ -8,18 +9,18 @@ import (
 )
 
 // GetReplicaSet returns a single replicaset
-func (c *Client) GetReplicaSet(context, namespace string, name string, options GetOptions) (*types.ReplicaSetDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) GetReplicaSet(contextStr, namespace string, name string, options GetOptions) (*types.ReplicaSetDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
 	// REVIEW: In the future it will be useful to have a function to convert client.GetOptions -> metav1.GetOptions
-	replicaset, err := cs.ExtensionsV1beta1().ReplicaSets(namespace).Get(name, metav1.GetOptions{})
+	replicaset, err := cs.AppsV1().ReplicaSets(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	r := types.ReplicaSetDiscovery{context, *replicaset}
+	r := types.ReplicaSetDiscovery{contextStr, *replicaset}
 	c.Transform(&r)
 	if !filter.MatchLabel(r, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")

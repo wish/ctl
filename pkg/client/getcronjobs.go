@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"github.com/wish/ctl/pkg/client/filter"
 	"github.com/wish/ctl/pkg/client/types"
@@ -8,18 +9,18 @@ import (
 )
 
 // GetCronJob returns a single cron job
-func (c *Client) GetCronJob(context, namespace string, name string, options GetOptions) (*types.CronJobDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) GetCronJob(contextStr, namespace string, name string, options GetOptions) (*types.CronJobDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
 	// REVIEW: In the future it will be useful to have a function to convert client.GetOptions -> metav1.GetOptions
-	cronjob, err := cs.BatchV1beta1().CronJobs(namespace).Get(name, metav1.GetOptions{})
+	cronjob, err := cs.BatchV1beta1().CronJobs(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	d := types.CronJobDiscovery{context, *cronjob}
+	d := types.CronJobDiscovery{contextStr, *cronjob}
 	c.Transform(&d)
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")
