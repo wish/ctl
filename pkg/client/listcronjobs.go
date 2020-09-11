@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/wish/ctl/pkg/client/filter"
@@ -12,18 +13,18 @@ import (
 )
 
 // ListCronJobs returns a list of all cron jobs that match the query
-func (c *Client) ListCronJobs(context string, namespace string, options ListOptions) ([]types.CronJobDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) ListCronJobs(contextStr string, namespace string, options ListOptions) ([]types.CronJobDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
-	cronjobs, err := cs.BatchV1beta1().CronJobs(namespace).List(metav1.ListOptions{})
+	cronjobs, err := cs.BatchV1beta1().CronJobs(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 	var items []types.CronJobDiscovery
 	for _, cj := range cronjobs.Items {
-		cjd := types.CronJobDiscovery{context, cj}
+		cjd := types.CronJobDiscovery{contextStr, cj}
 		c.Transform(&cjd)
 		if filter.MatchLabel(cjd, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(cjd.Name)) { // TODO: Modularize to allow adding more search parameters
 			items = append(items, cjd)

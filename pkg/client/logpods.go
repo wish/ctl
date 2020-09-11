@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -61,7 +62,7 @@ func (c *Client) LogPodsOverContexts(contexts []string, namespace, container str
 			req = cl.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &v1.PodLogOptions{Container: container, Follow: options.Follow, Timestamps: true})
 		}
 
-		readCloser, err := req.Stream()
+		readCloser, err := req.Stream(context.TODO())
 		if err != nil {
 			return nil, err
 		}

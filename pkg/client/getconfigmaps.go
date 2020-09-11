@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"github.com/wish/ctl/pkg/client/filter"
 	"github.com/wish/ctl/pkg/client/types"
@@ -8,18 +9,18 @@ import (
 )
 
 // GetConfigMap returns a single configmap
-func (c *Client) GetConfigMap(context, namespace string, name string, options GetOptions) (*types.ConfigMapDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) GetConfigMap(contextStr, namespace string, name string, options GetOptions) (*types.ConfigMapDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
 	// REVIEW: In the future it will be useful to have a function to convert client.GetOptions -> metav1.GetOptions
-	configmap, err := cs.CoreV1().ConfigMaps(namespace).Get(name, metav1.GetOptions{})
+	configmap, err := cs.CoreV1().ConfigMaps(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	d := types.ConfigMapDiscovery{context, *configmap}
+	d := types.ConfigMapDiscovery{contextStr, *configmap}
 	c.Transform(&d)
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")

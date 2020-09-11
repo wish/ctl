@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/wish/ctl/pkg/client/filter"
@@ -12,18 +13,18 @@ import (
 )
 
 // ListReplicaSets returns a list of all replicaset that match the query
-func (c *Client) ListReplicaSets(context string, namespace string, options ListOptions) ([]types.ReplicaSetDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) ListReplicaSets(contextStr string, namespace string, options ListOptions) ([]types.ReplicaSetDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
-	replicasets, err := cs.ExtensionsV1beta1().ReplicaSets(namespace).List(metav1.ListOptions{})
+	replicasets, err := cs.AppsV1().ReplicaSets(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 	var items []types.ReplicaSetDiscovery
 	for _, replicaset := range replicasets.Items {
-		cm := types.ReplicaSetDiscovery{context, replicaset}
+		cm := types.ReplicaSetDiscovery{contextStr, replicaset}
 		c.Transform(&cm)
 		if filter.MatchLabel(cm, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(cm.Name)) {
 			items = append(items, cm)

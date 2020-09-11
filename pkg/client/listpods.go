@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/wish/ctl/pkg/client/filter"
@@ -12,18 +13,18 @@ import (
 )
 
 // ListPods returns a list of all pod that match the query
-func (c *Client) ListPods(context string, namespace string, options ListOptions) ([]types.PodDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) ListPods(contextStr string, namespace string, options ListOptions) ([]types.PodDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
-	pods, err := cs.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	pods, err := cs.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 	var items []types.PodDiscovery
 	for _, pod := range pods.Items {
-		p := types.PodDiscovery{context, pod}
+		p := types.PodDiscovery{contextStr, pod}
 		c.Transform(&p)
 		if filter.MatchLabel(p, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(p.Name)) && (options.StatusMatch.State == "" || p.Status.Phase == options.StatusMatch.State) {
 			items = append(items, p)

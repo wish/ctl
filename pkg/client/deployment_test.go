@@ -1,18 +1,18 @@
 package client
 
 import (
+	v1 "k8s.io/api/apps/v1"
 	"strconv"
 	"testing"
 
-	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func getRandomDeployments(N int) []*extensionsv1beta1.Deployment {
-	deployments := make([]*extensionsv1beta1.Deployment, N)
+func getRandomDeployments(N int) []*v1.Deployment {
+	deployments := make([]*v1.Deployment, N)
 	for n := 0; n < N; n++ {
-		deployments[n] = &extensionsv1beta1.Deployment{
+		deployments[n] = &v1.Deployment{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "deployment",
 				APIVersion: "v1",
@@ -29,7 +29,7 @@ func getRandomDeployments(N int) []*extensionsv1beta1.Deployment {
 func getRandomDeploymentsObject(N int) []runtime.Object {
 	deployments := make([]runtime.Object, N)
 	for n := 0; n < N; n++ {
-		temp := &extensionsv1beta1.Deployment{
+		temp := &v1.Deployment{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "deployment",
 				APIVersion: "v1",
@@ -45,7 +45,7 @@ func getRandomDeploymentsObject(N int) []runtime.Object {
 }
 
 func TestListDeploymentsSingle(t *testing.T) {
-	deployment := extensionsv1beta1.Deployment{
+	deployment := v1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "deployment",
 			APIVersion: "v1",
@@ -70,7 +70,7 @@ func TestListDeploymentsSingle(t *testing.T) {
 }
 
 func TestListDeploymentsBadContext(t *testing.T) {
-	deployment := extensionsv1beta1.Deployment{
+	deployment := v1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "deployment",
 			APIVersion: "v1",

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -16,7 +17,7 @@ func (c *Client) GetCtlExt() map[string]map[string]string {
 			continue
 		}
 
-		cf, err := ci.CoreV1().ConfigMaps("ctl").Get("ctl-config", metav1.GetOptions{})
+		cf, err := ci.CoreV1().ConfigMaps("ctl").Get(context.TODO(),"ctl-config", metav1.GetOptions{})
 		if err != nil {
 			continue
 		}

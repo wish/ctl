@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"github.com/wish/ctl/pkg/client/filter"
 	"github.com/wish/ctl/pkg/client/types"
@@ -8,18 +9,18 @@ import (
 )
 
 // GetDeployment returns a single deployment
-func (c *Client) GetDeployment(context, namespace string, name string, options GetOptions) (*types.DeploymentDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) GetDeployment(contextStr, namespace string, name string, options GetOptions) (*types.DeploymentDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
 	// REVIEW: In the future it will be useful to have a function to convert client.GetOptions -> metav1.GetOptions
-	configmap, err := cs.ExtensionsV1beta1().Deployments(namespace).Get(name, metav1.GetOptions{})
+	configmap, err := cs.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	d := types.DeploymentDiscovery{context, *configmap}
+	d := types.DeploymentDiscovery{contextStr, *configmap}
 	c.Transform(&d)
 	if !filter.MatchLabel(d, options.LabelMatch) {
 		return nil, errors.New("found object does not satisfy filters")

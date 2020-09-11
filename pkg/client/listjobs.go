@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/wish/ctl/pkg/client/filter"
@@ -12,18 +13,18 @@ import (
 )
 
 // ListJobs returns a list of all jobs that match the query
-func (c *Client) ListJobs(context string, namespace string, options ListOptions) ([]types.JobDiscovery, error) {
-	cs, err := c.getContextInterface(context)
+func (c *Client) ListJobs(contextStr string, namespace string, options ListOptions) ([]types.JobDiscovery, error) {
+	cs, err := c.getContextInterface(contextStr)
 	if err != nil {
 		return nil, err
 	}
-	jobs, err := cs.BatchV1().Jobs(namespace).List(metav1.ListOptions{})
+	jobs, err := cs.BatchV1().Jobs(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 	var items []types.JobDiscovery
 	for _, job := range jobs.Items {
-		r := types.JobDiscovery{context, job}
+		r := types.JobDiscovery{contextStr, job}
 		c.Transform(&r)
 		if filter.MatchLabel(r, options.LabelMatch) && (options.Search == nil || options.Search.MatchString(r.Name)) {
 			items = append(items, r)
