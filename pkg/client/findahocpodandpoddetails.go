@@ -5,21 +5,16 @@ import (
 	"fmt"
 	"github.com/wish/ctl/cmd/util/config"
 	"github.com/wish/ctl/pkg/client/types"
-	"strings"
 )
 
 // FindAdhocPodAndAppDetails loops through all valid contexts and returns the first adhoc pod found along with context details about the pod
-func (c *Client) FindAdhocPodAndAppDetails(appName string, user string) (*types.PodDiscovery, *types.ManifestDetails, *types.RunDetails, error) {
+func (c *Client) FindAdhocPodAndAppDetails(appName string, options ListOptions) (*types.PodDiscovery, *types.ManifestDetails, *types.RunDetails, error) {
 
 	// Get all kubernetes contexts from config file
 	config, err := config.GetCtlExt()
 	if err != nil {
 		return nil, nil, nil, err
 	}
-
-	// Replace periods with dashes and convert to lower case to follow K8's name constraints
-	user = strings.Replace(user, ".", "-", -1)
-	user = strings.ToLower(user)
 
 	for ctx := range config {
 
@@ -42,7 +37,7 @@ func (c *Client) FindAdhocPodAndAppDetails(appName string, user string) (*types.
 					}
 
 					// Check if a job is already running
-					pods, err := c.ListPods(ctx, manifestData.Metadata.Namespace, ListOptions{})
+					pods, err := c.ListPods(ctx, manifestData.Metadata.Namespace, options)
 					if err != nil {
 						return nil, nil, nil, fmt.Errorf("Failed to search for existing job: %s", err)
 					}

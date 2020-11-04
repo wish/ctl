@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 	v1 "k8s.io/api/core/v1"
 	"os"
@@ -47,8 +48,11 @@ If the pod has multiple containers, it will choose the first container found.`,
 			// Replace periods with dashes and convert to lower case to follow K8's name constraints
 			user = strings.Replace(user, ".", "-", -1)
 			user = strings.ToLower(user)
+			podName := fmt.Sprintf("%s-%s", appName, user)
+			lm, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", podName))
+			options := client.ListOptions{LabelMatch:lm}
 
-			pod, manifestData, runDetails, err := c.FindAdhocPodAndAppDetails(appName, user)
+			pod, manifestData, runDetails, err := c.FindAdhocPodAndAppDetails(appName, options)
 			if err != nil {
 				return fmt.Errorf("Failed to find adhoc pod and app details: %v", err)
 			}
@@ -62,7 +66,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 				}
 				time.Sleep(time.Second * 10) // Delay after invoking command to allow clusters to update
 
-				pod, manifestData, runDetails, err = c.FindAdhocPodAndAppDetails(appName,user)
+				pod, manifestData, runDetails, err = c.FindAdhocPodAndAppDetails(appName,options)
 				if err != nil {
 					return err
 				}
