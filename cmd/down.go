@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 	"os"
 	"strings"
@@ -30,9 +31,12 @@ func downCmd(c *client.Client) *cobra.Command {
 			// Replace periods with dashes and convert to lower case to follow K8's name constraints
 			user = strings.Replace(user, ".", "-", -1)
 			user = strings.ToLower(user)
+			podName := fmt.Sprintf("%s-%s", appName, user)
+			lm, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", podName))
+			options := client.ListOptions{LabelMatch:lm}
 
 			// Find existing jobs
-			job, err := c.FindAdhocJob(appName,user)
+			job, err := c.FindAdhocJob(appName,options)
 			if err != nil {
 				return fmt.Errorf("Failed to find jobs: %v", err)
 			}

@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 	v1 "k8s.io/api/core/v1"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 // func cpTest() {
@@ -50,7 +52,14 @@ If no container is set, it will use the first one.`,
 				}
 			}
 
-			pod, _, _, err := c.FindAdhocPodAndAppDetails(appName, user)
+			// Replace periods with dashes and convert to lower case to follow K8's name constraints
+			user = strings.Replace(user, ".", "-", -1)
+			user = strings.ToLower(user)
+			podName := fmt.Sprintf("%s-%s", appName, user)
+			lm, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", podName))
+			options := client.ListOptions{LabelMatch:lm}
+
+			pod, _, _, err := c.FindAdhocPodAndAppDetails(appName, options)
 			if err != nil {
 				return err
 			}

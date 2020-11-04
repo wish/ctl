@@ -1,17 +1,14 @@
 package client
 
 import (
-	"errors"
 	"encoding/json"
 	"fmt"
 	"github.com/wish/ctl/cmd/util/config"
 	"github.com/wish/ctl/pkg/client/types"
-	"os"
-	"strings"
 )
 
 // FindAdhocJob loops through all valid contexts and returns the first active job found
-func (c *Client) FindAdhocJob(appName string, user string) (*types.JobDiscovery, error) {
+func (c *Client) FindAdhocJob(appName string, options ListOptions) (*types.JobDiscovery, error) {
 
 	// Get all kubernetes contexts from config file
 	config, err := config.GetCtlExt()
@@ -31,17 +28,6 @@ func (c *Client) FindAdhocJob(appName string, user string) (*types.JobDiscovery,
 			// Check if the app name exists in the raw runs
 			if run, ok := runs[appName]; ok {
 				if run.Active {
-					// Get hostname to use in job name if not supplied
-					if user == "" {
-						user, err = os.Hostname()
-						if err != nil {
-							return nil, errors.New("Unable to get hostname of machine")
-						}
-					}
-
-					// Replace periods with dashes and convert to lower case to follow K8's name constraints
-					user = strings.Replace(user, ".", "-", -1)
-					user = strings.ToLower(user)
 
 					// Extract manifest json as struct to parse
 					var manifestData types.ManifestDetails
@@ -51,7 +37,7 @@ func (c *Client) FindAdhocJob(appName string, user string) (*types.JobDiscovery,
 					}
 
 					// Check if a job is already running
-					jobs, err := c.ListJobs(ctx, manifestData.Metadata.Namespace, ListOptions{})
+					jobs, err := c.ListJobs(ctx, manifestData.Metadata.Namespace, options)
 					if err != nil {
 						return nil, fmt.Errorf("Failed to search for existing job: %s", err)
 					}
