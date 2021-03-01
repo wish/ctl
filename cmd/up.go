@@ -23,8 +23,8 @@ import (
 const (
 	// DefaultDeadline - default amount (in secs) of time to keep the ad hoc pods running
 	DefaultDeadline string = "43200" // 12 hours = 60 * 60 * 12
-	// MaxDeadline sets the max deadline for a job (defaulted to 1 day)
-	MaxDeadline int = 60 * 60 * 24
+	// MaxDeadline sets the max deadline for a job (defaulted to 2 days)
+	MaxDeadline int = 60 * 60 * 24 * 2
 	// DefaultCPU is used to template cpu in manifest file if no default or flag is found
 	DefaultCPU string = "0.5"
 	// DefaultMemory is used to template memory in manifest file if no default or flag is found
@@ -204,7 +204,7 @@ func upCmd(c *client.Client) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String("deadline", "", "Time pod will stay alive in seconds")
+	cmd.Flags().String("deadline", "", "Time pod will stay alive in seconds. Defaulted to 43200 seconds (12 hours)")
 	cmd.Flags().String("cpu", "", "CPU for pod, default is "+DefaultCPU+". eg. --cpu=0.5")
 	cmd.Flags().String("memory", "", "Memory for pod, default is "+DefaultMemory+". eg --memory=4.0Gi")
 	cmd.Flags().StringP("user", "u", "", "Name that is used for ad hoc jobs. Defaulted to hostname.")
