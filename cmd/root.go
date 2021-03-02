@@ -23,7 +23,6 @@ func cmd() *cobra.Command {
 	out, err := exec.Command("bash", "-c", "git ls-remote --tags https://github.com/wish/ctl.git | tail -n 1 | cut -d'/' -f3 |  cut -d'^' -f1").Output()
     if err != nil {
 		fmt.Printf("Unable to retrieve remote CTL tags for version comparison. Error: %s\n",err)
-		os.Exit(1)
     }
 	if Version != string(out) {
 		fmt.Printf(WarningColor, "WARNING: Your CTL is not up-to-date. Please update CTL by running either `brew upgrade wish-ctl` on Mac or `sudo apt-get update && sudo apt-get install ctl` on Linux to get the latest changes and bug fixes\n")
