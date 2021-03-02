@@ -24,7 +24,7 @@ func cmd() *cobra.Command {
     if err != nil {
 		fmt.Printf("Unable to retrieve remote CTL tags for version comparison. Error: %s\n",err)
     }
-	if Version != string(out) {
+	if Version != string(out) && err == nil {
 		fmt.Printf(WarningColor, "WARNING: Your CTL is not up-to-date. Please update CTL by running either `brew upgrade wish-ctl` on Mac or `sudo apt-get update && sudo apt-get install ctl` on Linux to get the latest changes and bug fixes\n")
 	}
 
