@@ -23,7 +23,7 @@ type clusterFunctionality struct {
 
 type configClientsetGetter struct {
 	clientsets map[string]clusterFunctionality
-	config     string
+	config     []string
 	cslock     sync.RWMutex
 }
 
@@ -36,7 +36,7 @@ func (d *configClientsetGetter) getContextInterface(context string) (kubernetes.
 	d.cslock.RUnlock()
 	// Get config
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: d.config},
+		&clientcmd.ClientConfigLoadingRules{Precedence: d.config},
 		&clientcmd.ConfigOverrides{CurrentContext: context}).ClientConfig()
 	if err != nil {
 		return nil, err

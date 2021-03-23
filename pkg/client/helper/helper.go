@@ -3,22 +3,23 @@ package helper
 import (
 	"os"
 	"path/filepath"
-
 	"k8s.io/client-go/tools/clientcmd"
+	"strings"
 )
 
 // GetKubeConfigPath returns the default location of a kubeconfig file
-func GetKubeConfigPath() string {
-	// TODO: handle multiple paths in KUBECONFIG
+func GetKubeConfigPath() []string {
 	if fl := os.Getenv("KUBECONFIG"); fl != "" {
-		return fl
+		// split KUBECONFIG string to handle multiple kube config files
+		kube_configs := strings.Split(fl, ":")
+		return kube_configs
 	}
 	home, err := os.UserHomeDir()
 	if err != nil { // Can't find home dir
 		panic(err.Error())
 	}
 
-	return filepath.Join(home, ".kube", "config")
+	return []string {filepath.Join(home, ".kube", "/Users/phariharan/.kube/config")}
 }
 
 // GetContexts returns a list of clusters from a config file

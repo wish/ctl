@@ -47,12 +47,16 @@ func GetDefaultConfigClient() *Client {
 }
 
 // GetConfigClient returns a client with a specific kubeconfig path
-func GetConfigClient(path string) *Client {
-	contexts := helper.GetContexts(path)
+func GetConfigClient(paths []string) *Client {
+	var contexts []string
+	for _, path := range paths {
+		context := helper.GetContexts(path)
+		contexts = append(contexts, context...)
+	}
 	return &Client{
 		clientsetGetter: &configClientsetGetter{
 			clientsets: make(map[string]clusterFunctionality),
-			config:     path,
+			config:     paths,
 		},
 		contextsGetter: StaticContextsGetter{
 			contexts: contexts,

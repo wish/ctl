@@ -45,7 +45,7 @@ func (c *Client) ExecInPod(contexts []string, namespace, name, container string,
 	}, scheme.ParameterCodec)
 
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: helper.GetKubeConfigPath()},
+		&clientcmd.ClientConfigLoadingRules{Precedence: helper.GetKubeConfigPath()},
 		&clientcmd.ConfigOverrides{CurrentContext: pod.Context}).ClientConfig()
 
 	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())

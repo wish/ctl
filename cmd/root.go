@@ -11,13 +11,13 @@ import (
 	"github.com/wish/ctl/cmd/cron"
 	"github.com/wish/ctl/cmd/util/config"
 	"github.com/wish/ctl/pkg/client"
+	"strings"
 )
 
 func cmd() *cobra.Command {
 	viper.SetDefault("deadline", 18000)
 
 	viper.SetConfigName("config")
-
 	// Check if CTL version is the latest version by comparing local CTL version with remote version tags from GitHub
 	var WarningColor = "\033[1;33m%s\033[0m"
 	out, err := exec.Command("bash", "-c", "git ls-remote --tags https://github.com/wish/ctl.git | tail -n 1 | cut -d'/' -f3 |  cut -d'^' -f1 | tr -d '\n'").Output()
@@ -51,9 +51,10 @@ func cmd() *cobra.Command {
 	}
 
 	var c *client.Client
-	if k := viper.GetString("kubeconfig"); len(k) > 0 {
-		c = client.GetConfigClient(k)
-		// konf = true
+	if k := viper.GetString("KUBECONFIG"); len(k) > 0 {
+		// split KUBECONFIG string to handle multiple kube config files
+		kube_configs := strings.Split(k, ":")
+		c = client.GetConfigClient(kube_configs)
 	} else {
 		c = client.GetDefaultConfigClient()
 	}
