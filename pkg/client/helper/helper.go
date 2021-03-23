@@ -11,8 +11,8 @@ import (
 func GetKubeConfigPath() []string {
 	if fl := os.Getenv("KUBECONFIG"); fl != "" {
 		// split KUBECONFIG string to handle multiple kube config files
-		kube_configs := strings.Split(fl, ":")
-		return kube_configs
+		kubeConfigs := strings.Split(fl, ":")
+		return kubeConfigs
 	}
 	home, err := os.UserHomeDir()
 	if err != nil { // Can't find home dir

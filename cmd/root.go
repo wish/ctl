@@ -53,8 +53,8 @@ func cmd() *cobra.Command {
 	var c *client.Client
 	if k := viper.GetString("KUBECONFIG"); len(k) > 0 {
 		// split KUBECONFIG string to handle multiple kube config files
-		kube_configs := strings.Split(k, ":")
-		c = client.GetConfigClient(kube_configs)
+		kubeConfigs := strings.Split(k, ":")
+		c = client.GetConfigClient(kubeConfigs)
 	} else {
 		c = client.GetDefaultConfigClient()
 	}
