@@ -19,7 +19,7 @@ func GetKubeConfigPath() []string {
 		panic(err.Error())
 	}
 
-	return []string {filepath.Join(home, ".kube", "/Users/phariharan/.kube/config")}
+	return []string {filepath.Join(home, ".kube", "config")}
 }
 
 // GetContexts returns a list of clusters from a config file
