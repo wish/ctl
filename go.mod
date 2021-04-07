@@ -1,6 +1,6 @@
 module github.com/wish/ctl
 
-go 1.13
+go 1.16
 
 require (
 	github.com/robfig/cron v1.2.0
