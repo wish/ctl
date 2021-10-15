@@ -44,6 +44,7 @@ func upCmd(c *client.Client) *cobra.Command {
 			container, _ := cmd.Flags().GetString("container")
 			memory, _ := cmd.Flags().GetString("memory")
 			user, _ := cmd.Flags().GetString("user")
+			context, _ := cmd.Flags().GetStringSlice("context")
 
 			// Check for valid input for deadline and set default if needed
 			if deadlineInt, err := strconv.Atoi(deadline); err != nil || deadlineInt < 1 || deadlineInt > MaxDeadline {
@@ -71,7 +72,13 @@ func upCmd(c *client.Client) *cobra.Command {
 				return err
 			}
 			e := clusterext.Extension{ClusterExt: m, K8Envs: nil}
-			ctxs := e.GetFilteredContexts(labelMatch)
+
+			var ctxs []string
+			if len(context) > 0 {
+				ctxs = context
+			} else {
+				ctxs = e.GetFilteredContexts(labelMatch)
+			}
 
 			// Random shuffle contexts
 			rand.Seed(time.Now().UnixNano())
@@ -169,7 +176,7 @@ func upCmd(c *client.Client) *cobra.Command {
 										manifest = strings.ReplaceAll(manifest, containerDetail.Image, image)
 										break;
 									} else if i == len(manifestData.Spec.Template.Spec.Containers)-1 { // If container is not found
-											return fmt.Errorf("Container %s not found", container)
+										return fmt.Errorf("Container %s not found", container)
 									}
 								}
 							}
