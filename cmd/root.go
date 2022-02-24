@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
-	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,9 +21,9 @@ func cmd() *cobra.Command {
 	// Check if CTL version is the latest version by comparing local CTL version with remote version tags from GitHub
 	var WarningColor = "\033[1;33m%s\033[0m"
 	out, err := exec.Command("bash", "-c", "git ls-remote --tags https://github.com/wish/ctl.git | tail -n 1 | cut -d'/' -f3 |  cut -d'^' -f1 | tr -d '\n'").Output()
-    if err != nil {
+	if err != nil {
 		fmt.Printf("Unable to retrieve remote CTL tags for version comparison. Error: %s\n",err)
-    }
+	}
 	if Version != string(out) && err == nil {
 		fmt.Printf(WarningColor, "WARNING: Your CTL is not up-to-date. Please update CTL by running either `brew upgrade wish-ctl` on Mac or `sudo apt-get update && sudo apt-get install ctl` on Linux to get the latest changes and bug fixes\n")
 	}
