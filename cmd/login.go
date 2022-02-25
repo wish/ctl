@@ -83,6 +83,23 @@ If the pod has multiple containers, it will choose the first container found.`,
 				return fmt.Errorf("Pod %s is still being created", pod.Name)
 			}
 
+			//check to see if pod is terminating
+			podDeletionTime := pod.ObjectMeta.DeletionTimestamp
+			if podDeletionTime != nil {
+				fmt.Printf("Existing job is being terminated. Creating a new ad hoc job by running `ctl up %s`\n",
+					appName)
+				// Invoke the `ctl up` command
+				if err := upCmd(c).RunE(cmd, args); err != nil {
+					return fmt.Errorf("Failed to create ad hoc pod: %v", err)
+				}
+				time.Sleep(time.Second * 10) // Delay after invoking command to allow clusters to update
+
+				pod, manifestData, runDetails, err = c.FindAdhocPodAndAppDetails(appName,options)
+				if err != nil {
+					return err
+				}
+			}
+
 			// Build kubectl exec command
 			context := fmt.Sprintf("--context=%s", pod.Context)
 			namespace = fmt.Sprintf("--namespace=%s", pod.Namespace)
@@ -157,3 +174,4 @@ If the pod has multiple containers, it will choose the first container found.`,
 
 	return cmd
 }
+

@@ -139,6 +139,7 @@ func upCmd(c *client.Client) *cobra.Command {
 							// Check if a job is already running. We want to limit 1 job per user.
 							// Get the namespace for the job from the manifest
 							// We find the job using its name '<app name>-<host name>' eg 'foo-bar'
+							fmt.Printf("Looking for Jobs.....\n")
 							jobs, err := c.FindJobs([]string{}, manifestData.Metadata.Namespace, []string{fmt.Sprintf("%s-%s", appName, user)},
 								client.ListOptions{},
 							)
