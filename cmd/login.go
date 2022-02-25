@@ -129,7 +129,7 @@ If the pod has multiple containers, it will choose the first container found.`,
 					command.Stdin = os.Stdin
 					err =  command.Run()
 					if err != nil {
-						return fmt.Errorf("Failed to run pre-login commands: %v", err)
+						fmt.Errorf("Failed to run pre-login commands: %v", err)
 					}
 				}
 			}
