@@ -3,13 +3,14 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
+	"os/exec"
+	"strings"
+
 	"github.com/spf13/cobra"
 	"github.com/wish/ctl/cmd/util/parsing"
 	"github.com/wish/ctl/pkg/client"
 	v1 "k8s.io/api/core/v1"
-	"os"
-	"os/exec"
-	"strings"
 )
 
 // func cpTest() {
@@ -57,7 +58,7 @@ If no container is set, it will use the first one.`,
 			user = strings.ToLower(user)
 			podName := fmt.Sprintf("%s-%s", appName, user)
 			lm, _ := parsing.LabelMatch(fmt.Sprintf("name=%s", podName))
-			options := client.ListOptions{LabelMatch:lm}
+			options := client.ListOptions{LabelMatch: lm}
 
 			pod, _, _, err := c.FindAdhocPodAndAppDetails(appName, options)
 			if err != nil {
@@ -97,11 +98,15 @@ If no container is set, it will use the first one.`,
 			// Print out useful info for users
 			fmt.Printf("\nCopying files from: %s\n", source)
 			fmt.Printf("Placing them in: %v\n", out)
-			command := exec.Command("kubectl", "cp", sourceFiles, outputFiles, context, container)
+			var command *exec.Cmd
+			if container == "" {
+				command = exec.Command("kubectl", "cp", sourceFiles, outputFiles, context)
+			} else {
+				command = exec.Command("kubectl", "cp", sourceFiles, outputFiles, context, container)
+			}
 			command.Stdout = os.Stdout
 			command.Stderr = os.Stderr
 			command.Stdin = os.Stdin
-
 			// Build command
 			return command.Run()
 		},
