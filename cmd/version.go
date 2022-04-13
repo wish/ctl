@@ -6,7 +6,7 @@ import (
 )
 
 // Version set default value
-var Version = "v14.4.2"
+var Version = "v14.4.3"
 
 func versionCmd(*client.Client) *cobra.Command {
 	return &cobra.Command{
