@@ -6,4 +6,3 @@ packrd
 *-packr.go
 .DS_Store
 .vscode/*
-vendor/*
