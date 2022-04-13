@@ -1,4 +1,4 @@
-ctl (14.4.1-1-1) bionic; urgency=medium
+ctl (14.4.2-1-1) bionic; urgency=medium
 
   * Made revisions according to feedback from infra poc (warning messages, list all envs, change env to k8s_env). -zliu
   * Fixed ctl cp in command, fixed context flag, prevent loggining into failing pod, minor bug fixes. -axia
