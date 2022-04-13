@@ -1,3 +1,22 @@
+ctl (14.4.1-1-1) bionic; urgency=medium
+
+  * Made revisions according to feedback from infra poc (warning messages, list all envs, change env to k8s_env). -zliu
+  * Fixed ctl cp in command, fixed context flag, prevent loggining into failing pod, minor bug fixes. -axia
+
+ -- Wish Engineering <launchpad@contextlogic.com>  Tue, 12 Apr 2022 15:20:00 +0000
+
+ctl (14.4.0-1-1) bionic; urgency=medium
+
+    Don't login to pods that are in the middle of termination (#57)
+
+    * Bypass pre-login script failures by displaying warning error of script failing, but still allow pod login to proceed. and>
+
+    * allow pre-login script to be bypassed even if failed
+
+    * separate ticket work
+
+ -- Wish Engineering <launchpad@contextlogic.com>  Mon, 28 Feb 2022 12:34:33 -0800
+
 ctl (12.0.1-1-1) bionic; urgency=medium
 
   * Made revisions according to feedback from infra poc (warning messages, list all envs, change env to k8s_env). -zliu

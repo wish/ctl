@@ -94,7 +94,6 @@ If no container is set, it will use the first one.`,
 			if container != "" {
 				container = fmt.Sprintf("--container=%s", container)
 			}
-
 			// Print out useful info for users
 			fmt.Printf("\nCopying files from: %s\n", source)
 			fmt.Printf("Placing them in: %v\n", out)
